@@ -323,3 +323,92 @@ describe('API HTTP', () => {
     }
   });
 });
+
+/** Minimal row that satisfies the public task contract (tweak per test). */
+function contractBaseRow(overrides: Record<string, unknown> = {}): Record<string, unknown> {
+  return {
+    id: 'task-id-1',
+    title: 'Title',
+    status: 'pending',
+    taskDate: null,
+    contentJson: '{"root":{"type":"root","version":1}}',
+    contentText: '',
+    checklistTotal: 0,
+    checklistCompleted: 0,
+    priority: 'normal',
+    estimateMinutes: null,
+    pinned: false,
+    timeSpentSeconds: 0,
+    timerStartedAt: null,
+    recurrence: null,
+    areaId: null,
+    createdAt: '2025-01-01T00:00:00.000Z',
+    updatedAt: '2025-01-02T00:00:00.000Z',
+    ...overrides,
+  };
+}
+
+describe('expectApiTaskRow', () => {
+  it('accepts a minimal valid row', () => {
+    expectApiTaskRow(contractBaseRow());
+  });
+
+  it('accepts taskDate as YYYY-MM-DD', () => {
+    expectApiTaskRow(contractBaseRow({taskDate: '2025-06-15'}));
+  });
+
+  it('accepts numeric estimateMinutes', () => {
+    expectApiTaskRow(contractBaseRow({estimateMinutes: 90}));
+  });
+
+  it('accepts timerStartedAt as ISO string', () => {
+    expectApiTaskRow(contractBaseRow({timerStartedAt: '2025-03-01T08:30:00.000Z'}));
+  });
+
+  it('accepts areaId string', () => {
+    expectApiTaskRow(contractBaseRow({areaId: 'area-uuid'}));
+  });
+
+  it('accepts completed status', () => {
+    expectApiTaskRow(contractBaseRow({status: 'completed'}));
+  });
+
+  it.each(['low', 'high'] as const)('accepts priority %s', (priority) => {
+    expectApiTaskRow(contractBaseRow({priority}));
+  });
+
+  it.each(['daily', 'weekly', 'biweekly', 'monthly', 'yearly'] as const)(
+    'accepts recurrence %s',
+    (recurrence) => {
+      expectApiTaskRow(contractBaseRow({recurrence}));
+    },
+  );
+
+  it('fails when createdAt is not parseable as a date', () => {
+    expect(() => expectApiTaskRow(contractBaseRow({createdAt: 'not-a-date'}))).toThrow();
+  });
+
+  it('fails when updatedAt is not parseable as a date', () => {
+    expect(() => expectApiTaskRow(contractBaseRow({updatedAt: 'also-bad'}))).toThrow();
+  });
+
+  it('fails when taskDate is neither null nor a valid date key', () => {
+    expect(() => expectApiTaskRow(contractBaseRow({taskDate: '31-12-2025'}))).toThrow();
+  });
+
+  it('fails when estimateMinutes is not null nor a finite number', () => {
+    expect(() => expectApiTaskRow(contractBaseRow({estimateMinutes: Number.NaN}))).toThrow();
+  });
+
+  it('fails when recurrence is not a supported kind', () => {
+    expect(() => expectApiTaskRow(contractBaseRow({recurrence: 'hourly'}))).toThrow();
+  });
+
+  it('fails when areaId is neither null nor a string', () => {
+    expect(() => expectApiTaskRow(contractBaseRow({areaId: 1}))).toThrow();
+  });
+
+  it('fails when timerStartedAt is neither null nor a string', () => {
+    expect(() => expectApiTaskRow(contractBaseRow({timerStartedAt: 0}))).toThrow();
+  });
+});
