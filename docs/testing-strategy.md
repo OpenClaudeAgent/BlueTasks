@@ -2,6 +2,16 @@
 
 We describe behaviour with **Feature → Scenario → Given / When / Then** (Gherkin-style thinking) and map each scenario to the **lowest layer** that gives enough confidence without duplication.
 
+### Behaviour first (not “tests for tests”)
+
+Every test should defend a **behaviour someone cares about** (user journey, API contract, or invariant), and the title should make that obvious.
+
+- **Before adding a test**, name the behaviour: e.g. “quick capture on Today assigns today’s date”, “export DB triggers download with server filename”, “invalid area filter resets to All”.
+- **Do not** add cases whose only goal is to raise a coverage percentage, or vague examples (`it('works')`, `it('renders')` without a stated outcome). If coverage is low on a file, treat that as a **backlog of behaviours** to specify (often already partially covered by Playwright under [`scenario/`](../scenario/)), not as a prompt to touch arbitrary lines.
+- **Coverage gates** ([`vitest.coverage-gate.config.ts`](../web/app/vitest.coverage-gate.config.ts)) are a **regression guardrail**: they catch accidental deletion of exercised paths. They do **not** replace a clear scenario list. When a gate and “100% behaviour coverage” disagree, **behaviour and docs win**; then we either add a real scenario or accept a documented exclusion.
+
+---
+
 | Layer | Scope | Tools | When to use |
 |--------|--------|--------|-------------|
 | **Unit** | Pure logic, small helpers, domain rules | Vitest (`node` or `jsdom`) | Fast feedback; no I/O; stable contracts |
@@ -73,10 +83,11 @@ Add more E2E only for flows that **integration tests cannot trust** (e.g. full O
 
 ## Coverage policy
 
-- **Pipeline gate (80%)**: `npm run test:coverage:gate` uses [`web/app/vitest.coverage-gate.config.ts`](../web/app/vitest.coverage-gate.config.ts) ( **`src/lib/**` only** on the web) and [`server/vitest.coverage-gate.config.ts`](../server/vitest.coverage-gate.config.ts) (all server `src/**` except `index.ts`). Fails CI if any metric drops below **80%**.
-- **Broader report** (optional locally): `npm run test:coverage` still uses [`web/app/vitest.config.ts`](../web/app/vitest.config.ts) with extra UI files in the report and lower thresholds.
+- **Web pipeline gate**: [`web/app/vitest.coverage-gate.config.ts`](../web/app/vitest.coverage-gate.config.ts) measures almost all of [`web/app/src/`](../web/app/src/) (see file header for exclusions such as `LexicalTaskEditor.tsx`, `main.tsx`, `i18n.ts`, locales, types). **Lines and statements** must stay ≥ **80%**. **Branches** and **functions** use slightly lower floors because v8 counts many JSX callbacks separately; closing those gaps should still be done via **named behaviours** (see § Behaviour first), not anonymous smoke tests.
+- **Server pipeline gate**: [`server/vitest.coverage-gate.config.ts`](../server/vitest.coverage-gate.config.ts) — all of `server/src/**` except `index.ts`, thresholds **80%** on lines, statements, branches, functions.
+- **Broader report** (optional locally): `npm run test:coverage` uses [`web/app/vitest.config.ts`](../web/app/vitest.config.ts) with a wider UI include list and softer thresholds for exploration.
 
-Coverage is a **guardrail**, not the goal: prefer scenarios that document behaviour (BDD titles) over chasing 100% on UI shells.
+Coverage is a **guardrail**, not the goal: prefer scenarios that document behaviour (BDD titles) over chasing 100% on UI shells or inflating metrics without a story.
 
 ---
 
@@ -86,7 +97,7 @@ Coverage is a **guardrail**, not the goal: prefer scenarios that document behavi
 |---------|---------|
 | `npm run test` | All Vitest unit/integration (web + server) |
 | `npm run test:coverage` | Vitest + coverage (broader web scope, softer thresholds) |
-| `npm run test:coverage:gate` | **≥80%** gate (web `src/lib/**` + full server `src/`) |
+| `npm run test:coverage:gate` | Web gate (almost full `web/app/src/`, see config exclusions) + server `src/**` (except `index.ts`); see § Coverage policy |
 | `npm run test:scenario` | Playwright scenario suite (starts `npm run build` + `npm run start` unless reusing a server) |
 | `npm run ci` | Lint, jscpd, **coverage gate**, production build, scenario tests |
 
