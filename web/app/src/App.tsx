@@ -9,6 +9,7 @@ import {useBlueTasksBoard} from './hooks/useBlueTasksBoard';
 function App() {
   const {t} = useTranslation();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [quickCaptureValue, setQuickCaptureValue] = useState('');
   const board = useBlueTasksBoard();
 
   return (
@@ -40,16 +41,38 @@ function App() {
           </div>
 
           <div className="mainHeader__actions">
-            <button
-              aria-label={t('addTaskAria')}
-              className="mainHeader__addBtn"
-              disabled={board.loading}
-              onClick={() => void board.handleAddTask()}
-              type="button"
-            >
-              <Plus aria-hidden size={18} strokeWidth={2.25} />
-              <span>{t('addTask')}</span>
-            </button>
+            <div className="mainHeader__actionsRow">
+              <input
+                aria-label={t('quickCapturePlaceholder')}
+                className="mainHeader__quickCapture"
+                disabled={board.loading}
+                onChange={(event) => setQuickCaptureValue(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key !== 'Enter') {
+                    return;
+                  }
+                  event.preventDefault();
+                  const next = quickCaptureValue.trim();
+                  if (!next || board.loading) {
+                    return;
+                  }
+                  void board.handleQuickCapture(next).finally(() => setQuickCaptureValue(''));
+                }}
+                placeholder={t('quickCapturePlaceholder')}
+                type="text"
+                value={quickCaptureValue}
+              />
+              <button
+                aria-label={t('addTaskAria')}
+                className="mainHeader__addBtn"
+                disabled={board.loading}
+                onClick={() => void board.handleAddTask()}
+                type="button"
+              >
+                <Plus aria-hidden size={18} strokeWidth={2.25} />
+                <span>{t('addTask')}</span>
+              </button>
+            </div>
           </div>
         </header>
 

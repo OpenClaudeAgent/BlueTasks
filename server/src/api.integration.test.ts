@@ -74,7 +74,10 @@ describe('API HTTP', () => {
     expect(updated.body.title).toBe('B');
     expect(updated.body.id).toBe(id);
     expect(updated.body.createdAt).toBe(createdAt);
-    expect((updated.body.updatedAt as string) >= createdAt).toBe(true);
+    const updatedAtMs = Date.parse(updated.body.updatedAt as string);
+    const createdAtMs = Date.parse(createdAt);
+    expect(updatedAtMs).not.toBeNaN();
+    expect(updatedAtMs).toBeGreaterThanOrEqual(createdAtMs);
   });
 
   it('DELETE /api/tasks/:id returns 204 and removes the task from the list', async () => {
@@ -327,7 +330,7 @@ describe('API HTTP', () => {
 /** Minimal row that satisfies the public task contract (tweak per test). */
 function contractBaseRow(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
-    id: 'task-id-1',
+    id: '550e8400-e29b-41d4-a716-446655440000',
     title: 'Title',
     status: 'pending',
     taskDate: null,
@@ -365,8 +368,8 @@ describe('expectApiTaskRow', () => {
     expectApiTaskRow(contractBaseRow({timerStartedAt: '2025-03-01T08:30:00.000Z'}));
   });
 
-  it('accepts areaId string', () => {
-    expectApiTaskRow(contractBaseRow({areaId: 'area-uuid'}));
+  it('accepts areaId as a UUID string', () => {
+    expectApiTaskRow(contractBaseRow({areaId: '6ba7b810-9dad-11d1-80b4-00c04fd430c8'}));
   });
 
   it('accepts completed status', () => {
@@ -406,6 +409,10 @@ describe('expectApiTaskRow', () => {
 
   it('fails when areaId is neither null nor a string', () => {
     expect(() => expectApiTaskRow(contractBaseRow({areaId: 1}))).toThrow();
+  });
+
+  it('fails when areaId is a string but not a UUID', () => {
+    expect(() => expectApiTaskRow(contractBaseRow({areaId: 'area-uuid'}))).toThrow();
   });
 
   it('fails when timerStartedAt is neither null nor a string', () => {

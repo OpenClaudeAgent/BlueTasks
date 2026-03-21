@@ -5,7 +5,7 @@ import {defineConfig, devices} from '@playwright/test';
  * Locally, `webServer` runs `npm run build` then `npm run start` unless reuseExistingServer.
  */
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './scenario',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,

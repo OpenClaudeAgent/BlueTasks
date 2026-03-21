@@ -1,46 +1,46 @@
-# Architecture BlueTasks
+# BlueTasks architecture
 
-## Dépôts et exécution
+## Repositories and runtime
 
-- **`web/app`** — client React (Vite), UI, i18n, appels HTTP vers l’API.
-- **`server`** — API Express, persistance **SQLite** (`better-sqlite3`), sert le build statique du client en production.
-- **`shared/`** — artefacts partagés entre client et serveur sans dépendance npm croisée.
+- **`web/app`** — React client (Vite), UI, i18n, HTTP calls to the API.
+- **`server`** — Express API, **SQLite** persistence (`better-sqlite3`), serves the static client build in production.
+- **`shared/`** — Shared artifacts between client and server without cross npm dependencies.
 
-En développement, le front tourne sur le port Vite (ex. 5173) et appelle l’API sur **8787** (origine directe ou `VITE_API_ORIGIN`). En production, le serveur sert `web/app/dist` et expose API + fichiers statiques sur le même hôte.
+In development the front runs on the Vite port (e.g. 5173) and talks to the API on **8787** (same origin or `VITE_API_ORIGIN`). In production the server serves `web/app/dist` and exposes the API and static files on one host.
 
-## Contrat des icônes de zones
+## Area icon contract
 
-Le fichier **`shared/area-icon-ids.json`** est la liste canonique des identifiants d’icône pour les zones.
+**`shared/area-icon-ids.json`** is the canonical list of icon ids for areas.
 
-- Le **serveur** charge ce JSON au démarrage (`server/src/areaIconIds.ts`) et refuse les valeurs hors liste via `normalizeAreaIcon`.
-- Le **client** importe le même JSON dans `web/app/src/lib/areaIcons.ts` et mappe chaque id à un composant Lucide. Un garde-fou au chargement du module vérifie que la map et le JSON sont alignés.
+- The **server** loads this JSON at startup (`server/src/areaIconIds.ts`) and rejects unknown values via `normalizeAreaIcon`.
+- The **client** imports the same JSON in `web/app/src/lib/areaIcons.ts` and maps each id to a Lucide component. A guard at module load checks that the map and JSON stay aligned.
 
-Toute nouvelle icône doit : mettre à jour le JSON, le mapping Lucide côté web, et éventuellement les textes UI (picker).
+Adding an icon requires updating the JSON, the Lucide map on the web app, and any UI copy (picker).
 
-## Flux de données tâches
+## Task data flow
 
-- Liste / création / mise à jour / suppression via REST sur le serveur.
-- Le tableau principal est orchestré par le hook **`useBlueTasksBoard`** (`web/app/src/hooks/useBlueTasksBoard.ts`) : chargement, filtres par section et zone, autosave différé avec révisions pour éviter d’écraser des éditions plus récentes.
+- List / create / update / delete via REST on the server.
+- The main board is driven by **`useBlueTasksBoard`** (`web/app/src/hooks/useBlueTasksBoard.ts`): loading, filters by section and area, debounced autosave with revision guards so newer edits are not overwritten.
 
-## Export et import de la base
+## Database export and import
 
-- **`GET /api/export/database`** : `VACUUM INTO` vers un fichier temporaire, puis envoi du `.sqlite` (`Content-Disposition: attachment`). **Paramètres → Général** : « Exporter la base SQLite ».
-- **`POST /api/import/database`** : corps **multipart**, champ fichier **`database`** (fichier `.sqlite` compatible BlueTasks). Remplace atomiquement le fichier SQLite de production après validation + migrations. **Paramètres → Général** : « Importer une base SQLite » (confirmation obligatoire). Inactif (`501`) si la base est `:memory:` (tests).
+- **`GET /api/export/database`** — `VACUUM INTO` to a temp file, then download as `.sqlite` (`Content-Disposition: attachment`). **Settings → General** — “Export SQLite database”.
+- **`POST /api/import/database`** — **multipart** body, field **`database`** (a BlueTasks-compatible `.sqlite`). Atomically replaces the production SQLite file after validation and migrations. **Settings → General** — “Import SQLite database” (confirmation required). Returns `501` if the DB is `:memory:` (tests).
 
 ## Docker
 
-- **Build JS** (Vite + `tsc`) sur le développeur ou **GitHub Actions** ; le contexte Docker (`.dockerctx/`) ne transporte que les `dist` + lockfiles. **`npm ci` prod serveur** s’exécute dans une étape Docker **Linux** (`deps`), puis image finale sans toolchain. Détails et GHCR : [`docs/docker.md`](docker.md).
-- Données dans **`/app/.data`** (ex. `./.data` via `docker-compose`). Variables : `HOST=0.0.0.0`, `PORT=8787`.
+- **JS build** (Vite + `tsc`) runs on the developer machine or **GitHub Actions**; the Docker context (`.dockerctx/`) only ships `dist` outputs and lockfiles. **`npm ci`** for production server deps runs in a **Linux** Docker stage (`deps`), then the final image has no toolchain. Details and GHCR: [`docs/docker.md`](docker.md).
+- Data under **`/app/.data`** (e.g. `./.data` with `docker-compose`). Env: `HOST=0.0.0.0`, `PORT=8787`.
 
-## Structure serveur (tests)
+## Server layout (tests)
 
-- `server/src/index.ts` — point d’entrée : ouverture SQLite, `createApp`, écoute HTTP.
-- `server/src/createApp.ts` — routes Express (réutilisée en tests avec une base `:memory:`).
-- `server/src/dbSetup.ts` — schéma + migrations (`runMigrations`, `PRAGMA user_version`).
-- `server/src/taskSanitize.ts` — normalisation des payloads tâches (tests unitaires).
+- `server/src/index.ts` — entry: open SQLite, `createApp`, listen.
+- `server/src/createApp.ts` — Express routes (reused in tests with `:memory:` DB).
+- `server/src/dbSetup.ts` — schema + migrations (`runMigrations`, `PRAGMA user_version`).
+- `server/src/taskSanitize.ts` — task payload normalization (unit tests).
 
-## SQLite : version de schéma et restauration
+## SQLite schema version and recovery
 
-- **`PRAGMA user_version`** : incrémentée par `runMigrations` dans [`server/src/dbSetup.ts`](server/src/dbSetup.ts). Une base plus récente que le code attendu provoque une erreur explicite au démarrage.
-- **Sauvegarde** : `GET /api/export/database` ou copie de **`.data/bluetasks.sqlite`** (et des fichiers `-wal`/`-shm` si présents, après arrêt propre du serveur).
-- **Restauration** : **Paramètres → Importer** (recommandé), ou arrêter le serveur et remplacer `bluetasks.sqlite` puis redémarrer. En Docker, volume **`./.data`** sur l’hôte.
+- **`PRAGMA user_version`** — bumped by `runMigrations` in [`server/src/dbSetup.ts`](../server/src/dbSetup.ts). If the file is newer than the code expects, startup fails with an explicit error.
+- **Backup** — `GET /api/export/database` or copy **`.data/bluetasks.sqlite`** (and `-wal`/`-shm` if present, after a clean server stop).
+- **Restore** — **Settings → Import** (recommended), or stop the server, replace `bluetasks.sqlite`, restart. With Docker, mount **`./.data`** on the host.

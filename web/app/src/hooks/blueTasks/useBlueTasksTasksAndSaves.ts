@@ -1,6 +1,7 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import type {TFunction} from 'i18next';
 import {areasApi, tasksApi} from '../../api';
+import {addDaysToKey, todayKey} from '../../lib/date';
 import {coerceAreaIcon} from '../../lib/areaIcons';
 import {
   applyRecurringStatusToggle,
@@ -40,6 +41,9 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
   tRef.current = t;
 
   const [tasks, setTasks] = useState<Task[]>([]);
+  const tasksRef = useRef<Task[]>(tasks);
+  tasksRef.current = tasks;
+
   const [areas, setAreas] = useState<Area[]>([]);
   const [savingIds, setSavingIds] = useState<Record<string, boolean>>({});
   const pendingSavesRef = useRef(new Map<string, PendingTaskSave>());
@@ -129,6 +133,10 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
   }
 
   function flushSave(taskId: string) {
+    const pendingTimer = saveTimersRef.current.get(taskId);
+    if (pendingTimer !== undefined) {
+      window.clearTimeout(pendingTimer);
+    }
     saveTimersRef.current.delete(taskId);
 
     const tail = flushChainsRef.current.get(taskId) ?? Promise.resolve();
@@ -189,24 +197,24 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
   }
 
   function handleTaskMutation(taskId: string, mutate: (task: Task) => Task) {
-    let nextTask: Task | null = null;
+    const current = tasksRef.current;
+    const currentTask = current.find((task) => task.id === taskId);
+    if (!currentTask) {
+      return;
+    }
 
-    setTasks((current) => {
-      const currentTask = current.find((task) => task.id === taskId);
-      if (!currentTask) {
-        return current;
-      }
+    const nextTask: Task = {
+      ...mutate(currentTask),
+      updatedAt: new Date().toISOString(),
+    };
 
-      nextTask = {
-        ...mutate(currentTask),
-        updatedAt: new Date().toISOString(),
-      };
+    const sorted = sortTasks(current.map((task) => (task.id === taskId ? nextTask : task)));
+    setTasks(sorted);
+    tasksRef.current = sorted;
 
-      return sortTasks(current.map((task) => (task.id === taskId ? nextTask! : task)));
-    });
-
-    if (nextTask) {
-      scheduleSave(nextTask);
+    scheduleSave(nextTask);
+    if (currentTask.status !== nextTask.status) {
+      flushSave(nextTask.id);
     }
   }
 
@@ -242,6 +250,51 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
     }
   }
 
+  /** Header quick capture: title preset, optional default date from active section (Today / Upcoming). */
+  const handleQuickCapture = useCallback(
+    async (rawTitle: string, areaFilter: AreaFilter, sectionHint: SectionId) => {
+      const title = rawTitle.trim();
+      if (!title) {
+        return;
+      }
+
+      const captureAreaId =
+        areaFilter !== AREA_FILTER_ALL && areaFilter !== AREA_FILTER_UNCATEGORIZED ? areaFilter : null;
+
+      let taskDate: string | null = null;
+      if (sectionHint === 'today') {
+        taskDate = todayKey();
+      } else if (sectionHint === 'upcoming') {
+        taskDate = addDaysToKey(todayKey(), 1);
+      }
+
+      const optimisticBase = createTask(title, captureAreaId);
+      const optimisticTask: Task = {
+        ...optimisticBase,
+        taskDate,
+      };
+
+      setTasks((current) => sortTasks([optimisticTask, ...current]));
+      bridgeRef.current.setSelectedSection(getTaskSection(optimisticTask));
+      bridgeRef.current.setSelectedTaskId(optimisticTask.id);
+      bridgeRef.current.setTitleFocusTaskId(null);
+      bridgeRef.current.setErrorMessage(null);
+
+      try {
+        const saved = await tasksApi.create({
+          id: optimisticTask.id,
+          ...toTaskDraftPayload(optimisticTask),
+        });
+        setTasks((current) => sortTasks(current.map((task) => (task.id === saved.id ? mergeTaskFromApi(saved as Task) : task))));
+      } catch (error) {
+        const tr = tRef.current;
+        bridgeRef.current.setErrorMessage(error instanceof Error ? error.message : tr('errors.createTask'));
+        await loadTasksAndAreas();
+      }
+    },
+    [loadTasksAndAreas],
+  );
+
   async function handleDelete(taskId: string) {
     const previousTasks = tasks;
     const existingTimeout = saveTimersRef.current.get(taskId);
@@ -276,6 +329,7 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
     loadTasksAndAreas,
     refreshTasksAndAreas,
     handleAddTask,
+    handleQuickCapture,
     handleTaskDraftChange,
     handleToggleRecurringStatus,
     handleDelete,

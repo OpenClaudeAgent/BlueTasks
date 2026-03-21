@@ -107,14 +107,18 @@ npm run ci
 
 | Topic | Doc |
 |--------|-----|
-| Quality, tests, coverage, workflows | [docs/quality.md](docs/quality.md) |
-| BDD layers (unit / integration / E2E) | [docs/testing-strategy.md](docs/testing-strategy.md) |
+| Product brief | [docs/product-brief.md](docs/product-brief.md) |
+| User journeys (flows) | [docs/user-journeys.md](docs/user-journeys.md) |
+| Design principles & visual direction | [docs/design-principles.md](docs/design-principles.md), [docs/visual-direction.md](docs/visual-direction.md) |
+| Data model (SQLite / API task shape) | [docs/data-model.md](docs/data-model.md) |
+| i18n | [docs/i18n-strategy.md](docs/i18n-strategy.md) |
 | Architecture, API, SQLite | [docs/architecture.md](docs/architecture.md) |
-| Architecture roadmap (cycles, phases) | [docs/architecture-improvement-plan.md](docs/architecture-improvement-plan.md) |
+| Quality, tests, coverage, workflows | [docs/quality.md](docs/quality.md) |
+| BDD layers (unit / integration / scenario tests) | [docs/testing-strategy.md](docs/testing-strategy.md) |
 | Accessibility (lint) | [docs/a11y.md](docs/a11y.md) |
 | Docker, GHCR, tags `v*`, manual dispatch | [docs/docker.md](docs/docker.md) |
 | Versioning, Release workflow, CHANGELOG | [docs/releasing.md](docs/releasing.md) |
-| MCP RPG index | [docs/rpg.md](docs/rpg.md) |
+| Third-party / dependency licenses (MIT compatibility) | [docs/dependency-licenses.md](docs/dependency-licenses.md) |
 
 ---
 

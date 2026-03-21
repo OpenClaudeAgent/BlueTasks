@@ -35,8 +35,17 @@ export function useBlueTasksBoard() {
     t,
   );
 
-  const {tasks, areas, savingIds, refreshTasksAndAreas, handleAddTask, handleTaskDraftChange, handleToggleRecurringStatus, handleDelete} =
-    core;
+  const {
+    tasks,
+    areas,
+    savingIds,
+    refreshTasksAndAreas,
+    handleAddTask,
+    handleQuickCapture,
+    handleTaskDraftChange,
+    handleToggleRecurringStatus,
+    handleDelete,
+  } = core;
 
   const visibleTasks = useMemo(
     () => filterTasks(tasks, selectedSection, areaFilter),
@@ -110,6 +119,7 @@ export function useBlueTasksBoard() {
     handleAddTask: () => {
       void handleAddTask(areaFilter);
     },
+    handleQuickCapture: (title: string) => handleQuickCapture(title, areaFilter, selectedSection),
     handleTaskDraftChange,
     handleToggleRecurringStatus,
     handleDelete,

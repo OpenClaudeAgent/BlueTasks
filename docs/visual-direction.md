@@ -1,17 +1,20 @@
-# Visual Direction
+# Visual direction
 
-## Ton
-Direction `quiet luxury`: sobre, premium, précise, avec une personnalité visuelle discrète.
+## Tone
 
-## Intention
-- fond clair ou légèrement teinté
-- contrastes maîtrisés
-- typographie nette et confortable
-- espacements généreux sans vide inutile
-- badges minimaux mais utiles
+**Restrained and clear**: calm surfaces, controlled contrast, readable typography, and only subtle emphasis — nothing flashy or ornamental.
+
+## Intent
+
+- Light or subtly tinted backgrounds.
+- Controlled contrast — comfortable in long sessions.
+- Crisp, readable typography.
+- Generous spacing without empty noise.
+- Small badges only when they carry meaning.
 
 ## Micro-interactions
-- hover subtil
-- transitions courtes
-- feedback d’action immédiat
-- aucun mouvement décoratif gratuit
+
+- Subtle hover states.
+- Short transitions.
+- Immediate feedback when an action is taken.
+- No decorative motion without purpose.

@@ -1,16 +1,19 @@
-# Design Principles
+# Design principles
 
-## Principes
-- Hiérarchie visuelle immédiate
-- Densité équilibrée: assez d’information pour agir vite, jamais au prix du calme
-- Interactions natives et prévisibles
-- Animations sobres qui clarifient l’action
-- États, badges et priorités discrets mais lisibles
+## Principles
 
-## Anti-objectifs
-- ressembler à une web app empaquetée
-- multiplier les panneaux et les actions visibles
-- sacrifier la lisibilité pour la décoration
+- **Immediate visual hierarchy** — users know where to look first.
+- **Balanced density** — enough information to act quickly, never at the cost of calm.
+- **Native-feeling interactions** — predictable patterns, minimal novelty for its own sake.
+- **Restrained motion** — animation clarifies state changes, not decoration.
+- **Quiet status** — badges, priorities, and states are readable but not loud.
 
-## Règle produit
-`Today` doit rester l’écran le plus clair et le plus rassurant du produit.
+## Anti-goals
+
+- Looking like a generic “wrapped” web app.
+- Stacking panels and visible actions until the UI feels busy.
+- Trading readability for ornament.
+
+## Product rule
+
+**Today** should remain the clearest, most reassuring screen in the product.

@@ -23,6 +23,8 @@ Prefer checks that pin **behaviour and shape** to the code under test:
 
 Shallow patterns (`toBeTruthy`, bare `toBeDefined`, `Array.isArray` without element checks) are acceptable only as a **supplement** when a stronger assertion already covers the contract.
 
+**Do not** encode type unions as a single boolean passed to `expect(…).toBe(true)` (e.g. `expect(x === null || typeof x === 'string').toBe(true)`). That almost never fails in a useful way. Prefer explicit branches: `expect(x).toBeNull()` / `expect(x).toMatch(…)` / `expect(array).toContain(x)` / `expect(x).toMatch(uuidRegex)`.
+
 ---
 
 ## Naming convention (BDD)
@@ -55,12 +57,13 @@ describe('Feature: Task card time display', () => {
 ### Integration
 
 - **REST API + SQLite (memory or temp file)**: [`server/src/api.integration.test.ts`](../server/src/api.integration.test.ts), [`dbSetup.test.ts`](../server/src/dbSetup.test.ts).
+- **Public API JSON (Zod)**: [`contract/`](../contract/) — Vitest ([`server/src/api.integration.test.helpers.ts`](../server/src/api.integration.test.helpers.ts)); Playwright ([`scenario/contract-expectations.ts`](../scenario/contract-expectations.ts)).
 - **Client API wrapper**: [`web/app/src/api.test.ts`](../web/app/src/api.test.ts).
 - **Components (RTL)**: settings and task row behaviour with i18n — [`SettingsDialog.test.tsx`](../web/app/src/components/SettingsDialog.test.tsx), [`TaskCard.test.tsx`](../web/app/src/components/TaskCard.test.tsx) (mock heavy editors).
 
 ### End-to-end
 
-- **Production-shaped server**: [`e2e/bluetasks.spec.ts`](../e2e/bluetasks.spec.ts) — API contract, **full UI flows** (create task + reload persistence, mark done, expand/collapse, sidebar sections, Settings → General), with [`e2e/helpers.ts`](../e2e/helpers.ts) for stable English UI (see [`playwright.config.ts`](../playwright.config.ts)).
+- **Scenario tests (browser)**: Playwright under [`scenario/`](../scenario/) — [`api.production.spec.ts`](../scenario/api.production.spec.ts) (HTTP against the live build), [`task-lifecycle.spec.ts`](../scenario/task-lifecycle.spec.ts) (tasks UI), [`navigation-settings.spec.ts`](../scenario/navigation-settings.spec.ts), [`editor-toolbar.spec.ts`](../scenario/editor-toolbar.spec.ts) (Lexical toolbar: bold, italic, lists, table, markdown `[] `, etc.); shared helpers [`scenario/helpers.ts`](../scenario/helpers.ts), [`scenario/api-helpers.ts`](../scenario/api-helpers.ts) (see [`playwright.config.ts`](../playwright.config.ts)). Additional specs (`task-*.spec.ts`, `section-upcoming`, `area-sidebar-filters`, `settings-*-advanced`, `quick-capture`, …) are **scaffolds** (`test.skip()` until implemented).
 
 Add more E2E only for flows that **integration tests cannot trust** (e.g. full OAuth, file upload across browsers). Prefer **integration** tests for business rules; E2E should stay a **focused** set of real user paths, not a duplicate of every unit test.
 
@@ -82,14 +85,14 @@ Coverage is a **guardrail**, not the goal: prefer scenarios that document behavi
 | `npm run test` | All Vitest unit/integration (web + server) |
 | `npm run test:coverage` | Vitest + coverage (broader web scope, softer thresholds) |
 | `npm run test:coverage:gate` | **≥80%** gate (web `src/lib/**` + full server `src/`) |
-| `npm run test:e2e` | Playwright (starts `npm run build` + `npm run start` unless reusing a server) |
-| `npm run ci` | Lint, jscpd, **coverage gate**, production build, E2E |
+| `npm run test:scenario` | Playwright scenario suite (starts `npm run build` + `npm run start` unless reusing a server) |
+| `npm run ci` | Lint, jscpd, **coverage gate**, production build, scenario tests |
 
 ---
 
 ## CI
 
-- **CI workflow**: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — parallel jobs for lint, tests + coverage, build, and **E2E** (Chromium + system deps on Ubuntu).
+- **CI workflow**: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — parallel jobs for lint, tests + coverage, build, and **scenario tests** (Chromium + system deps on Ubuntu).
 
 ---
 
@@ -97,5 +100,5 @@ Coverage is a **guardrail**, not the goal: prefer scenarios that document behavi
 
 1. **Hook integration test**: `useBlueTasksBoard` with mocked `tasksApi` / `areasApi` (debounced save, error path).
 2. **Server**: extra API cases (import/export boundaries) if not already covered.
-3. **E2E**: second scenario “create task via UI” once stable selectors / `data-testid` policy exists.
+3. **Scenario tests**: extra UI paths once stable selectors / `data-testid` policy exists.
 4. Optional **Gherkin files** + cucumber runner only if the team wants non-developers to author scenarios — not required today.

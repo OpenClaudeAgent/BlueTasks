@@ -95,6 +95,36 @@ describe('Feature: Task card (collapsed)', () => {
       expect(card!.tagName).toBe('ARTICLE');
       expect(card).toHaveClass('taskCard');
       await user.click(within(card!).getByRole('button', {name: /mark as done/i}));
+      expect(onToggleStatus).toHaveBeenCalledTimes(1);
+      expect(onToggleStatus).toHaveBeenCalledWith(task.id);
+    });
+  });
+
+  describe('Scenario: User reopens a completed task', () => {
+    it('given a completed task, when they activate the status control, then onToggleStatus receives the task id', async () => {
+      const user = userEvent.setup();
+      const onToggleStatus = vi.fn();
+      const task = {...createTask('Ship fix'), status: 'completed' as const};
+
+      const {container} = render(
+        <I18nextProvider i18n={i18n}>
+          <TaskCard
+            areas={[]}
+            expanded={false}
+            isSaving={false}
+            onChange={vi.fn()}
+            onDelete={vi.fn()}
+            onToggleExpand={vi.fn()}
+            onToggleStatus={onToggleStatus}
+            task={task}
+          />
+        </I18nextProvider>,
+      );
+
+      const card = container.querySelector('article.taskCard');
+      expect(card).not.toBeNull();
+      await user.click(within(card!).getByRole('button', {name: /reopen task/i}));
+      expect(onToggleStatus).toHaveBeenCalledTimes(1);
       expect(onToggleStatus).toHaveBeenCalledWith(task.id);
     });
   });

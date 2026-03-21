@@ -9,13 +9,13 @@
 | `npm run test:coverage` | Vitest with the broader web thresholds ([`web/app/vitest.config.ts`](../web/app/vitest.config.ts)) |
 | `npm run test:coverage:gate` | **CI gate — ≥80%** lines, statements, branches, functions on [`web/app/src/lib/**`](../web/app/src/lib) and on [`server/src/**`](../server/src) except `index.ts` ([gate configs](../web/app/vitest.coverage-gate.config.ts)) |
 | `npm run duplicates` | [jscpd](https://github.com/kucherenko/jscpd) — copy-paste clones (global threshold in `.jscpd.json`) |
-| `npm run test:e2e` | Playwright — built SPA + real server ([`e2e/`](../e2e/), [`playwright.config.ts`](../playwright.config.ts)) |
-| `npm run ci` | `lint` → `duplicates` → **`test:coverage:gate`** → `build` → `test:e2e` |
+| `npm run test:scenario` | Playwright — built SPA + real server ([`scenario/`](../scenario/), [`playwright.config.ts`](../playwright.config.ts)) |
+| `npm run ci` | `lint` → `duplicates` → **`test:coverage:gate`** → `build` → `test:scenario` |
 | `npm run check` | Alias for `ci` |
 
 ## GitHub Actions CI
 
-Workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs the same steps as `npm run ci` on Node 22, split across **parallel** jobs (`lint` includes ESLint + jscpd; `test` runs **`npm run test:coverage:gate`** and uploads `coverage-gate/` summaries; `build` runs the production build; **`e2e`** runs Playwright). You can also run it manually via **Actions → CI → Run workflow**.
+Workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs the same steps as `npm run ci` on Node 22, split across **parallel** jobs (`lint` includes ESLint + jscpd; `test` runs **`npm run test:coverage:gate`** and uploads `coverage-gate/` summaries; `build` runs the production build; **`scenario`** runs Playwright). You can also run it manually via **Actions → CI → Run workflow**.
 
 To mirror this in another repository (e.g. **OpenClaudeAgent/open-flow**), copy the same pattern: a dedicated Vitest config with `coverage.thresholds` at **80** and a CI step that runs `npm run test:coverage:gate` (or your package manager equivalent).
 

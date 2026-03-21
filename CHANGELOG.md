@@ -6,8 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-- Docs: [`docs/architecture-improvement-plan.md`](docs/architecture-improvement-plan.md) finalized (English, status table, metrics template, cycle-tool hints).
-- E2E: [`e2e/bluetasks.spec.ts`](e2e/bluetasks.spec.ts) — real browser flows (create + reload, mark done, expand/collapse, sidebar, Settings); English UI via `localStorage` + `locale: en-US`; empty DB between lifecycle tests via API deletes.
+- Docs: English-only pass; expanded [`docs/user-journeys.md`](docs/user-journeys.md) and [`docs/data-model.md`](docs/data-model.md); removed internal roadmap, MVP scope, and MCP RPG notes from `docs/`.
+- Scenario tests: Playwright specs under [`scenario/`](scenario/) (formerly `e2e/`); `npm run test:scenario` (replaces `test:e2e`). Split files: [`api.production.spec.ts`](scenario/api.production.spec.ts), [`task-lifecycle.spec.ts`](scenario/task-lifecycle.spec.ts), [`navigation-settings.spec.ts`](scenario/navigation-settings.spec.ts); helpers [`helpers.ts`](scenario/helpers.ts), [`api-helpers.ts`](scenario/api-helpers.ts); English UI via `localStorage` + `locale: en-US`.
+- Scenario scaffolds (skipped): priority/pin, estimate/recurrence, timer, notes persistence, Upcoming, area filters, assign area, Settings areas CRUD, language/import, quick capture — plus Vitest todos in [`server/src/api.task-fields.integration.test.ts`](server/src/api.task-fields.integration.test.ts).
+- Scenario: [`scenario/editor-toolbar.spec.ts`](scenario/editor-toolbar.spec.ts) — Lexical toolbar (bold, italic, heading, bullet + checklist, table, markdown `[] `, quote, code block, divider).
 - Release: [`.github/workflows/release.yml`](.github/workflows/release.yml) — enter semver (e.g. `0.2.0`) to sync all workspace `package.json` versions, update this file, refresh `package-lock.json`, commit, push tag `v*`, and trigger Docker publish (see [docs/releasing.md](docs/releasing.md)).
 - CI: optional manual runs (`workflow_dispatch`) for [CI](.github/workflows/ci.yml) and [Docker image](.github/workflows/docker-publish.yml).
 - CI: [Docker build check](.github/workflows/docker-build-check.yml) verifies the image builds on relevant PRs (amd64, no push).

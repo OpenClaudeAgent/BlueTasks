@@ -1,4 +1,4 @@
-# Same quality gate as `npm run ci`: lint → jscpd → coverage gate (≥80%) → build → Playwright e2e (split across parallel jobs).
+# Same quality gate as `npm run ci`: lint → jscpd → coverage gate (≥80%) → build → Playwright scenario tests (split across parallel jobs).
 name: CI
 
 on:
@@ -86,8 +86,8 @@ jobs:
       - name: Production build
         run: npm run build
 
-  e2e:
-    name: E2E (Playwright)
+  scenario:
+    name: Scenario tests (Playwright)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -104,7 +104,7 @@ jobs:
       - name: Install Playwright Chromium
         run: npx playwright install chromium --with-deps
 
-      - name: Run Playwright (E2E)
+      - name: Run Playwright (scenario)
         env:
           CI: "true"
-        run: npm run test:e2e
+        run: npm run test:scenario

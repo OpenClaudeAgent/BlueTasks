@@ -326,6 +326,45 @@ button,
   min-width: 0;
 }
 
+.mainHeader__actionsRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.mainHeader__quickCapture {
+  min-width: min(100%, 220px);
+  max-width: 320px;
+  flex: 1 1 200px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.22);
+  color: var(--text);
+  font-size: 14px;
+  letter-spacing: -0.01em;
+  outline: none;
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.mainHeader__quickCapture::placeholder {
+  color: var(--text-muted);
+}
+
+.mainHeader__quickCapture:focus-visible {
+  border-color: rgba(126, 184, 255, 0.4);
+  box-shadow: 0 0 0 3px rgba(126, 184, 255, 0.15);
+}
+
+.mainHeader__quickCapture:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
 .languageSwitcher {
   display: inline-flex;
   gap: 2px;

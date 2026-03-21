@@ -40,8 +40,9 @@ describe('dbSetup', () => {
       expect(getUserVersion(db)).toBe(0);
       runMigrations(db);
       const cols = db.prepare('PRAGMA table_info(tasks)').all() as {name: string}[];
-      expect(cols.some((c) => c.name === 'priority')).toBe(true);
-      expect(cols.some((c) => c.name === 'area_id')).toBe(true);
+      const colNames = cols.map((c) => c.name);
+      expect(colNames).toContain('priority');
+      expect(colNames).toContain('area_id');
       expect(getUserVersion(db)).toBe(CURRENT_SCHEMA_VERSION);
     } finally {
       db.close();
