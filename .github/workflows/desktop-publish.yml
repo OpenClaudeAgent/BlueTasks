@@ -1,6 +1,7 @@
 # Build macOS + Windows Tauri bundles (unsigned) and attach installers to the GitHub Release for tag v*.
 # Trigger: tag push v* or manual dispatch with an existing tag.
 name: Desktop release
+run-name: Desktop release ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
 
 on:
   push:
@@ -25,7 +26,7 @@ env:
 
 jobs:
   build-macos:
-    name: macOS (aarch64)
+    name: macOS (aarch64) — ${{ env.RELEASE_TAG }}
     runs-on: macos-latest
     timeout-minutes: 45
     steps:
@@ -67,7 +68,7 @@ jobs:
           if-no-files-found: warn
 
   build-windows:
-    name: Windows (x64)
+    name: Windows (x64) — ${{ env.RELEASE_TAG }}
     runs-on: windows-latest
     timeout-minutes: 45
     steps:
@@ -116,7 +117,7 @@ jobs:
           path: win-installers/
 
   build-linux:
-    name: Linux (x64, .deb)
+    name: Linux (x64, .deb) — ${{ env.RELEASE_TAG }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -169,7 +170,7 @@ jobs:
           path: linux-debs/
 
   publish:
-    name: Publish GitHub Release assets
+    name: Publish GitHub Release (${{ env.RELEASE_TAG }})
     needs: [build-macos, build-windows, build-linux]
     runs-on: ubuntu-latest
     steps:
