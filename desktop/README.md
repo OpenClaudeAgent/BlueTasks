@@ -36,6 +36,10 @@ npm run tauri build
 
 `beforeBuildCommand` runs `npm run prep`, which invokes `desktop:prep` from the repo root (embedded runtime + Node).
 
+### macOS `.dmg` from Releases
+
+Artifacts named like `BlueTasks_*_aarch64.dmg` are **Apple Silicon (arm64)** only. Open the DMG, drag **BlueTasks** into **Applications**. Builds from CI are **not code-signed**: if macOS blocks launch, use **Right-click → Open**, or `xattr -dr com.apple.quarantine /Applications/BlueTasks.app`. To read server errors, run `/Applications/BlueTasks.app/Contents/MacOS/BlueTasks` in a terminal.
+
 ## Data
 
 SQLite and WAL files live under the OS app data directory (`BLUETASKS_DATA_DIR`), not inside the read-only app bundle. Static assets and the server bundle use `BLUETASKS_HOME` (the copied `bluetasks-runtime` tree).
