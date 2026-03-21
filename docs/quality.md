@@ -13,7 +13,7 @@
 | `npm run test:coverage` | Vitest with the broader web thresholds ([`web/app/vitest.config.ts`](../web/app/vitest.config.ts)) |
 | `npm run test:coverage:gate` | **CI gate — ≥80%** lines, statements, branches, functions on [`web/app/src/lib/**`](../web/app/src/lib) and on [`server/src/**`](../server/src) except `index.ts` ([gate configs](../web/app/vitest.coverage-gate.config.ts)) |
 | `npm run duplicates` | [jscpd](https://github.com/kucherenko/jscpd) — copy-paste clones (global threshold in `.jscpd.json`) |
-| `npm run test:scenario` | Playwright — built SPA + real server ([`scenario/`](../scenario/), [`playwright.config.ts`](../playwright.config.ts)) |
+| `npm run test:scenario` | Playwright — built SPA + real server ([`scenario/`](../scenario/), [`playwright.config.ts`](../playwright.config.ts)); locally full suite. **CI** splits with `--shard=1/2` and `--shard=2/2` (two isolated runners; see [testing-strategy.md](testing-strategy.md#end-to-end)) |
 | `npm run semgrep:docker` | **Semgrep** — same as CI: (1) whole [`web/app/`](../web/app/) with `p/typescript` + `p/react` (Vite/Vitest configs + `src/`, not only `src/`), (2) [`server/`](../server/) + [`contract/`](../contract/) + [`scenario/`](../scenario/) + [`scripts/`](../scripts/) + root `playwright.config.ts` + `eslint.*.config.mjs` with `p/typescript` only (Docker) |
 | `npm run ci` | `lint` → `duplicates` → **`test:coverage:gate`** → `build` → `test:scenario` (does **not** run Semgrep — use `semgrep:docker` locally; CI runs Semgrep in its own job) |
 | `npm run check` | Alias for `ci` |

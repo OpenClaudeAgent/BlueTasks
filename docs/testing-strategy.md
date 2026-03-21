@@ -65,6 +65,8 @@ describe('Feature: Task card time display', () => {
 
 - **Scenario tests (browser)**: Playwright under [`scenario/`](../scenario/) — [`api.production.spec.ts`](../scenario/api.production.spec.ts) (HTTP against the live build), [`app-shell.spec.ts`](../scenario/app-shell.spec.ts) (initial load, SPA fallback), [`task-lifecycle.spec.ts`](../scenario/task-lifecycle.spec.ts) (tasks UI), [`navigation-settings.spec.ts`](../scenario/navigation-settings.spec.ts), [`editor-toolbar.spec.ts`](../scenario/editor-toolbar.spec.ts) (Lexical toolbar: bold, italic, lists, table, markdown `[] `, etc.); shared helpers [`scenario/helpers.ts`](../scenario/helpers.ts), [`scenario/api-helpers.ts`](../scenario/api-helpers.ts), [`scenario/task-flow-helpers.ts`](../scenario/task-flow-helpers.ts) (see [`playwright.config.ts`](../playwright.config.ts)). Further specs cover estimates, recurrence, timer, areas, settings, quick capture, Upcoming, and filters.
 
+**Parallelism:** [`playwright.config.ts`](../playwright.config.ts) uses **`workers: 1`** by default. The E2E server shares one SQLite file; raising workers on a single job would interleave tests against the same DB and cause **flaky** failures. **CI** runs the suite in **two shards** (`playwright test --shard=1/2` and `--shard=2/2`) as separate jobs — each runner has its own server and DB, so wall-clock time improves without cross-test races. Optional override: `PLAYWRIGHT_WORKERS` (use only if you understand the tradeoff).
+
 Add more E2E only for flows that **integration tests cannot trust** (e.g. full OAuth, file upload across browsers). Prefer **integration** tests for business rules; E2E should stay a **focused** set of real user paths, not a duplicate of every unit test.
 
 ---

@@ -7,9 +7,11 @@ test.describe('App shell', () => {
   test('after load: no global error, loading cleared, primary actions ready', async ({page, request}) => {
     await resetBoard(page, request);
 
+    // Wait for the shell to be interactive first (slow CI / cold build); then assert no error UI.
+    const addTask = page.getByRole('button', {name: 'Add task'});
+    await expect(addTask).toBeEnabled({timeout: 30_000});
     await expect(page.locator('.appError')).toHaveCount(0);
     await expect(page.locator('.emptyState--loading')).toHaveCount(0);
-    await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled();
     await expect(page.getByRole('navigation', {name: 'Primary navigation'})).toBeVisible();
   });
 
