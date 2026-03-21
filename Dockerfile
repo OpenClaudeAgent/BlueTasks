@@ -1,10 +1,10 @@
-# Image d’exécution minimale (pas de gcc/python dans la couche finale).
+# Minimal runtime image (no gcc/python in the final layer).
 #
-# Contexte = sortie de scripts/assemble-docker-context.sh :
-#   package.json, lock, server/dist, web/app/dist, shared (sans node_modules).
+# Build context = output of scripts/assemble-docker-context.sh:
+#   package.json, lock, server/dist, web/app/dist, shared (no node_modules).
 #
-# L’installation npm prod a lieu dans l’étape « deps » sous Linux, pour que
-# better-sqlite3 soit compilé/téléchargé pour la bonne plateforme (CI, Mac, etc.).
+# Production npm install runs in the deps stage on Linux so better-sqlite3 is
+# built or downloaded for the target platform (CI, Mac host builds, etc.).
 
 FROM node:22-alpine AS deps
 RUN apk add --no-cache python3 make g++

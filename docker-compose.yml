@@ -1,6 +1,6 @@
-# Données : ./.data → /app/.data (bluetasks.sqlite).
-# Avant le premier build : npm run docker:release  (génère .dockerctx/ + dépendances prod).
-# Image GHCR : remplacez build par image: ghcr.io/<owner>/bluetasks:<tag>
+# Data: host ./.data → container /app/.data (bluetasks.sqlite).
+# Before first build: npm run docker:release  (generates .dockerctx/ + prod deps).
+# GHCR image: replace build with image: ghcr.io/<owner>/bluetasks:<tag>
 services:
   bluetasks:
     build:
@@ -10,7 +10,7 @@ services:
     environment:
       HOST: 0.0.0.0
       PORT: 8787
-    # Base SQLite sur le disque hôte : ./.data/bluetasks.sqlite (facile à sauvegarder)
+    # SQLite on the host: ./.data/bluetasks.sqlite (easy to back up)
     volumes:
       - ./.data:/app/.data
     healthcheck:
