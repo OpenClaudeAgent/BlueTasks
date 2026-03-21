@@ -59,7 +59,7 @@ jobs:
           test -d "$APP"
           ditto -c -k --keepParent "$APP" "$GITHUB_WORKSPACE/BlueTasks_${VERSION}_macos_aarch64.app.zip"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: bluetasks-macos
           path: |
@@ -111,7 +111,7 @@ jobs:
             throw "No Windows installer found under $root/nsis or $root/msi"
           }
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: bluetasks-windows
           path: win-installers/
@@ -164,7 +164,7 @@ jobs:
           ls -la "$GITHUB_WORKSPACE/linux-debs/"
           test "$(find "$GITHUB_WORKSPACE/linux-debs" -name '*.deb' | wc -l)" -ge 1
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: bluetasks-linux
           path: linux-debs/
@@ -174,7 +174,7 @@ jobs:
     needs: [build-macos, build-windows, build-linux]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v7
         with:
           pattern: bluetasks-*
           path: release-assets
