@@ -1,0 +1,12 @@
+node_modules
+.env
+.env.*
+!.env.example
+.DS_Store
+.data
+**/coverage
+web/app/dist
+server/dist
+
+# Graphe MCP RPG (local, régénérable avec build_rpg)
+.rpg/

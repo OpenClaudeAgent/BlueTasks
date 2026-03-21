@@ -1,0 +1,6 @@
+# Réduit le travail de build_rpg (MCP RPG) — moins de risque de timeout / blocage
+node_modules/
+**/node_modules/
+**/dist/
+**/coverage/
+.git/

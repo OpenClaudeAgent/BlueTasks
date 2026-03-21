@@ -1,0 +1,13 @@
+node_modules
+web/app/node_modules
+server/node_modules
+web/app/dist
+server/dist
+.data
+.git
+.github
+**/*.test.ts
+**/*.test.tsx
+**/coverage
+**/vitest.config.ts
+**/.eslintcache

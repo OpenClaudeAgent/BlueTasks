@@ -1,0 +1,16 @@
+{
+  "threshold": 12,
+  "minLines": 12,
+  "minTokens": 100,
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "**/.github/**",
+    "**/*.test.ts",
+    "**/package-lock.json",
+    "**/.git/**"
+  ],
+  "reporters": ["console"],
+  "absolute": true
+}

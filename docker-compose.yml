@@ -1,0 +1,27 @@
+# Données : ./.data → /app/.data (bluetasks.sqlite). Pour une image GHCR, remplacez build par :
+# image: ghcr.io/<owner>/bluetasks:<tag>
+services:
+  bluetasks:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8787:8787"
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8787
+    # Base SQLite sur le disque hôte : ./.data/bluetasks.sqlite (facile à sauvegarder)
+    volumes:
+      - ./.data:/app/.data
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:8787/api/tasks').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s

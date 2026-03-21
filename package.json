@@ -1,0 +1,25 @@
+{
+  "name": "bluetasks",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "web/app",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently -k \"npm run dev --workspace server\" \"npm run dev --workspace web/app\"",
+    "build": "npm run build --workspace web/app && npm run build --workspace server",
+    "start": "npm run start --workspace server",
+    "lint": "npm run lint --workspace web/app && npm run lint --workspace @bluetasks/server",
+    "a11y": "npm run lint --workspace web/app",
+    "test": "npm run test --workspace @bluetasks/app && npm run test --workspace @bluetasks/server",
+    "test:coverage": "npm run test:coverage --workspace @bluetasks/app && npm run test:coverage --workspace @bluetasks/server",
+    "duplicates": "jscpd .",
+    "ci": "npm run lint && npm run duplicates && npm run test:coverage && npm run build",
+    "check": "npm run ci"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1",
+    "jscpd": "^4.0.8"
+  }
+}
