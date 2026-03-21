@@ -15,6 +15,7 @@ Variables utiles : `HOST` (défaut `0.0.0.0`), `PORT` (défaut `8787`).
 
 ## Contenu de l’image
 
+- **Plateformes** : le workflow GitHub publie une image **multi-arch** (`linux/amd64` et **`linux/arm64`**) pour les Mac Apple Silicon et les serveurs ARM.
 - **Build multi-étapes** : compilation Vite + `tsc` dans une étape `builder`, image finale avec `npm ci --omit=dev` limité au workspace **`@bluetasks/server`** et les artefacts `server/dist` + `web/app/dist` + `shared/`.
 - Point d’entrée : `npm run start` (racine), comme en local.
 
