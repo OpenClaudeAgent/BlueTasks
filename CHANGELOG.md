@@ -23,6 +23,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - CI: optional manual runs (`workflow_dispatch`) for [CI](.github/workflows/ci.yml) and [Docker image](.github/workflows/docker-publish.yml).
 - CI: removed standalone **Docker build check** workflow; the image is built and pushed only via [Docker image](.github/workflows/docker-publish.yml) (tag or dispatch).
 
+## [0.1.9] - 2026-03-21
+
+- Playwright: API-seeded UI specs (task-seeded-ui), area-ui-journey, shared area footer helpers; createTaskViaApi/putTaskViaApi; docs: releasing via Actions only.
+
 ## [0.1.8] - 2026-03-21
 
 - CI: auto-dispatch Docker image after release; patch bump.
@@ -60,7 +64,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial published image tag `v0.1.0` (multi-arch GHCR workflow).
 
-[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.8...HEAD
+[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.9...HEAD
+[0.1.9]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.8...v0.1.9
 [0.1.8]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.5...v0.1.6
