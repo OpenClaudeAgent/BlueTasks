@@ -1,4 +1,5 @@
-# Bump workspace versions, update CHANGELOG, commit, push tag v* → triggers Docker image workflow.
+# Bump workspace versions, update CHANGELOG, commit, push tag v*, then dispatch Docker image workflow.
+# (Tag push with GITHUB_TOKEN does not trigger other workflows; we call workflow_dispatch explicitly.)
 name: Release
 
 on:
@@ -97,3 +98,19 @@ jobs:
           git tag "v${V}"
           git push origin "HEAD:${{ github.ref_name }}"
           git push origin "v${V}"
+
+  publish-docker:
+    name: Publish Docker image
+    needs: ship
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Trigger Docker image workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run docker-publish.yml \
+            --repo "${{ github.repository }}" \
+            -f "tag=v${{ inputs.version }}"

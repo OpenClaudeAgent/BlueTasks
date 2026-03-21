@@ -17,8 +17,7 @@ The job will:
 - Insert the new section into `CHANGELOG.md` and update compare links.
 - Run `npm install` to sync `package-lock.json`.
 - Commit `chore(release): vX.Y.Z`, create tag `vX.Y.Z`, and **push** commit + tag.
-
-**Docker after Release:** a tag push performed with the workflow’s default `GITHUB_TOKEN` **does not** start another workflow (GitHub limitation). After **Release**, run **Actions → Docker image → Run workflow** once with the same tag (e.g. `v0.2.0`) to push the image to GHCR (including `:latest`). A tag pushed **from your machine** or with a PAT that has `contents` scope **will** trigger [**Docker image**](../.github/workflows/docker-publish.yml) automatically.
+- Run a follow-up job that **dispatches** [**Docker image**](../.github/workflows/docker-publish.yml) with `tag=vX.Y.Z`, so GHCR gets `:vX.Y.Z` and `:latest` with no manual step. (Pushes performed with the default `GITHUB_TOKEN` do not trigger other workflows; Release works around that by calling `gh workflow run`.)
 
 ## Manual release (local)
 
