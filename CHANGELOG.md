@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - CI: optional manual runs (`workflow_dispatch`) for [CI](.github/workflows/ci.yml) and [Docker image](.github/workflows/docker-publish.yml).
 - CI: removed standalone **Docker build check** workflow; the image is built and pushed only via [Docker image](.github/workflows/docker-publish.yml) (tag or dispatch).
 
+## [0.1.6] - 2026-03-21
+
+- Slimmer GHCR image (esbuild bundle + pruned native deps). Remove Docker build-check workflow.
+
 ## [0.1.5] - 2026-03-21
 
 - TaskCard modules; E2E app-shell and quick-capture API checks; DELETE unknown task idempotence
@@ -41,7 +45,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial published image tag `v0.1.0` (multi-arch GHCR workflow).
 
-[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.6...HEAD
+[0.1.6]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.2...v0.1.3
