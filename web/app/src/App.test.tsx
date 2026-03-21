@@ -77,12 +77,12 @@ describe('Feature: App shell', () => {
       loading: true,
       visibleTasks: [],
     });
-    const {container} = render(
+    render(
       <I18nextProvider i18n={i18n}>
         <App />
       </I18nextProvider>,
     );
-    expect(container.querySelector('.emptyState--loading')).toBeTruthy();
+    expect(screen.getByText('Loading tasks...')).toBeVisible();
   });
 
   it('Scenario: Quick capture Enter — calls handleQuickCapture with trimmed title', async () => {
