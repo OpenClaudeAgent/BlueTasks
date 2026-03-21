@@ -43,18 +43,21 @@ export default {
   close: 'Close',
   save: 'Save',
   sections: {
+    all: 'All',
     today: 'Today',
     upcoming: 'Upcoming',
     anytime: 'Anytime',
     done: 'Done',
   },
   subtitles: {
+    all: 'Every task in the current area filter, open and done.',
     today: 'What deserves attention now, including anything overdue.',
     upcoming: 'The next due dates, kept intentionally light.',
     anytime: 'A calm backlog without forced scheduling.',
     done: 'Work that is already finished.',
   },
   empty: {
+    all: 'No tasks match this view yet.',
     today: 'Nothing urgent is waiting right now.',
     upcoming: 'Nothing else is due next.',
     anytime: 'No tasks captured for later yet.',

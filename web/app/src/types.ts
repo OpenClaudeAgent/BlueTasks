@@ -6,7 +6,11 @@ export type TaskPriority = 'low' | 'normal' | 'high';
 
 export type RecurrenceKind = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'yearly';
 
-export type SectionId = 'today' | 'upcoming' | 'anytime' | 'done';
+/** Concrete bucket for a single task (sidebar section "All" is not a bucket). */
+export type TaskSectionBucket = 'today' | 'upcoming' | 'anytime' | 'done';
+
+/** Primary nav: includes "All" (every task in the current area filter). */
+export type SectionId = TaskSectionBucket | 'all';
 
 /** Sidebar filter: `AREA_FILTER_ALL`, `AREA_FILTER_UNCATEGORIZED`, or an area id. */
 export const AREA_FILTER_ALL = 'all';

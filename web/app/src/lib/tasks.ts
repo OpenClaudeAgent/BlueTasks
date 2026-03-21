@@ -1,17 +1,25 @@
+import {
+  getTaskSectionBucket,
+  taskMatchesAreaFilterRow,
+  taskMatchesBoardSectionRow,
+  type BoardSectionId,
+} from '@bluetasks/contract/task-board-filter.js';
 import {todayKey} from './dateKeys';
 import {createEmptyEditorState, lexicalDocsContentEqual} from './editorState';
 import {
   AREA_FILTER_ALL,
-  AREA_FILTER_UNCATEGORIZED,
   type AreaFilter,
   type SectionId,
   type Task,
   type TaskCounts,
   type TaskDraftPayload,
+  type TaskSectionBucket,
 } from '../types';
 import {coercePinned, coerceRecurrence} from './taskPropertyValidation';
 
-export const sectionOrder: SectionId[] = ['today', 'upcoming', 'anytime', 'done'];
+export const sectionOrder: SectionId[] = ['all', 'today', 'upcoming', 'anytime', 'done'];
+
+export type {TaskSectionBucket} from '../types';
 
 export {coercePinned, coerceRecurrence} from './taskPropertyValidation';
 
@@ -95,14 +103,16 @@ export function isSaveSuperseded(sentRev: number, pending: {rev: number} | undef
   return pending !== undefined && pending.rev !== sentRev;
 }
 
+function toBoardFilterTask(task: Task) {
+  return {
+    status: task.status,
+    taskDate: task.taskDate,
+    areaId: task.areaId,
+  };
+}
+
 export function taskMatchesAreaFilter(task: Task, filter: AreaFilter): boolean {
-  if (filter === AREA_FILTER_ALL) {
-    return true;
-  }
-  if (filter === AREA_FILTER_UNCATEGORIZED) {
-    return !task.areaId;
-  }
-  return task.areaId === filter;
+  return taskMatchesAreaFilterRow(toBoardFilterTask(task), filter);
 }
 
 export function filterTasks(
@@ -114,33 +124,17 @@ export function filterTasks(
 
   return sortTasks(
     tasks.filter((task) => {
-      if (!taskMatchesAreaFilter(task, areaFilter)) {
+      if (!taskMatchesAreaFilterRow(toBoardFilterTask(task), areaFilter)) {
         return false;
       }
-
-      if (section === 'done') {
-        return task.status === 'completed';
-      }
-
-      if (task.status === 'completed') {
-        return false;
-      }
-
-      if (section === 'today') {
-        return Boolean(task.taskDate && task.taskDate <= today);
-      }
-
-      if (section === 'upcoming') {
-        return Boolean(task.taskDate && task.taskDate > today);
-      }
-
-      return !task.taskDate;
+      return taskMatchesBoardSectionRow(toBoardFilterTask(task), section as BoardSectionId, today);
     }),
   );
 }
 
 export function getTaskCounts(tasks: Task[], areaFilter: AreaFilter = AREA_FILTER_ALL): TaskCounts {
   return {
+    all: filterTasks(tasks, 'all', areaFilter).length,
     today: filterTasks(tasks, 'today', areaFilter).length,
     upcoming: filterTasks(tasks, 'upcoming', areaFilter).length,
     anytime: filterTasks(tasks, 'anytime', areaFilter).length,
@@ -194,15 +188,6 @@ export function getPreferredTaskId(
   return visibleTasks[0].id;
 }
 
-export function getTaskSection(task: Task): SectionId {
-  if (task.status === 'completed') {
-    return 'done';
-  }
-
-  if (!task.taskDate) {
-    return 'anytime';
-  }
-
-  return task.taskDate <= todayKey() ? 'today' : 'upcoming';
+export function getTaskSection(task: Task): TaskSectionBucket {
+  return getTaskSectionBucket(toBoardFilterTask(task), todayKey());
 }
-

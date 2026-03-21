@@ -47,18 +47,21 @@ export default {
   close: 'Fermer',
   save: 'Enregistrer',
   sections: {
+    all: 'Tout',
     today: "Aujourd'hui",
     upcoming: 'À venir',
     anytime: 'À garder',
     done: 'Terminées',
   },
   subtitles: {
+    all: 'Toutes les tâches du filtre de zone actuel, ouvertes et terminées.',
     today: "Ce qui mérite votre attention aujourd'hui, y compris le retard.",
     upcoming: 'Les prochaines échéances, sans friction.',
     anytime: 'Votre backlog calme, sans date imposée.',
     done: 'Le travail déjà terminé.',
   },
   empty: {
+    all: 'Aucune tâche ne correspond à cette vue pour le moment.',
     today: "Aucune tâche urgente pour l'instant.",
     upcoming: "Aucune échéance n'arrive ensuite.",
     anytime: "Aucune tâche capturée pour plus tard.",

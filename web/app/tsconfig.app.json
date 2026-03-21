@@ -16,6 +16,10 @@
     "moduleDetection": "force",
     "noEmit": true,
     "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@bluetasks/contract/*": ["../../contract/*"]
+    },
 
     /* Linting */
     "strict": true,

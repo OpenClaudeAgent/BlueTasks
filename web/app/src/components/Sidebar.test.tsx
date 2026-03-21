@@ -7,7 +7,7 @@ import i18n from '../i18n';
 import {Sidebar} from './Sidebar';
 import {AREA_FILTER_ALL} from '../types';
 
-const baseCounts = {today: 1, upcoming: 0, anytime: 2, done: 0};
+const baseCounts = {all: 3, today: 1, upcoming: 0, anytime: 2, done: 0};
 
 describe('Feature: Sidebar', () => {
   it('Scenario: User switches section — calls onSelect with section id', async () => {
@@ -31,6 +31,29 @@ describe('Feature: Sidebar', () => {
     const nav = screen.getByRole('navigation', {name: /primary navigation/i});
     await user.click(within(nav).getByRole('button', {name: (n) => n.startsWith('Anytime')}));
     expect(onSelect).toHaveBeenCalledWith('anytime');
+  });
+
+  it('Scenario: User selects All section — calls onSelect with all', async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    render(
+      <I18nextProvider i18n={i18n}>
+        <Sidebar
+          areaFilter={AREA_FILTER_ALL}
+          areaRowCounts={{all: 3, uncategorized: 1, byId: {}}}
+          areas={[]}
+          counts={baseCounts}
+          onAreaFilterChange={vi.fn()}
+          onOpenSettings={vi.fn()}
+          onSelect={onSelect}
+          selectedSection="today"
+        />
+      </I18nextProvider>,
+    );
+
+    const nav = screen.getByRole('navigation', {name: /primary navigation/i});
+    await user.click(within(nav).getByRole('button', {name: (n) => n.startsWith('All')}));
+    expect(onSelect).toHaveBeenCalledWith('all');
   });
 
   it('Scenario: User filters by named area — calls onAreaFilterChange', async () => {

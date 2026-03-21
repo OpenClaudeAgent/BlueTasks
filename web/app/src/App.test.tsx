@@ -30,7 +30,7 @@ function baseBoard() {
     errorMessage: null as string | null,
     savingIds: {} as Record<string, boolean>,
     visibleTasks: [] as Task[],
-    counts: {today: 0, upcoming: 0, anytime: 0, done: 0},
+    counts: {all: 0, today: 0, upcoming: 0, anytime: 0, done: 0},
     taskCountByAreaId: {} as Record<string, number>,
     areaSidebarCounts: {all: 0, uncategorized: 0, byId: {} as Record<string, number>},
     refreshTasksAndAreas: vi.fn(),

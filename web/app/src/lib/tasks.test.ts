@@ -263,6 +263,18 @@ describe('filterTasks', () => {
     expect(filterTasks(tasks, 'today', z1).map((t) => t.id)).toEqual(['a']);
     expect(filterTasks(tasks, 'today', AREA_FILTER_UNCATEGORIZED).map((t) => t.id)).toEqual(['b']);
   });
+
+  it('all section lists every task in area including completed, sorted', () => {
+    const today = todayKey();
+    const z = 'zone-all';
+    const tasks = [
+      {...createTask('Open'), id: 'o', taskDate: today, areaId: z, status: 'pending' as const},
+      {...createTask('Closed'), id: 'c', taskDate: today, areaId: z, status: 'completed' as const},
+      {...createTask('Other zone'), id: 'x', taskDate: today, areaId: 'other', status: 'pending' as const},
+    ];
+    const ids = filterTasks(tasks, 'all', z).map((t) => t.id);
+    expect(ids).toEqual(['o', 'c']);
+  });
 });
 
 describe('coerceRecurrence', () => {
@@ -283,9 +295,11 @@ describe('getTaskCounts', () => {
       {...createTask('T3'), id: '3', taskDate: today, areaId: null},
     ];
     const all = getTaskCounts(tasks, AREA_FILTER_ALL);
+    expect(all.all).toBe(3);
     expect(all.today).toBe(2);
     expect(all.anytime).toBe(1);
     const zOnly = getTaskCounts(tasks, z);
+    expect(zOnly.all).toBe(2);
     expect(zOnly.today).toBe(1);
     expect(zOnly.anytime).toBe(1);
   });
