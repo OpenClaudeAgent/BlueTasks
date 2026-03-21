@@ -17,7 +17,7 @@
   "dependencies": {
     "@lexical/code": "^0.35.0",
     "@lexical/link": "^0.35.0",
-    "@lexical/list": "^0.35.0",
+    "@lexical/list": "^0.42.0",
     "@lexical/markdown": "^0.35.0",
     "@lexical/react": "^0.35.0",
     "@lexical/rich-text": "^0.35.0",
