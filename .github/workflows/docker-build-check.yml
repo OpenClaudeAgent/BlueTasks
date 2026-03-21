@@ -3,7 +3,7 @@ name: Docker build check
 
 on:
   pull_request:
-    paths:
+    paths: &docker-check-paths
       - "Dockerfile"
       - "docker-compose.yml"
       - "scripts/assemble-docker-context.sh"
@@ -12,6 +12,10 @@ on:
       - "server/**"
       - "web/**"
       - ".github/workflows/docker-build-check.yml"
+  # Badge + default-branch status need a run on main (PR-only workflows show "no status").
+  push:
+    branches: [main, master]
+    paths: *docker-check-paths
   workflow_dispatch:
 
 concurrency:
