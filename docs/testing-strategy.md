@@ -59,7 +59,7 @@ describe('Feature: Task card time display', () => {
 - **REST API + SQLite (memory or temp file)**: [`server/src/api.integration.test.ts`](../server/src/api.integration.test.ts), [`dbSetup.test.ts`](../server/src/dbSetup.test.ts).
 - **Public API JSON (Zod)**: [`contract/`](../contract/) — Vitest ([`server/src/api.integration.test.helpers.ts`](../server/src/api.integration.test.helpers.ts)); Playwright ([`scenario/contract-expectations.ts`](../scenario/contract-expectations.ts)).
 - **Client API wrapper**: [`web/app/src/api.test.ts`](../web/app/src/api.test.ts).
-- **Components (RTL)**: settings and task row behaviour with i18n — [`SettingsDialog.test.tsx`](../web/app/src/components/SettingsDialog.test.tsx), [`TaskCard.test.tsx`](../web/app/src/components/TaskCard.test.tsx) (mock heavy editors).
+- **Components (RTL)**: settings, language toggle, task row behaviour with i18n — [`SettingsDialog.test.tsx`](../web/app/src/components/SettingsDialog.test.tsx), [`LanguageSwitcher.test.tsx`](../web/app/src/components/LanguageSwitcher.test.tsx), [`TaskCard.test.tsx`](../web/app/src/components/TaskCard.test.tsx) (mock heavy editors).
 
 ### End-to-end
 

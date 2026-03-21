@@ -4,6 +4,7 @@ import {createEmptyEditorState} from './editorState';
 import type {Task} from '../types';
 import {
   applyRecurringStatusToggle,
+  applySavedTaskPreservingLexicalShape,
   coercePinned,
   coerceRecurrence,
   createTask,
@@ -12,6 +13,7 @@ import {
   getTaskCounts,
   getTaskSection,
   isSaveSuperseded,
+  mergeTaskFromApi,
   sortTasks,
   toTaskDraftPayload,
 } from './tasks';
@@ -46,19 +48,86 @@ describe('createTask', () => {
   });
 });
 
-describe('toTaskDraftPayload', () => {
-  it('includes contentJson in the save payload', () => {
-    const content = createEmptyEditorState();
-    const task = createTask('Test');
-    const taskWithContent = {...task, contentJson: content};
-    const payload = toTaskDraftPayload(taskWithContent);
-    expect(payload.contentJson).toBe(content);
-  });
+describe('Feature: Task draft payload for API', () => {
+  describe('Scenario: Client sends a PUT body', () => {
+    it('given contentJson set, when toTaskDraftPayload runs, then payload mirrors it', () => {
+      const content = createEmptyEditorState();
+      const task = createTask('Test');
+      const taskWithContent = {...task, contentJson: content};
+      const payload = toTaskDraftPayload(taskWithContent);
+      expect(payload.contentJson).toBe(content);
+    });
 
-  it('coerces numeric pinned (e.g. from SQLite) to boolean', () => {
-    const base = createTask('Pin');
-    const task = {...base, id: 'pin-test', pinned: 1 as unknown as boolean};
-    expect(toTaskDraftPayload(task).pinned).toBe(true);
+    it('given numeric pinned from SQLite, when toTaskDraftPayload runs, then pinned is boolean true', () => {
+      const base = createTask('Pin');
+      const task = {...base, id: 'pin-test', pinned: 1 as unknown as boolean};
+      expect(toTaskDraftPayload(task).pinned).toBe(true);
+    });
+
+    it('given empty string areaId, when toTaskDraftPayload runs, then areaId is null', () => {
+      const task = {...createTask('Z'), id: 'area-empty', areaId: ''};
+      expect(toTaskDraftPayload(task).areaId).toBeNull();
+    });
+  });
+});
+
+describe('Feature: Normalize task from API', () => {
+  describe('Scenario: SQLite / JSON oddities', () => {
+    it('given null priority and numeric pinned, when mergeTaskFromApi runs, then fields are normalized', () => {
+      const base = createTask('API');
+      const raw = {
+        ...base,
+        id: 'n1',
+        priority: null as unknown as Task['priority'],
+        pinned: 1 as unknown as boolean,
+        timeSpentSeconds: null as unknown as number,
+        recurrence: 'bogus' as unknown as Task['recurrence'],
+        areaId: '' as unknown as string | null,
+      };
+      const merged = mergeTaskFromApi(raw as Task);
+      expect(merged.priority).toBe('normal');
+      expect(merged.pinned).toBe(true);
+      expect(merged.timeSpentSeconds).toBe(0);
+      expect(merged.recurrence).toBeNull();
+      expect(merged.areaId).toBeNull();
+    });
+  });
+});
+
+describe('Feature: After save, preserve local Lexical JSON shape', () => {
+  describe('Scenario: Server echoes equivalent editor JSON', () => {
+    it('given pretty-printed local JSON and minified remote JSON, when applySavedTaskPreservingLexicalShape runs, then local JSON and text are kept', () => {
+      const minified = createEmptyEditorState();
+      const pretty = JSON.stringify(JSON.parse(minified), null, 2);
+      const local = {...createTask('Lex'), id: 'l1', contentJson: pretty, contentText: 'Note'};
+      const saved = mergeTaskFromApi({
+        ...local,
+        contentJson: minified,
+        contentText: 'Note',
+      });
+      const result = applySavedTaskPreservingLexicalShape(local, saved);
+      expect(result.contentJson).toBe(pretty);
+      expect(result.contentText).toBe('Note');
+      expect(result.id).toBe('l1');
+    });
+
+    it('given different semantic editor content, when applySavedTaskPreservingLexicalShape runs, then server copy wins', () => {
+      const local = {...createTask('L2'), id: 'l2', contentJson: createEmptyEditorState(), contentText: ''};
+      const remoteJson = JSON.stringify({
+        root: {
+          type: 'root',
+          version: 1,
+          children: [{type: 'paragraph', version: 1, children: [{type: 'text', text: 'Remote', version: 1}]}],
+          direction: null,
+          format: '',
+          indent: 0,
+        },
+      });
+      const saved = mergeTaskFromApi({...local, contentJson: remoteJson, contentText: 'Remote'});
+      const result = applySavedTaskPreservingLexicalShape(local, saved);
+      expect(result.contentJson).toBe(remoteJson);
+      expect(result.contentText).toBe('Remote');
+    });
   });
 });
 
@@ -144,6 +213,28 @@ describe('sortTasks', () => {
       updatedAt: '2025-01-01T10:00:00.000Z',
     };
     expect(sortTasks([newer, older]).map((t) => t.id)).toEqual(['old', 'new']);
+  });
+
+  it('places completed tasks after pending when dates match', () => {
+    const day = todayKey();
+    const common = {
+      taskDate: day,
+      pinned: false,
+      contentJson: createEmptyEditorState(),
+      contentText: '',
+      checklistTotal: 0,
+      checklistCompleted: 0,
+      priority: 'normal' as const,
+      estimateMinutes: null,
+      timeSpentSeconds: 0,
+      timerStartedAt: null,
+      recurrence: null,
+      createdAt: '2025-01-01T10:00:00.000Z',
+      updatedAt: '2025-01-01T10:00:00.000Z',
+    };
+    const pending: Task = {...common, id: 'pen', title: 'Open', status: 'pending'};
+    const done: Task = {...common, id: 'done', title: 'Closed', status: 'completed'};
+    expect(sortTasks([done, pending]).map((t) => t.id)).toEqual(['pen', 'done']);
   });
 });
 

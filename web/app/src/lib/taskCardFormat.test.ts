@@ -74,6 +74,14 @@ describe('Feature: Estimate label on task card', () => {
     it('given 45 minutes, when labeled, then it uses estimateMinutesShort', () => {
       expect(formatEstimateMinutesLabel(45, t)).toBe('45 min');
     });
+
+    it('given 1 minute, when labeled, then it uses estimateMinutesShort', () => {
+      expect(formatEstimateMinutesLabel(1, t)).toBe('1 min');
+    });
+
+    it('given 1500 minutes (not whole days), when labeled, then it uses whole-hour branch', () => {
+      expect(formatEstimateMinutesLabel(1500, t)).toBe('25 h');
+    });
   });
 });
 

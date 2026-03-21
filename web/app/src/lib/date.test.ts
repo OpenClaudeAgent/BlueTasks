@@ -1,5 +1,13 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {addDaysToKey, formatDateKey, getDateTone, parseTaskDate, todayKey} from './date';
+import {
+  addDaysToKey,
+  formatDateKey,
+  formatTaskDate,
+  formatTaskDatePill,
+  getDateTone,
+  parseTaskDate,
+  todayKey,
+} from './date';
 
 describe('getDateTone', () => {
   beforeEach(() => {
@@ -31,5 +39,20 @@ describe('parseTaskDate / formatDateKey / addDaysToKey', () => {
 describe('todayKey', () => {
   it('returns a YYYY-MM-DD key', () => {
     expect(todayKey()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe('Feature: Task date presentation', () => {
+  describe('Scenario: User sees a formatted date in the UI', () => {
+    it('given a calendar key and en-US, when formatTaskDate runs, then Intl returns a non-empty localized string', () => {
+      const label = formatTaskDate('2024-06-15', 'en-US');
+      expect(label.length).toBeGreaterThan(0);
+      expect(label).toMatch(/\d/);
+    });
+
+    it('given a calendar key and en-US, when formatTaskDatePill runs, then it returns uppercase month token and day', () => {
+      const pill = formatTaskDatePill('2024-06-15', 'en-US');
+      expect(pill).toMatch(/^[A-Z]{3,9} \d{1,2}$/);
+    });
   });
 });

@@ -3,6 +3,7 @@ import {
   createEmptyEditorState,
   extractChecklistStats,
   lexicalDocsContentEqual,
+  summarizeText,
 } from './editorState';
 
 describe('createEmptyEditorState', () => {
@@ -102,6 +103,14 @@ describe('extractChecklistStats', () => {
       },
     };
     expect(extractChecklistStats(state)).toEqual({checklistTotal: 0, checklistCompleted: 0});
+  });
+});
+
+describe('Feature: Plain text summary for editor', () => {
+  describe('Scenario: Collapse whitespace', () => {
+    it('given repeated spaces and newlines, when summarizeText runs, then output is a single trimmed line', () => {
+      expect(summarizeText('  hello   \n  world  ')).toBe('hello world');
+    });
   });
 });
 
