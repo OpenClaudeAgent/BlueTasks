@@ -7,45 +7,29 @@
 
 License: [MIT](LICENSE). Changelog: [CHANGELOG.md](CHANGELOG.md).
 
----
-
-## Run the published image (no clone)
-
-Replace `v0.1.3` with the [tag](https://github.com/OpenClaudeAgent/BlueTasks/tags) you want.
-
-1. **Pull** the image:
-
-   ```bash
-   docker pull ghcr.io/openclaudeagent/bluetasks:v0.1.3
-   ```
-
-   If the package is **private**: `docker login ghcr.io` first.
-
-2. **Data directory** on the host:
-
-   ```bash
-   mkdir -p ./bluetasks-data
-   ```
-
-3. **Run** (publish port **8787** and mount data):
-
-   ```bash
-   docker run --rm -d \
-     --name bluetasks \
-     -p 8787:8787 \
-     -v "$(pwd)/bluetasks-data:/app/.data" \
-     ghcr.io/openclaudeagent/bluetasks:v0.1.3
-   ```
-
-4. Open **http://localhost:8787**.
-
-5. **Stop**: `docker stop bluetasks`.
-
-`docker pull` alone does not start a server — you need `docker run` with **`-p 8787:8787`**.
+**App URL:** http://localhost:8787 · **SQLite (clone / Compose / `npm run start`):** `.data/bluetasks.sqlite` at the repo root (Compose mounts the `.data` folder).
 
 ---
 
-## From a repo clone (Docker Compose)
+## Prebuilt image
+
+Use any [release tag](https://github.com/OpenClaudeAgent/BlueTasks/tags) instead of `v0.1.4`. Private package: `docker login ghcr.io` first.
+
+```bash
+docker pull ghcr.io/openclaudeagent/bluetasks:v0.1.4
+mkdir -p ./bluetasks-data
+docker run --rm -d \
+  --name bluetasks \
+  -p 8787:8787 \
+  -v "$(pwd)/bluetasks-data:/app/.data" \
+  ghcr.io/openclaudeagent/bluetasks:v0.1.4
+```
+
+Stop: `docker stop bluetasks`
+
+---
+
+## From source (Compose)
 
 Requires [Node.js 22](https://nodejs.org/) and Docker.
 
@@ -55,8 +39,6 @@ cd BlueTasks
 npm run docker:release
 docker compose up --build -d
 ```
-
-Then **http://localhost:8787**. Data is in **`./.data`** at the repo root (mounted into the container).
 
 ---
 
@@ -69,8 +51,6 @@ npm install
 npm run build
 npm run start
 ```
-
-Then **http://localhost:8787**. SQLite is created at **`.data/bluetasks.sqlite`** in the repo root.
 
 ---
 

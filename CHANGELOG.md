@@ -14,6 +14,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - CI: optional manual runs (`workflow_dispatch`) for [CI](.github/workflows/ci.yml) and [Docker image](.github/workflows/docker-publish.yml).
 - CI: [Docker build check](.github/workflows/docker-build-check.yml) verifies the image builds on relevant PRs (amd64, no push).
 
+## [0.1.4] - 2026-03-21
+
+- Patch release; pull `ghcr.io/<owner>/bluetasks:v0.1.4` (multi-arch manifest).
+- CI actions upgraded (checkout/setup-node/upload-artifact, Docker build/push); README run docs; scenario Playwright suite; server Vitest `maxConcurrency` for stable API tests.
+
 ## [0.1.3] - 2026-03-20
 
 - Patch release; pull `ghcr.io/<owner>/bluetasks:v0.1.3` (multi-arch manifest).
@@ -30,7 +35,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial published image tag `v0.1.0` (multi-arch GHCR workflow).
 
-[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.0...v0.1.1
