@@ -4,7 +4,7 @@ import {CalendarDays, LoaderCircle, Pin, RotateCw, Timer, Trash2} from 'lucide-r
 import {useTranslation} from 'react-i18next';
 import {getAreaIconComponent} from '../../lib/areaIcons';
 import {formatDurationLabel, formatEstimateMinutesLabel, nextPriority} from '../../lib/taskCardFormat';
-import {coercePinned, coerceRecurrence} from '../../lib/tasks';
+import {coercePinned, coerceRecurrence} from '../../lib/taskPropertyValidation';
 import {todayKey} from '../../lib/date';
 import type {Area, RecurrenceKind, Task, TaskDraftUpdate} from '../../types';
 import {ESTIMATE_PRESETS, RECURRENCE_OPTIONS} from './constants';

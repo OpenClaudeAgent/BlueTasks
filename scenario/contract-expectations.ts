@@ -1,11 +1,10 @@
 import {expect} from '@playwright/test';
-import {apiAreaRowSchema} from '../contract/schemas/api-area-row.schema.js';
-import {apiTaskRowSchema} from '../contract/schemas/api-task-row.schema.js';
+import {assertApiAreaRowContract, assertApiTaskRowContract} from '../contract/api-contract-validation.js';
 
 export function expectApiTaskRow(t: unknown): void {
-  expect(() => apiTaskRowSchema.parse(t)).not.toThrow();
+  expect(() => assertApiTaskRowContract(t)).not.toThrow();
 }
 
 export function expectApiAreaRow(t: unknown): void {
-  expect(() => apiAreaRowSchema.parse(t)).not.toThrow();
+  expect(() => assertApiAreaRowContract(t)).not.toThrow();
 }

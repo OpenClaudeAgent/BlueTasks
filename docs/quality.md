@@ -43,3 +43,23 @@ Related workflows:
 
 - Validation logic lives in [`server/src/taskSanitize.ts`](../server/src/taskSanitize.ts) (unit tests).
 - HTTP app is wired in [`server/src/createApp.ts`](../server/src/createApp.ts) (mounts [`server/src/routes/`](../server/src/routes/) — tasks, areas, import/export) + in-memory DB for integration tests (`supertest`).
+
+## Module layout and import-cycle goals
+
+### API contract checks
+
+- Shared Zod contract assertions live in [`contract/api-contract-validation.ts`](../contract/api-contract-validation.ts) (`assertApiTaskRowContract`, `assertApiAreaRowContract`).
+- Playwright ([`scenario/contract-expectations.ts`](../scenario/contract-expectations.ts)) and Vitest ([`server/src/api.integration.test.helpers.ts`](../server/src/api.integration.test.helpers.ts)) only wrap those with framework-specific `expect`; they must not duplicate `parse` logic.
+
+### Task property coercion (web)
+
+- Normalisation of pinned / recurrence from API or SQLite shapes lives in [`web/app/src/lib/taskPropertyValidation.ts`](../web/app/src/lib/taskPropertyValidation.ts). [`web/app/src/lib/tasks.ts`](../web/app/src/lib/tasks.ts) re-exports for backward compatibility.
+
+### TaskCard derived values
+
+- Shared pure helpers for the task card (for example `areaNameByIdMap`, checklist ratio) belong in [`web/app/src/components/taskCard/taskCardModel.ts`](../web/app/src/components/taskCard/taskCardModel.ts). When splitting footer pickers into subcomponents, import from here rather than introducing a second model module or duplicating maps.
+
+### RPG / dependency-cycle KPIs
+
+- **Target**: eliminate **utility-to-utility** cycles (for example a layered `lib/date`: parsing → arithmetic → recurrence). Health tools should trend toward **zero** cycles inside pure `lib/` and `contract/` code after refactors.
+- **Acceptable residual**: some **UI ↔ lib** edges may remain (components importing date/format helpers). A small cross-file count there is acceptable unless it causes load-order or bundling issues; prioritise breaking cycles inside shared libraries first.

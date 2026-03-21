@@ -4,7 +4,7 @@ import {useTranslation} from 'react-i18next';
 import {formatTaskDatePill, getDateTone} from '../lib/date';
 import {formatTrackedSeconds} from '../lib/taskCardFormat';
 import {getAreaIconComponent} from '../lib/areaIcons';
-import {coercePinned, coerceRecurrence} from '../lib/tasks';
+import {coercePinned, coerceRecurrence} from '../lib/taskPropertyValidation';
 import type {Area, Task, TaskDraftUpdate} from '../types';
 import {TaskCardExpandedBody} from './taskCard/TaskCardExpandedBody';
 import {TaskCardHeaderRow} from './taskCard/TaskCardHeaderRow';

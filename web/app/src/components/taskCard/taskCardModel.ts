@@ -1,3 +1,7 @@
+/**
+ * Pure helpers shared by TaskCard, footer, and any extracted picker subcomponents.
+ * Prefer importing from here over duplicating maps/ratios or adding a parallel “model” module.
+ */
 import type {Area} from '../../types';
 
 export function checklistCompletionRatio(completed: number, total: number): number {
