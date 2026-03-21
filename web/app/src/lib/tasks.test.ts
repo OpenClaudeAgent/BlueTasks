@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {addDaysToKey, todayKey} from './date';
+import {addDaysToKey, todayKey} from './dateKeys';
 import {createEmptyEditorState} from './editorState';
 import type {Task} from '../types';
 import {

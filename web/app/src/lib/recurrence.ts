@@ -1,4 +1,4 @@
-import {addDaysToKey, addMonthsToKey, addYearsToKey} from './date';
+import {addDaysToKey, addMonthsToKey, addYearsToKey} from './dateKeys';
 import type {RecurrenceKind} from '../types';
 
 export function advanceRecurrenceDate(dateKey: string, kind: RecurrenceKind): string {

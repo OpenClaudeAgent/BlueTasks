@@ -49,7 +49,7 @@ Related workflows:
 ### API contract checks
 
 - Shared Zod contract assertions live in [`contract/api-contract-validation.ts`](../contract/api-contract-validation.ts) (`assertApiTaskRowContract`, `assertApiAreaRowContract`).
-- Playwright ([`scenario/contract-expectations.ts`](../scenario/contract-expectations.ts)) and Vitest ([`server/src/api.integration.test.helpers.ts`](../server/src/api.integration.test.helpers.ts)) only wrap those with framework-specific `expect`; they must not duplicate `parse` logic.
+- Playwright ([`scenario/contract-expectations.ts`](../scenario/contract-expectations.ts)) and Vitest ([`server/src/api.integration.test.helpers.ts`](../server/src/api.integration.test.helpers.ts)) re-export those assertions as `expectApiTaskRow` / `expectApiAreaRow` for stable import paths; they must not duplicate `parse` logic.
 
 ### Task property coercion (web)
 

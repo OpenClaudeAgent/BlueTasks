@@ -4,7 +4,7 @@ import {renderHook, waitFor} from '@testing-library/react';
 import {I18nextProvider} from 'react-i18next';
 import i18n from '../i18n';
 import {useBlueTasksBoard} from './useBlueTasksBoard';
-import {todayKey} from '../lib/date';
+import {todayKey} from '../lib/dateKeys';
 import {createTask} from '../lib/tasks';
 import {AREA_FILTER_ALL} from '../types';
 

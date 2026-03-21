@@ -24,7 +24,7 @@ vi.mock('../../api', () => ({
 }));
 
 import {createTask, mergeTaskFromApi} from '../../lib/tasks';
-import {addDaysToKey, todayKey} from '../../lib/date';
+import {addDaysToKey, todayKey} from '../../lib/dateKeys';
 import {AREA_FILTER_ALL} from '../../types';
 import {tasksApi, areasApi} from '../../api';
 
