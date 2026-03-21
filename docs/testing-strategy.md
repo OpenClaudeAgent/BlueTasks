@@ -60,9 +60,9 @@ describe('Feature: Task card time display', () => {
 
 ### End-to-end
 
-- **Production-shaped server**: [`e2e/app.spec.ts`](../e2e/app.spec.ts) — `GET /api/tasks` and `/` with built assets (see [`playwright.config.ts`](../playwright.config.ts)).
+- **Production-shaped server**: [`e2e/bluetasks.spec.ts`](../e2e/bluetasks.spec.ts) — API contract, **full UI flows** (create task + reload persistence, mark done, expand/collapse, sidebar sections, Settings → General), with [`e2e/helpers.ts`](../e2e/helpers.ts) for stable English UI (see [`playwright.config.ts`](../playwright.config.ts)).
 
-Expand E2E only for flows that **integration tests cannot trust** (e.g. full OAuth, file upload across browsers). Prefer more **integration** tests for business rules. The Playwright suite stays intentionally small: it checks that the built app and API respond, not every UI interaction.
+Add more E2E only for flows that **integration tests cannot trust** (e.g. full OAuth, file upload across browsers). Prefer **integration** tests for business rules; E2E should stay a **focused** set of real user paths, not a duplicate of every unit test.
 
 ---
 
