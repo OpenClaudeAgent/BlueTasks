@@ -1,7 +1,8 @@
 import {expect, test} from '@playwright/test';
 import {
   addTaskWithTitle,
-  expandTaskCardIfCollapsed,
+  assignTaskToAreaFromFooter,
+  clearTaskAreaFromFooter,
   reloadPageAfterApiSeed,
   resetBoard,
   taskCardByTitle,
@@ -22,14 +23,8 @@ test.describe('Assign task to area', () => {
 
     await addTaskWithTitle(page, 'Link me');
 
+    await assignTaskToAreaFromFooter(page, 'Link me', 'My Area');
     const card = taskCardByTitle(page, 'Link me');
-    await expandTaskCardIfCollapsed(page, 'Link me');
-    await card.locator('.taskCard__footerAreaTrigger').click();
-    await page.locator('.footerPopover').getByRole('button', {name: 'My Area'}).click();
-    await page.waitForResponse(
-      (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
-    );
-
     await expect(card.locator('.taskCard__chip--area')).toContainText('My Area');
 
     const list = await request.get('/api/tasks');
@@ -45,19 +40,9 @@ test.describe('Assign task to area', () => {
 
     await addTaskWithTitle(page, 'Detach');
 
+    await assignTaskToAreaFromFooter(page, 'Detach', 'Temp');
     const card = taskCardByTitle(page, 'Detach');
-    await expandTaskCardIfCollapsed(page, 'Detach');
-    await card.locator('.taskCard__footerAreaTrigger').click();
-    await page.locator('.footerPopover').getByRole('button', {name: 'Temp'}).click();
-    await page.waitForResponse(
-      (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
-    );
-
-    await card.locator('.taskCard__footerAreaTrigger').click();
-    await page.locator('.footerPopover').getByRole('button', {name: 'No area'}).click();
-    await page.waitForResponse(
-      (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
-    );
+    await clearTaskAreaFromFooter(page, 'Detach');
 
     await expect(card.locator('.taskCard__chip--area')).toHaveCount(0);
   });

@@ -1,5 +1,11 @@
 import {expect, test} from '@playwright/test';
-import {addTaskWithTitle, expandTaskCardIfCollapsed, reloadPageAfterApiSeed, resetBoard, taskCardByTitle} from './task-flow-helpers';
+import {
+  addTaskWithTitle,
+  assignTaskToAreaFromFooter,
+  reloadPageAfterApiSeed,
+  resetBoard,
+  taskCardByTitle,
+} from './task-flow-helpers';
 
 test.describe('Area filters', () => {
   test.describe.configure({mode: 'serial'});
@@ -17,12 +23,7 @@ test.describe('Area filters', () => {
     await addTaskWithTitle(page, 'No area task');
     await addTaskWithTitle(page, 'In zone task');
 
-    await expandTaskCardIfCollapsed(page, 'In zone task');
-    await taskCardByTitle(page, 'In zone task').locator('.taskCard__footerAreaTrigger').click();
-    await page.locator('.footerPopover').getByRole('button', {name: 'Work Zone'}).click();
-    await page.waitForResponse(
-      (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
-    );
+    await assignTaskToAreaFromFooter(page, 'In zone task', 'Work Zone');
 
     await page.locator('.sidebar__areasNav').getByRole('button', {name: /Unassigned/}).click();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
@@ -41,12 +42,7 @@ test.describe('Area filters', () => {
     await addTaskWithTitle(page, 'Loose');
     await addTaskWithTitle(page, 'Assigned');
 
-    await expandTaskCardIfCollapsed(page, 'Assigned');
-    await taskCardByTitle(page, 'Assigned').locator('.taskCard__footerAreaTrigger').click();
-    await page.locator('.footerPopover').getByRole('button', {name: 'Project X'}).click();
-    await page.waitForResponse(
-      (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
-    );
+    await assignTaskToAreaFromFooter(page, 'Assigned', 'Project X');
 
     await page.locator('.sidebar__areasNav').getByRole('button', {name: /Project X/}).click();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');

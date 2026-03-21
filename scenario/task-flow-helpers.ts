@@ -20,6 +20,14 @@ export async function resetBoard(page: Page, request: APIRequestContext): Promis
   await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
 }
 
+/** Local calendar date `YYYY-MM-DD` (runner timezone — same as typical browser locale for E2E). */
+export function localDateYmd(d: Date = new Date()): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 /** Quick capture field (sidebar): same accessible name in EN locale. */
 export function quickCaptureTextbox(page: Page) {
   return page.getByRole('textbox', {name: /Capture a task/i});
@@ -75,6 +83,31 @@ export async function reloadPageAfterApiSeed(page: Page): Promise<void> {
   await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
 }
 
+/**
+ * Full UI flow: Settings → Areas → name → Add. Closes the dialog; sidebar shows the new zone.
+ * Uses English labels (same as {@link gotoWithEnglish}).
+ */
+export async function createAreaViaSettingsUi(page: Page, name: string): Promise<{id: string}> {
+  await page.getByRole('button', {name: 'Settings'}).click();
+  const dialog = page.getByRole('dialog', {name: 'Settings'});
+  await dialog.getByRole('button', {name: 'Areas'}).click();
+
+  const postArea = page.waitForResponse(
+    (r) => r.url().includes('/api/areas') && r.request().method() === 'POST' && r.status() === 201,
+  );
+  await dialog.getByPlaceholder('New area name').fill(name);
+  await dialog.getByRole('button', {name: 'Add'}).click();
+  const areaRes = await postArea;
+  const created = (await areaRes.json()) as {id: string; name: string};
+  expect(created.name).toBe(name);
+
+  await expect(dialog.getByText(name)).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('.sidebar__areasNav').getByRole('button', {name: new RegExp(name)})).toBeVisible();
+
+  return {id: created.id};
+}
+
 export async function expandTaskCardIfCollapsed(page: Page, title: string): Promise<void> {
   const card = taskCardByTitle(page, title);
   const areaTrigger = card.locator('.taskCard__footerAreaTrigger');
@@ -84,4 +117,29 @@ export async function expandTaskCardIfCollapsed(page: Page, title: string): Prom
       await collapsedTitle.click();
     }
   }
+}
+
+function waitForTaskPutOk(page: Page) {
+  return page.waitForResponse(
+    (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
+  );
+}
+
+/** Footer area popover → pick a zone → wait for successful task PUT. */
+export async function assignTaskToAreaFromFooter(page: Page, title: string, areaName: string): Promise<void> {
+  const card = taskCardByTitle(page, title);
+  await expandTaskCardIfCollapsed(page, title);
+  await card.locator('.taskCard__footerAreaTrigger').click();
+  const put = waitForTaskPutOk(page);
+  await page.locator('.footerPopover').getByRole('button', {name: areaName}).click();
+  await put;
+}
+
+/** Footer area popover → “No area” → wait for successful task PUT. */
+export async function clearTaskAreaFromFooter(page: Page, title: string): Promise<void> {
+  const card = taskCardByTitle(page, title);
+  await card.locator('.taskCard__footerAreaTrigger').click();
+  const put = waitForTaskPutOk(page);
+  await page.locator('.footerPopover').getByRole('button', {name: 'No area'}).click();
+  await put;
 }
