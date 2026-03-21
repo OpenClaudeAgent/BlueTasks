@@ -4,19 +4,23 @@
 
 | Command | Role |
 |--------|------|
-| `npm run lint` | **ESLint** — web (TS, React Hooks, **jsx-a11y**; **Vitest** + **Testing Library** on `*.test.*` only), **Stylelint** on `web/app/src/**/*.css`, server (TS + **Vitest** on `*.test.ts`), **Playwright** ESLint on [`scenario/`](../scenario/) ([`eslint.scenario.config.mjs`](../eslint.scenario.config.mjs)) |
+| `npm run lint` | Runs all of: `lint:eslint-web` → `lint:stylelint` → `lint:eslint-server` → `lint:eslint-scenario` (same split as CI jobs) |
+| `npm run lint:eslint-web` | **ESLint** — web only (TS, React Hooks, **jsx-a11y**; **Vitest** + **Testing Library** on `*.test.*` only) |
+| `npm run lint:stylelint` | **Stylelint** — `web/app/src/**/*.css` |
+| `npm run lint:eslint-server` | **ESLint** — server (TS + **Vitest** on `*.test.ts`) |
+| `npm run lint:eslint-scenario` | **ESLint** — Playwright rules on [`scenario/`](../scenario/) ([`eslint.scenario.config.mjs`](../eslint.scenario.config.mjs)) |
 | `npm run test` | Vitest — **web** (`src/lib` + **RTL** on `SettingsDialog`) + **server** (sanitize, HTTP API, `dbSetup`, icons) |
 | `npm run test:coverage` | Vitest with the broader web thresholds ([`web/app/vitest.config.ts`](../web/app/vitest.config.ts)) |
 | `npm run test:coverage:gate` | **CI gate — ≥80%** lines, statements, branches, functions on [`web/app/src/lib/**`](../web/app/src/lib) and on [`server/src/**`](../server/src) except `index.ts` ([gate configs](../web/app/vitest.coverage-gate.config.ts)) |
 | `npm run duplicates` | [jscpd](https://github.com/kucherenko/jscpd) — copy-paste clones (global threshold in `.jscpd.json`) |
 | `npm run test:scenario` | Playwright — built SPA + real server ([`scenario/`](../scenario/), [`playwright.config.ts`](../playwright.config.ts)) |
 | `npm run semgrep:docker` | **Semgrep** — same scans as CI (Docker; needs Docker running) |
-| `npm run ci` | `lint` → `duplicates` → **`test:coverage:gate`** → `build` → `test:scenario` (Semgrep runs in the **lint** CI job; locally use `semgrep:docker`) |
+| `npm run ci` | `lint` → `duplicates` → **`test:coverage:gate`** → `build` → `test:scenario` (does **not** run Semgrep — use `semgrep:docker` locally; CI runs Semgrep in its own job) |
 | `npm run check` | Alias for `ci` |
 
 ## GitHub Actions CI
 
-Workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on Node 22, split across **parallel** jobs: **`lint`** runs `npm run lint` (ESLint + Stylelint + scenario ESLint), **jscpd**, then one **Semgrep** step (single Docker run: `p/typescript` + `p/react` on `web/app/src`, then `p/typescript` only on `server/src` — equivalent to two scans, no React pack on the API); **`test`** runs **`npm run test:coverage:gate`** and uploads `coverage-gate/` summaries; **`build`** runs the production build; **`scenario`** runs Playwright. You can also run it manually via **Actions → CI → Run workflow**.
+Workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on Node 22. **Quality checks are separate jobs** (each appears as its own row in the Actions UI): **ESLint (web)**, **Stylelint (web CSS)**, **ESLint (server)**, **ESLint (Playwright scenario)**, **Duplication (jscpd)**, **Semgrep** (Docker: `p/typescript` + `p/react` on `web/app/src`, then `p/typescript` on `server/src`), then **Tests & coverage**, **Production build**, **Scenario tests (Playwright)**. They run in parallel where GitHub schedules them; **any failed job marks the workflow run as failed** (steps use the default `continue-on-error: false`). Run manually via **Actions → CI → Run workflow**.
 
 To mirror this in another repository (e.g. **OpenClaudeAgent/open-flow**), copy the same pattern: a dedicated Vitest config with `coverage.thresholds` at **80** and a CI step that runs `npm run test:coverage:gate` (or your package manager equivalent).
 

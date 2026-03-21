@@ -1,4 +1,5 @@
-# Same quality gate as `npm run ci`: lint → Stylelint (via npm run lint) → jscpd → Semgrep → coverage gate (≥80%) → build → Playwright scenario tests (split across parallel jobs).
+# Quality gates mirror `npm run ci` pieces, each as its own job for clear Actions output.
+# Any failing step exits non-zero → that job fails → the workflow run is red (unless a step sets continue-on-error).
 name: CI
 
 on:
@@ -13,29 +14,78 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
-    name: Lint & duplicates
+  eslint-web:
+    name: ESLint (web)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
-
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm
+      - run: npm ci
+      - run: npm run lint:eslint-web
 
-      - name: Install dependencies
-        run: npm ci
+  stylelint:
+    name: Stylelint (web CSS)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:stylelint
 
-      - name: ESLint (web + server + scenario)
-        run: npm run lint
+  eslint-server:
+    name: ESLint (server)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:eslint-server
 
-      - name: Duplication scan (jscpd)
-        run: npm run duplicates
+  eslint-scenario:
+    name: ESLint (Playwright scenario)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:eslint-scenario
 
-      # Same logic as two separate steps, one container: React rules only on web; TS only on server.
-      - name: Semgrep (web TS+React, server TS only)
+  jscpd:
+    name: Duplication (jscpd)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run duplicates
+
+  semgrep:
+    name: Semgrep (TS + React web, TS server)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - name: Semgrep scan
         run: |
           docker run --rm -v "${{ github.workspace }}:/src" -w /src semgrep/semgrep sh -c \
             'semgrep scan --config p/typescript --config p/react --error web/app/src && semgrep scan --config p/typescript --error server/src'
@@ -46,18 +96,13 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v6
-
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
+      - run: npm ci
       - name: Tests with coverage gate (≥80%)
         run: npm run test:coverage:gate
-
       - name: Upload web coverage (gate scope)
         uses: actions/upload-artifact@v7
         if: success()
@@ -65,7 +110,6 @@ jobs:
           name: coverage-web-gate
           path: web/app/coverage-gate
           if-no-files-found: ignore
-
       - name: Upload server coverage (gate scope)
         uses: actions/upload-artifact@v7
         if: success()
@@ -80,17 +124,12 @@ jobs:
     timeout-minutes: 12
     steps:
       - uses: actions/checkout@v6
-
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Production build
-        run: npm run build
+      - run: npm ci
+      - run: npm run build
 
   scenario:
     name: Scenario tests (Playwright)
@@ -98,18 +137,13 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
-
       - uses: actions/setup-node@v6
         with:
           node-version: "22"
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
+      - run: npm ci
       - name: Install Playwright Chromium
         run: npx playwright install chromium --with-deps
-
       - name: Run Playwright (scenario)
         env:
           CI: "true"
