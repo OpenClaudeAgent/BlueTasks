@@ -323,7 +323,7 @@ function EditorSyncPlugin({
       return;
     }
 
-    let currentSerialized = '';
+    let currentSerialized: string;
     try {
       currentSerialized = JSON.stringify(editor.getEditorState().toJSON());
     } catch {

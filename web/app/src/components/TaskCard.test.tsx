@@ -15,7 +15,6 @@ import {TaskCard} from './TaskCard';
 vi.mock('./LexicalTaskEditor', () => ({
   LexicalTaskEditor: ({
     onChange,
-    value: _value,
   }: {
     onChange?: (payload: {
       json: string;

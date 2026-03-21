@@ -211,6 +211,7 @@ export function SettingsDialog({
                     <input
                       accept=".sqlite,application/vnd.sqlite3,application/octet-stream"
                       className="visuallyHidden"
+                      data-testid="settings-sqlite-import-input"
                       onChange={(e) => void handleImportFileChange(e)}
                       ref={importInputRef}
                       tabIndex={-1}

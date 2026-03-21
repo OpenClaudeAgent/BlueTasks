@@ -144,8 +144,7 @@ describe('SettingsDialog', () => {
     );
     await screen.findByRole('dialog');
     await user.click(screen.getByRole('button', {name: /general/i}));
-    const input = document.body.querySelector('input[type="file"]') as HTMLInputElement;
-    expect(input).toBeTruthy();
+    const input = screen.getByTestId('settings-sqlite-import-input');
     const file = new File(['x'], 'backup.sqlite', {type: 'application/octet-stream'});
     await user.upload(input, file);
     expect(uploadDatabaseImport).toHaveBeenCalledWith(file);
@@ -168,8 +167,7 @@ describe('SettingsDialog', () => {
     );
     await screen.findByRole('dialog');
     await user.click(screen.getByRole('button', {name: /general/i}));
-    const input = document.body.querySelector('input[type="file"]') as HTMLInputElement;
-    expect(input).toBeTruthy();
+    const input = screen.getByTestId('settings-sqlite-import-input');
     await user.upload(input, new File(['x'], 'b.sqlite'));
     expect(uploadDatabaseImport).not.toHaveBeenCalled();
   });
