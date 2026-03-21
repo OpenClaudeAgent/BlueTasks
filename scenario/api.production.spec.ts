@@ -1,38 +1,73 @@
 import {expect, test} from '@playwright/test';
+import type {APIRequestContext, APIResponse} from '@playwright/test';
+import {expectJsonContentType} from './api-production-helpers';
 import {expectApiAreaRow, expectApiTaskRow} from './contract-expectations';
+
+const GET_LIST_CASES = [
+  {
+    title: 'GET /api/tasks returns JSON array of full task rows',
+    path: '/api/tasks',
+    validateRow: expectApiTaskRow,
+  },
+  {
+    title: 'GET /api/areas returns JSON array of area rows',
+    path: '/api/areas',
+    validateRow: expectApiAreaRow,
+  },
+] as const;
+
+type NotFoundCase = {
+  title: string;
+  act: (request: APIRequestContext) => Promise<APIResponse>;
+  expectedJson: Record<string, string>;
+};
+
+const API_NOT_FOUND_CASES: NotFoundCase[] = [
+  {
+    title: 'PUT /api/tasks/:id with unknown id returns 404 and message',
+    act: (request) =>
+      request.put('/api/tasks/00000000-0000-4000-8000-000000000001', {
+        data: {title: 'ghost'},
+      }),
+    expectedJson: {message: 'Task not found'},
+  },
+  {
+    title: 'PUT /api/areas/:id with unknown id returns 404',
+    act: (request) =>
+      request.put('/api/areas/00000000-0000-4000-8000-000000000002', {
+        data: {name: 'x'},
+      }),
+    expectedJson: {message: 'Area not found'},
+  },
+  {
+    title: 'DELETE /api/areas/:id with unknown id returns 404',
+    act: (request) => request.delete('/api/areas/00000000-0000-4000-8000-000000000003'),
+    expectedJson: {message: 'Area not found'},
+  },
+];
 
 test.describe('API (production server)', () => {
   test.describe.configure({mode: 'serial'});
 
-  test('GET /api/tasks returns JSON array of full task rows', async ({request}) => {
-    const res = await request.get('/api/tasks');
-    expect(res.status()).toBe(200);
-    const ct = res.headers()['content-type'] ?? '';
-    expect(ct).toMatch(/application\/json/i);
-    const body: unknown = await res.json();
-    expect(Array.isArray(body)).toBe(true);
-    for (const row of body as object[]) {
-      expectApiTaskRow(row);
-    }
-  });
-
-  test('GET /api/areas returns JSON array of area rows', async ({request}) => {
-    const res = await request.get('/api/areas');
-    expect(res.status()).toBe(200);
-    expect(res.headers()['content-type'] ?? '').toMatch(/application\/json/i);
-    const body: unknown = await res.json();
-    expect(Array.isArray(body)).toBe(true);
-    for (const row of body as object[]) {
-      expectApiAreaRow(row);
-    }
-  });
+  for (const c of GET_LIST_CASES) {
+    test(c.title, async ({request}) => {
+      const res = await request.get(c.path);
+      expect(res.status()).toBe(200);
+      expectJsonContentType(res);
+      const body: unknown = await res.json();
+      expect(Array.isArray(body)).toBe(true);
+      for (const row of body as object[]) {
+        c.validateRow(row);
+      }
+    });
+  }
 
   test('POST /api/tasks returns 201 with a valid task row', async ({request}) => {
     const res = await request.post('/api/tasks', {
       data: {title: 'API create probe'},
     });
     expect(res.status()).toBe(201);
-    expect(res.headers()['content-type'] ?? '').toMatch(/application\/json/i);
+    expectJsonContentType(res);
     const row: unknown = await res.json();
     expectApiTaskRow(row);
     expect((row as {title: string}).title).toBe('API create probe');
@@ -56,7 +91,7 @@ test.describe('API (production server)', () => {
       },
     });
     expect(put.status()).toBe(200);
-    expect(put.headers()['content-type'] ?? '').toMatch(/application\/json/i);
+    expectJsonContentType(put);
     const updated = (await put.json()) as Record<string, unknown>;
     expectApiTaskRow(updated);
     expect(updated.title).toBe('PUT after');
@@ -82,21 +117,21 @@ test.describe('API (production server)', () => {
     expect(tasks.find((t) => t.id === id)).toBeUndefined();
   });
 
-  test('PUT /api/tasks/:id with unknown id returns 404 and message', async ({request}) => {
-    const res = await request.put('/api/tasks/00000000-0000-4000-8000-000000000001', {
-      data: {title: 'ghost'},
+  for (const c of API_NOT_FOUND_CASES) {
+    test(c.title, async ({request}) => {
+      const res = await c.act(request);
+      expect(res.status()).toBe(404);
+      expectJsonContentType(res);
+      expect(await res.json()).toEqual(c.expectedJson);
     });
-    expect(res.status()).toBe(404);
-    expect(res.headers()['content-type'] ?? '').toMatch(/application\/json/i);
-    expect(await res.json()).toEqual({message: 'Task not found'});
-  });
+  }
 
   test('POST /api/areas returns 201; row appears on GET; DELETE returns 204', async ({request}) => {
     const post = await request.post('/api/areas', {
       data: {name: '  API area  ', icon: 'folder'},
     });
     expect(post.status()).toBe(201);
-    expect(post.headers()['content-type'] ?? '').toMatch(/application\/json/i);
+    expectJsonContentType(post);
     const created = (await post.json()) as Record<string, unknown>;
     expectApiAreaRow(created);
     expect(created.name).toBe('API area');
@@ -135,20 +170,6 @@ test.describe('API (production server)', () => {
     expect(row.name).toBe('Renamed');
 
     await request.delete(`/api/areas/${id}`);
-  });
-
-  test('PUT /api/areas/:id with unknown id returns 404', async ({request}) => {
-    const res = await request.put('/api/areas/00000000-0000-4000-8000-000000000002', {
-      data: {name: 'x'},
-    });
-    expect(res.status()).toBe(404);
-    expect(await res.json()).toEqual({message: 'Area not found'});
-  });
-
-  test('DELETE /api/areas/:id with unknown id returns 404', async ({request}) => {
-    const res = await request.delete('/api/areas/00000000-0000-4000-8000-000000000003');
-    expect(res.status()).toBe(404);
-    expect(await res.json()).toEqual({message: 'Area not found'});
   });
 
   test('POST /api/tasks with areaId persists link when area exists', async ({request}) => {

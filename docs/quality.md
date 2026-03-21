@@ -12,7 +12,7 @@
 | `npm run test` | Vitest — **web** (`src/lib` + **RTL** on `SettingsDialog`) + **server** (sanitize, HTTP API, `dbSetup`, icons) |
 | `npm run test:coverage` | Vitest with the broader web thresholds ([`web/app/vitest.config.ts`](../web/app/vitest.config.ts)) |
 | `npm run test:coverage:gate` | **CI gate** — web: almost all [`web/app/src/`](../web/app/src/) (see [gate config](../web/app/vitest.coverage-gate.config.ts) exclusions); server: [`server/src/**`](../server/src) except `index.ts`. New tests should follow **behaviour-first BDD** ([testing-strategy.md](testing-strategy.md#behaviour-first-not-tests-for-tests)), not coverage for its own sake. |
-| `npm run duplicates` | [jscpd](https://github.com/kucherenko/jscpd) — copy-paste clones (global threshold in `.jscpd.json`) |
+| `npm run duplicates` | [jscpd](https://github.com/kucherenko/jscpd) — copy-paste clones (threshold in [`.jscpd.json`](../.jscpd.json)); writes an **HTML drill-down** under `jscpd-report/html/` (gitignored) alongside console output |
 | `npm run test:scenario` | Playwright — built SPA + real server ([`scenario/`](../scenario/), [`playwright.config.ts`](../playwright.config.ts)); locally full suite. **CI** splits with `--shard=1/2` and `--shard=2/2` (two isolated runners; see [testing-strategy.md](testing-strategy.md#end-to-end)) |
 | `npm run semgrep:docker` | **Semgrep** — same as CI: (1) whole [`web/app/`](../web/app/) with `p/typescript` + `p/react` (Vite/Vitest configs + `src/`, not only `src/`), (2) [`server/`](../server/) + [`contract/`](../contract/) + [`scenario/`](../scenario/) + [`scripts/`](../scripts/) + root `playwright.config.ts` + `eslint.*.config.mjs` with `p/typescript` only (Docker) |
 | `npm run ci` | `lint` → `duplicates` → **`test:coverage:gate`** → `build` → `test:scenario` (does **not** run Semgrep — use `semgrep:docker` locally; CI runs Semgrep in its own job) |
@@ -42,4 +42,4 @@ Related workflows:
 ## Server
 
 - Validation logic lives in [`server/src/taskSanitize.ts`](../server/src/taskSanitize.ts) (unit tests).
-- HTTP app is injectable via [`server/src/createApp.ts`](../server/src/createApp.ts) + in-memory DB for integration tests (`supertest`).
+- HTTP app is wired in [`server/src/createApp.ts`](../server/src/createApp.ts) (mounts [`server/src/routes/`](../server/src/routes/) — tasks, areas, import/export) + in-memory DB for integration tests (`supertest`).

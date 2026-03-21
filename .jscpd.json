@@ -13,6 +13,7 @@
     "**/package-lock.json",
     "**/.git/**"
   ],
-  "reporters": ["console"],
+  "reporters": ["console", "html"],
+  "output": "./jscpd-report",
   "absolute": true
 }
