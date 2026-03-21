@@ -13,6 +13,18 @@ export async function resetBoard(page: Page, request: APIRequestContext): Promis
   await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
 }
 
+/** Quick capture field (sidebar): same accessible name in EN locale. */
+export function quickCaptureTextbox(page: Page) {
+  return page.getByRole('textbox', {name: /Capture a task/i});
+}
+
+/** Wait for POST /api/tasks from the SPA (quick capture or add task). */
+export function waitForTaskCreateResponse(page: Page) {
+  return page.waitForResponse(
+    (r) => r.url().includes('/api/tasks') && r.request().method() === 'POST' && r.status() === 201,
+  );
+}
+
 /** POST task + save title; card stays expanded with editor visible. */
 export async function addTaskWithTitle(page: Page, title: string): Promise<void> {
   const post = page.waitForResponse(
