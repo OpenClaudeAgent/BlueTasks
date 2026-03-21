@@ -1,12 +1,53 @@
-node_modules
+# --- Dépendances ---
+node_modules/
+
+# --- Builds (Vite, tsc) ---
+dist/
+web/app/dist/
+server/dist/
+*.tsbuildinfo
+.vite/
+
+# --- Tests & couverture ---
+coverage/
+**/coverage/
+
+# --- Environnement & secrets (ne jamais committer) ---
 .env
 .env.*
 !.env.example
-.DS_Store
-.data
-**/coverage
-web/app/dist
-server/dist
 
-# Graphe MCP RPG (local, régénérable avec build_rpg)
+# --- Données SQLite locales (dev / Docker volume) ---
+.data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# --- Logs ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- IDE (garde les presets partageables si tu en ajoutes) ---
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# --- Linters / caches ---
+.eslintcache
+
+# --- Outils locaux (MCP RPG, etc.) ---
 .rpg/
