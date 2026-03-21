@@ -54,6 +54,7 @@ Related workflows:
 ### Task property coercion (web)
 
 - Normalisation of pinned / recurrence from API or SQLite shapes lives in [`web/app/src/lib/taskPropertyValidation.ts`](../web/app/src/lib/taskPropertyValidation.ts). [`web/app/src/lib/tasks.ts`](../web/app/src/lib/tasks.ts) re-exports for backward compatibility.
+- **`coercePinned` and `coerceRecurrence` are deliberate single entry points** for those boundaries: many call sites are expected; extend behaviour there (or add focused helpers they call) rather than scattering ad hoc checks in components or hooks.
 
 ### TaskCard derived values
 

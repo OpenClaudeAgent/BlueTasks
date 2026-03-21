@@ -96,6 +96,37 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
     }
   }, [fetchAndApplyLists]);
 
+  const persistOptimisticNewTask = useCallback(
+    async (
+      optimisticTask: Task,
+      options: {titleFocusTaskId: string | null; clearTitleFocusOnError: boolean},
+    ) => {
+      setTasks((current) => sortTasks([optimisticTask, ...current]));
+      bridgeRef.current.setSelectedSection(getTaskSection(optimisticTask));
+      bridgeRef.current.setSelectedTaskId(optimisticTask.id);
+      bridgeRef.current.setTitleFocusTaskId(options.titleFocusTaskId);
+      bridgeRef.current.setErrorMessage(null);
+
+      try {
+        const saved = await tasksApi.create({
+          id: optimisticTask.id,
+          ...toTaskDraftPayload(optimisticTask),
+        });
+        setTasks((current) =>
+          sortTasks(current.map((task) => (task.id === saved.id ? mergeTaskFromApi(saved as Task) : task))),
+        );
+      } catch (error) {
+        const tr = tRef.current;
+        bridgeRef.current.setErrorMessage(error instanceof Error ? error.message : tr('errors.createTask'));
+        if (options.clearTitleFocusOnError) {
+          bridgeRef.current.setTitleFocusTaskId(null);
+        }
+        await loadTasksAndAreas();
+      }
+    },
+    [loadTasksAndAreas],
+  );
+
   function setSavingFlag(taskId: string, value: boolean) {
     setSavingIds((current) => {
       if (!value) {
@@ -229,25 +260,10 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
     const captureAreaId =
       areaFilter !== AREA_FILTER_ALL && areaFilter !== AREA_FILTER_UNCATEGORIZED ? areaFilter : null;
     const optimisticTask = createTask('', captureAreaId);
-
-    setTasks((current) => sortTasks([optimisticTask, ...current]));
-    bridgeRef.current.setSelectedSection(getTaskSection(optimisticTask));
-    bridgeRef.current.setSelectedTaskId(optimisticTask.id);
-    bridgeRef.current.setTitleFocusTaskId(optimisticTask.id);
-    bridgeRef.current.setErrorMessage(null);
-
-    try {
-      const saved = await tasksApi.create({
-        id: optimisticTask.id,
-        ...toTaskDraftPayload(optimisticTask),
-      });
-      setTasks((current) => sortTasks(current.map((task) => (task.id === saved.id ? mergeTaskFromApi(saved) : task))));
-    } catch (error) {
-      const tr = tRef.current;
-      bridgeRef.current.setErrorMessage(error instanceof Error ? error.message : tr('errors.createTask'));
-      bridgeRef.current.setTitleFocusTaskId(null);
-      await loadTasksAndAreas();
-    }
+    await persistOptimisticNewTask(optimisticTask, {
+      titleFocusTaskId: optimisticTask.id,
+      clearTitleFocusOnError: true,
+    });
   }
 
   /** Header quick capture: title preset, optional default date from active section (Today / Upcoming). */
@@ -274,25 +290,12 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
         taskDate,
       };
 
-      setTasks((current) => sortTasks([optimisticTask, ...current]));
-      bridgeRef.current.setSelectedSection(getTaskSection(optimisticTask));
-      bridgeRef.current.setSelectedTaskId(optimisticTask.id);
-      bridgeRef.current.setTitleFocusTaskId(null);
-      bridgeRef.current.setErrorMessage(null);
-
-      try {
-        const saved = await tasksApi.create({
-          id: optimisticTask.id,
-          ...toTaskDraftPayload(optimisticTask),
-        });
-        setTasks((current) => sortTasks(current.map((task) => (task.id === saved.id ? mergeTaskFromApi(saved as Task) : task))));
-      } catch (error) {
-        const tr = tRef.current;
-        bridgeRef.current.setErrorMessage(error instanceof Error ? error.message : tr('errors.createTask'));
-        await loadTasksAndAreas();
-      }
+      await persistOptimisticNewTask(optimisticTask, {
+        titleFocusTaskId: null,
+        clearTitleFocusOnError: false,
+      });
     },
-    [loadTasksAndAreas],
+    [persistOptimisticNewTask],
   );
 
   async function handleDelete(taskId: string) {

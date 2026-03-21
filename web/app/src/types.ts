@@ -42,22 +42,7 @@ export type Task = {
   updatedAt: string;
 };
 
-export type TaskDraftPayload = {
-  title: string;
-  status: TaskStatus;
-  taskDate: string | null;
-  contentJson: string;
-  contentText: string;
-  checklistTotal: number;
-  checklistCompleted: number;
-  priority: TaskPriority;
-  estimateMinutes: number | null;
-  pinned: boolean;
-  timeSpentSeconds: number;
-  timerStartedAt: string | null;
-  recurrence: RecurrenceKind | null;
-  areaId: string | null;
-};
+export type TaskDraftPayload = Omit<Task, 'id' | 'createdAt' | 'updatedAt'>;
 
 export type TaskDraftUpdate = Partial<TaskDraftPayload>;
 

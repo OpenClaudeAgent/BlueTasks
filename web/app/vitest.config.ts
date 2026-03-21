@@ -1,14 +1,12 @@
 import {defineConfig, mergeConfig} from 'vitest/config';
 import viteConfig from './vite.config';
+import {appVitestTestDefaults} from './vitest.app-test-defaults';
 
 export default mergeConfig(
   viteConfig,
   defineConfig({
     test: {
-      globals: false,
-      include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
-      setupFiles: ['./src/test/setup.ts'],
-      environment: 'node',
+      ...appVitestTestDefaults,
       coverage: {
         provider: 'v8',
         reporter: ['text', 'json-summary', 'html'],

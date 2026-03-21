@@ -3,13 +3,12 @@
  * Keeps recurrence / task section logic separate from presentation (`dateFormat.ts`).
  */
 
+import {parseTaskDate} from './parseDateKey';
+
+export {parseTaskDate};
+
 export function todayKey(): string {
   return new Date().toISOString().slice(0, 10);
-}
-
-export function parseTaskDate(dateKey: string): Date {
-  const [year, month, day] = dateKey.split('-').map(Number);
-  return new Date(year, month - 1, day, 12);
 }
 
 export function formatDateKey(date: Date): string {

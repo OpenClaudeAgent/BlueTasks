@@ -3,6 +3,16 @@ import type Database from 'better-sqlite3';
 import {Router} from 'express';
 import {normalizeAreaIcon} from '../areaIconIds.js';
 
+function areaRowToJson(row: Record<string, unknown>) {
+  return {
+    id: row.id,
+    name: row.name,
+    icon: normalizeAreaIcon(row.icon),
+    sortIndex: Number(row.sortIndex) || 0,
+    createdAt: row.createdAt,
+  };
+}
+
 export function createAreasRouter(getDb: () => Database.Database): Router {
   const r = Router();
 
@@ -17,15 +27,7 @@ export function createAreasRouter(getDb: () => Database.Database): Router {
       )
       .all() as Record<string, unknown>[];
 
-    res.json(
-      rows.map((row) => ({
-        id: row.id,
-        name: row.name,
-        icon: normalizeAreaIcon(row.icon),
-        sortIndex: Number(row.sortIndex) || 0,
-        createdAt: row.createdAt,
-      })),
-    );
+    res.json(rows.map((row) => areaRowToJson(row)));
   });
 
   r.post('/', (req, res) => {
@@ -79,13 +81,7 @@ export function createAreasRouter(getDb: () => Database.Database): Router {
       .prepare('SELECT id, name, icon, sort_index as sortIndex, created_at as createdAt FROM areas WHERE id = ?')
       .get(req.params.id) as Record<string, unknown>;
 
-    res.json({
-      id: row.id,
-      name: row.name,
-      icon: normalizeAreaIcon(row.icon),
-      sortIndex: Number(row.sortIndex) || 0,
-      createdAt: row.createdAt,
-    });
+    res.json(areaRowToJson(row));
   });
 
   r.delete('/:id', (req, res) => {
