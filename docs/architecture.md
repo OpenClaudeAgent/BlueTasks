@@ -29,7 +29,7 @@ Toute nouvelle icône doit : mettre à jour le JSON, le mapping Lucide côté we
 
 ## Docker
 
-- Image **multi-étapes** : build Vite + serveur dans `builder`, exécution avec dépendances prod du workspace serveur uniquement. Détails et GHCR : [`docs/docker.md`](docker.md).
+- **Build JS** (Vite + `tsc`) sur le développeur ou **GitHub Actions** ; le contexte Docker (`.dockerctx/`) ne transporte que les `dist` + lockfiles. **`npm ci` prod serveur** s’exécute dans une étape Docker **Linux** (`deps`), puis image finale sans toolchain. Détails et GHCR : [`docs/docker.md`](docker.md).
 - Données dans **`/app/.data`** (ex. `./.data` via `docker-compose`). Variables : `HOST=0.0.0.0`, `PORT=8787`.
 
 ## Structure serveur (tests)

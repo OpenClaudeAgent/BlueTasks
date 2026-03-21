@@ -1,10 +1,10 @@
-# Données : ./.data → /app/.data (bluetasks.sqlite). Pour une image GHCR, remplacez build par :
-# image: ghcr.io/<owner>/bluetasks:<tag>
+# Données : ./.data → /app/.data (bluetasks.sqlite).
+# Avant le premier build : npm run docker:release  (génère .dockerctx/ + dépendances prod).
+# Image GHCR : remplacez build par image: ghcr.io/<owner>/bluetasks:<tag>
 services:
   bluetasks:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: .dockerctx
     ports:
       - "8787:8787"
     environment:

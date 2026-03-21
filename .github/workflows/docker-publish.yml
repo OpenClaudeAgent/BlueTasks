@@ -1,5 +1,5 @@
-# Build AMD64 et ARM64 en parallèle (runners natifs, sans QEMU).
-# Puis assemblage d’un manifest multi-arch pour :tag et :latest.
+# Build npm (Vite + tsc + deps prod) sur le runner, puis image = copie du contexte .dockerctx/
+# (pas de npm ci / toolchain dans Docker → image beaucoup plus légère).
 name: Docker image
 
 on:
@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   build:
-    name: Build (${{ matrix.slug }})
+    name: Image (${{ matrix.slug }})
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -31,6 +31,20 @@ jobs:
             runner: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install (dev + prod)
+        run: npm ci
+
+      - name: Production build (Vite + server tsc)
+        run: npm run build
+
+      - name: Assembler le contexte Docker (sans node_modules)
+        run: bash scripts/assemble-docker-context.sh
 
       - name: Image name (lowercase)
         id: meta
@@ -46,12 +60,12 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: .
+          context: .dockerctx
           push: true
           platforms: ${{ matrix.platform }}
           tags: ${{ steps.meta.outputs.image }}:${{ github.ref_name }}-${{ matrix.slug }}
-          cache-from: type=gha,scope=bluetasks-${{ matrix.slug }}
-          cache-to: type=gha,mode=max,scope=bluetasks-${{ matrix.slug }}
+          cache-from: type=gha,scope=bluetasks-ctx-${{ matrix.slug }}
+          cache-to: type=gha,mode=max,scope=bluetasks-ctx-${{ matrix.slug }}
 
   merge:
     name: Publish multi-arch manifest

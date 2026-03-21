@@ -16,7 +16,9 @@
     "test:coverage": "npm run test:coverage --workspace @bluetasks/app && npm run test:coverage --workspace @bluetasks/server",
     "duplicates": "jscpd .",
     "ci": "npm run lint && npm run duplicates && npm run test:coverage && npm run build",
-    "check": "npm run ci"
+    "check": "npm run ci",
+    "docker:prepare": "bash scripts/assemble-docker-context.sh",
+    "docker:release": "npm ci && npm run build && npm run docker:prepare"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

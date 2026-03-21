@@ -2,9 +2,10 @@
 
 ## Image locale
 
-À la racine du dépôt :
+Le **build JS** (Vite + `tsc`) se fait **sur ta machine** (ou sur GitHub Actions), pas dans la couche finale de l’image. Le contexte Docker ne contient que ~1 Mo d’artefacts + `package-lock.json` ; **`npm ci --omit=dev`** pour le serveur s’exécute dans une étape intermédiaire **sous Linux**, pour que `better-sqlite3` corresponde à l’OS cible (évite l’erreur *Exec format error* si tu build sur Mac).
 
 ```bash
+npm run docker:release    # npm ci + build + .dockerctx/
 docker compose build
 docker compose up -d
 ```
@@ -15,9 +16,9 @@ Variables utiles : `HOST` (défaut `0.0.0.0`), `PORT` (défaut `8787`).
 
 ## Contenu de l’image
 
-- **Plateformes** : le workflow **Docker image** construit **en parallèle** une image par arch sur des runners **natifs** (`ubuntu-latest` pour amd64, `ubuntu-24.04-arm` pour arm64 — réservé aux dépôts **publics** sur GitHub Free), puis publie un **manifest** multi-arch (`:tag` et `:latest`). Des tags intermédiaires `:tag-amd64` / `:tag-arm64` existent aussi sur le registre (utiles pour le debug). Le cache **GHA** (`type=gha`) accélère les rebuilds.
-- **Build multi-étapes** : compilation Vite + `tsc` dans une étape `builder`, image finale avec `npm ci --omit=dev` limité au workspace **`@bluetasks/server`** et les artefacts `server/dist` + `web/app/dist` + `shared/`.
-- Point d’entrée : `npm run start` (racine), comme en local.
+- **CI / GitHub Actions** : `npm ci` → `npm run build` → `scripts/assemble-docker-context.sh` → `docker build` sur `.dockerctx/`. Pas de double build Vite dans Docker.
+- **Dockerfile** : étape **`deps`** (Alpine + outils natifs uniquement pour compiler/télécharger `better-sqlite3`), étape **`runtime`** sans gcc/python — copie `node_modules` + `server/dist` + `web/app/dist` + `shared/`. Démarrage : `node server/dist/index.js`.
+- **Plateformes** : workflow **Docker image** en **parallèle** (amd64 sur `ubuntu-latest`, arm64 sur `ubuntu-24.04-arm` pour les dépôts publics), puis manifest multi-arch `:tag` et `:latest`. Tags intermédiaires `:tag-amd64` / `:tag-arm64`. Cache Buildx **GHA** sur le contexte.
 
 ## Import / export SQLite
 

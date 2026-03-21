@@ -48,10 +48,11 @@ The server exposes the built app on [http://localhost:8787](http://localhost:878
 
 ## Docker
 
-Single image (Vite build + Express API + static SPA on port **8787**):
+Production image (Express serves the Vite build; port **8787**). Build flow: **npm** builds the app locally/CI, then Docker copies artifacts and runs **`npm ci --omit=dev`** for Linux in a `deps` stage (correct `better-sqlite3` binary).
 
 ```sh
-docker compose up --build
+npm run docker:release
+docker compose build && docker compose up -d
 ```
 
 Open [http://localhost:8787](http://localhost:8787). SQLite lives in `./.data` on the host (mounted at `/app/.data` in the container).
