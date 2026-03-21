@@ -14,13 +14,15 @@
 | `npm run test:coverage:gate` | **CI gate — ≥80%** lines, statements, branches, functions on [`web/app/src/lib/**`](../web/app/src/lib) and on [`server/src/**`](../server/src) except `index.ts` ([gate configs](../web/app/vitest.coverage-gate.config.ts)) |
 | `npm run duplicates` | [jscpd](https://github.com/kucherenko/jscpd) — copy-paste clones (global threshold in `.jscpd.json`) |
 | `npm run test:scenario` | Playwright — built SPA + real server ([`scenario/`](../scenario/), [`playwright.config.ts`](../playwright.config.ts)) |
-| `npm run semgrep:docker` | **Semgrep** — same scans as CI (Docker; needs Docker running) |
+| `npm run semgrep:docker` | **Semgrep** — same as CI: (1) whole [`web/app/`](../web/app/) with `p/typescript` + `p/react` (Vite/Vitest configs + `src/`, not only `src/`), (2) [`server/`](../server/) + [`contract/`](../contract/) + [`scenario/`](../scenario/) + [`scripts/`](../scripts/) + root `playwright.config.ts` + `eslint.*.config.mjs` with `p/typescript` only (Docker) |
 | `npm run ci` | `lint` → `duplicates` → **`test:coverage:gate`** → `build` → `test:scenario` (does **not** run Semgrep — use `semgrep:docker` locally; CI runs Semgrep in its own job) |
 | `npm run check` | Alias for `ci` |
 
 ## GitHub Actions CI
 
-Workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on Node 22. **Quality checks are separate jobs** (each appears as its own row in the Actions UI): **ESLint (web)**, **Stylelint (web CSS)**, **ESLint (server)**, **ESLint (Playwright scenario)**, **Duplication (jscpd)**, **Semgrep** (Docker: `p/typescript` + `p/react` on `web/app/src`, then `p/typescript` on `server/src`), then **Tests & coverage**, **Production build**, **Scenario tests (Playwright)**. They run in parallel where GitHub schedules them; **any failed job marks the workflow run as failed** (steps use the default `continue-on-error: false`). Run manually via **Actions → CI → Run workflow**.
+Workflow [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) runs on Node 22. **Quality checks are separate jobs** (each appears as its own row in the Actions UI): **ESLint (web)**, **Stylelint (web CSS)**, **ESLint (server)**, **ESLint (Playwright scenario)**, **ESLint (contract, scripts, Playwright config)**, **Duplication (jscpd)**, **Semgrep** (Docker: two scans — full `web/app` with TS+React rules, then `server` + `contract` + `scenario` + `scripts` + root ESLint/Playwright configs with TS only), then **Tests & coverage**, **Production build**, **Scenario tests (Playwright)**. They run in parallel where GitHub schedules them; **any failed job marks the workflow run as failed** (steps use the default `continue-on-error: false`). Run manually via **Actions → CI → Run workflow**.
+
+Semgrep only reports **files it actually analyzes** (tracked by git, matching rule languages). A small tree like `contract/` has few files, so a low “N files” count there is expected, not a sign that other folders were skipped.
 
 To mirror this in another repository (e.g. **OpenClaudeAgent/open-flow**), copy the same pattern: a dedicated Vitest config with `coverage.thresholds` at **80** and a CI step that runs `npm run test:coverage:gate` (or your package manager equivalent).
 

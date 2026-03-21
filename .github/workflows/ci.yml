@@ -66,6 +66,19 @@ jobs:
       - run: npm ci
       - run: npm run lint:eslint-scenario
 
+  eslint-tooling:
+    name: ESLint (contract, scripts, Playwright config)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:eslint-tooling
+
   jscpd:
     name: Duplication (jscpd)
     runs-on: ubuntu-latest
@@ -80,15 +93,16 @@ jobs:
       - run: npm run duplicates
 
   semgrep:
-    name: Semgrep (TS + React web, TS server)
+    name: Semgrep (full web/app + server + contract + scenario + scripts + root configs)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
       - name: Semgrep scan
         run: |
           docker run --rm -v "${{ github.workspace }}:/src" -w /src semgrep/semgrep sh -c \
-            'semgrep scan --config p/typescript --config p/react --error web/app/src && semgrep scan --config p/typescript --error server/src'
+            'semgrep scan --config p/typescript --config p/react --error web/app && \
+             semgrep scan --config p/typescript --error server contract scenario scripts playwright.config.ts eslint.tooling.config.mjs eslint.scenario.config.mjs'
 
   test:
     name: Tests & coverage
