@@ -11,6 +11,11 @@ server/dist/
 # --- Tests & couverture ---
 coverage/
 **/coverage/
+coverage-gate/
+**/coverage-gate/
+playwright-report/
+test-results/
+playwright/.cache/
 
 # --- Environnement & secrets (ne jamais committer) ---
 .env

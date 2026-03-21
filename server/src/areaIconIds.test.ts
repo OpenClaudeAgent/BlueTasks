@@ -2,12 +2,12 @@ import {describe, expect, it} from 'vitest';
 import {AREA_ICON_IDS, normalizeAreaIcon} from './areaIconIds.js';
 
 describe('areaIconIds', () => {
-  it('normalise les icônes inconnues vers folder', () => {
+  it('normalizes unknown icons to folder', () => {
     expect(normalizeAreaIcon('__nope__')).toBe('folder');
     expect(normalizeAreaIcon(null)).toBe('folder');
   });
 
-  it('accepte chaque id canonique', () => {
+  it('accepts every canonical id', () => {
     for (const id of AREA_ICON_IDS) {
       expect(normalizeAreaIcon(id)).toBe(id);
     }

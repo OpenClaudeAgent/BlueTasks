@@ -1,0 +1,99 @@
+# Bump workspace versions, update CHANGELOG, commit, push tag v* → triggers Docker image workflow.
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Semver only, no leading v (e.g. 0.2.0)"
+        required: true
+        type: string
+      release_notes:
+        description: "One-line changelog bullet (shown under the new version)"
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  ship:
+    name: Version, changelog, tag
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Validate semver
+        env:
+          V: ${{ inputs.version }}
+        run: |
+          if [[ ! "$V" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-[0-9A-Za-z.-]+)?(\+[0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid semver: $V (use e.g. 0.2.0, no leading v)"
+            exit 1
+          fi
+
+      - name: Ensure tag does not exist
+        env:
+          V: ${{ inputs.version }}
+        run: |
+          git fetch --tags --force
+          if git rev-parse "v$V" >/dev/null 2>&1; then
+            echo "Tag v$V already exists."
+            exit 1
+          fi
+
+      - name: Previous release tag
+        id: prev
+        run: |
+          git fetch --tags --force
+          P=$(git tag -l 'v*' --sort=-v:refname | head -1)
+          if [[ -z "$P" ]]; then
+            echo "No existing v* tag found."
+            exit 1
+          fi
+          echo "tag=$P" >> "$GITHUB_OUTPUT"
+          echo "Previous tag: $P"
+
+      - name: Sync package.json versions
+        env:
+          V: ${{ inputs.version }}
+        run: node scripts/sync-package-version.mjs "$V"
+
+      - name: Update CHANGELOG
+        env:
+          V: ${{ inputs.version }}
+          PREV: ${{ steps.prev.outputs.tag }}
+          NOTE: ${{ inputs.release_notes }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: |
+          NOTE="${NOTE:-Release v${V}.}"
+          node scripts/changelog-release.mjs "$V" "$PREV" "$NOTE"
+
+      - name: Refresh package-lock.json
+        run: npm install --no-audit --no-fund
+
+      - name: Commit and push tag
+        env:
+          V: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json web/app/package.json server/package.json CHANGELOG.md
+          git status
+          git commit -m "chore(release): v${V}"
+          git tag "v${V}"
+          git push origin "HEAD:${{ github.ref_name }}"
+          git push origin "v${V}"

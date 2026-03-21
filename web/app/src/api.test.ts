@@ -11,7 +11,7 @@ describe('downloadDatabaseExport', () => {
     vi.unstubAllGlobals();
   });
 
-  it('rejette quand la réponse HTTP est en erreur', async () => {
+  it('rejects when the HTTP response is an error', async () => {
     vi.mocked(fetch).mockResolvedValue({
       ok: false,
       status: 500,
@@ -20,7 +20,7 @@ describe('downloadDatabaseExport', () => {
     await expect(downloadDatabaseExport()).rejects.toThrow('serveur');
   });
 
-  it('déclenche le téléchargement avec le nom issu du Content-Disposition', async () => {
+  it('triggers download using the filename from Content-Disposition', async () => {
     vi.stubGlobal('URL', {
       ...URL,
       createObjectURL: () => 'blob:mock',
@@ -46,7 +46,7 @@ describe('downloadDatabaseExport', () => {
 
     await downloadDatabaseExport();
 
-    expect(fetch).toHaveBeenCalled();
+    expect(vi.mocked(fetch)).toHaveBeenCalledExactlyOnceWith('http://localhost:8787/api/export/database');
     expect(click).toHaveBeenCalled();
     expect(remove).toHaveBeenCalled();
     expect(anchor.download).toBe('export.sqlite');

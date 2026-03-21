@@ -1,3 +1,4 @@
+# Same quality gate as `npm run ci`: lint → jscpd → coverage gate (≥80%) → build → Playwright e2e (split across parallel jobs).
 name: CI
 
 on:
@@ -5,6 +6,7 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -47,23 +49,23 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Tests with coverage
-        run: npm run test:coverage
+      - name: Tests with coverage gate (≥80%)
+        run: npm run test:coverage:gate
 
-      - name: Upload web coverage
+      - name: Upload web coverage (gate scope)
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: coverage-web
-          path: web/app/coverage
+          name: coverage-web-gate
+          path: web/app/coverage-gate
           if-no-files-found: ignore
 
-      - name: Upload server coverage
+      - name: Upload server coverage (gate scope)
         uses: actions/upload-artifact@v4
         if: success()
         with:
-          name: coverage-server
-          path: server/coverage
+          name: coverage-server-gate
+          path: server/coverage-gate
           if-no-files-found: ignore
 
   build:
@@ -83,3 +85,26 @@ jobs:
 
       - name: Production build
         run: npm run build
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install chromium --with-deps
+
+      - name: E2E smoke
+        env:
+          CI: "true"
+        run: npm run test:e2e

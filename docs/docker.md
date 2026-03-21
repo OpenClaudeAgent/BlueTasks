@@ -1,8 +1,8 @@
-# Docker et publication d’image
+# Docker and image publishing
 
-## Image locale
+## Local image
 
-Le **build JS** (Vite + `tsc`) se fait **sur ta machine** (ou sur GitHub Actions), pas dans la couche finale de l’image. Le contexte Docker ne contient que ~1 Mo d’artefacts + `package-lock.json` ; **`npm ci --omit=dev`** pour le serveur s’exécute dans une étape intermédiaire **sous Linux**, pour que `better-sqlite3` corresponde à l’OS cible (évite l’erreur *Exec format error* si tu build sur Mac).
+The **JS build** (Vite + `tsc`) runs **on the host** (or on GitHub Actions), not in the final image layer. The Docker context is only ~1 MB of artifacts plus `package-lock.json`; **`npm ci --omit=dev`** for the server runs in an intermediate **Linux** stage so `better-sqlite3` matches the target OS (avoids *Exec format error* when building on macOS).
 
 ```bash
 npm run docker:release    # npm ci + build + .dockerctx/
@@ -10,51 +10,76 @@ docker compose build
 docker compose up -d
 ```
 
-L’app écoute sur **8787**. Les données SQLite sont dans le volume **`./.data`** sur l’hôte (`bluetasks.sqlite`).
+The app listens on **8787**. SQLite data lives in **`./.data`** on the host (`bluetasks.sqlite`).
 
-Variables utiles : `HOST` (défaut `0.0.0.0`), `PORT` (défaut `8787`).
+Useful env vars: `HOST` (default `0.0.0.0`), `PORT` (default `8787`).
 
-## Contenu de l’image
+## What is in the image
 
-- **CI / GitHub Actions** : `npm ci` → `npm run build` → `scripts/assemble-docker-context.sh` → `docker build` sur `.dockerctx/`. Pas de double build Vite dans Docker.
-- **Dockerfile** : étape **`deps`** (Alpine + outils natifs uniquement pour compiler/télécharger `better-sqlite3`), étape **`runtime`** sans gcc/python — copie `node_modules` + `server/dist` + `web/app/dist` + `shared/`. Démarrage : `node server/dist/index.js`.
-- **Plateformes** : workflow **Docker image** en **parallèle** (amd64 sur `ubuntu-latest`, arm64 sur `ubuntu-24.04-arm` pour les dépôts publics), puis manifest multi-arch `:tag` et `:latest`. Tags intermédiaires `:tag-amd64` / `:tag-arm64`. Cache Buildx **GHA** sur le contexte.
+- **CI / GitHub Actions**: `npm ci` → `npm run build` → `scripts/assemble-docker-context.sh` → `docker build` on `.dockerctx/`. No second Vite build inside Docker.
+- **Dockerfile**: **`deps`** stage (Alpine + native toolchain only to compile/download `better-sqlite3`), **`runtime`** stage without gcc/python — copies `node_modules` + `server/dist` + `web/app/dist` + `shared/`. Entrypoint: `node server/dist/index.js`.
+- **Platforms**: **Docker image** workflow runs **amd64** (`ubuntu-latest`) and **arm64** (`ubuntu-24.04-arm`) in parallel, then publishes a multi-arch manifest `:tag` and `:latest`. Per-arch tags `:tag-amd64` / `:tag-arm64`. Buildx **GHA** cache on the context.
 
-## Import / export SQLite
+## PR smoke build
 
-- **Export** : Paramètres → Général, ou `GET /api/export/database`.
-- **Import** : Paramètres → Général (fichier `.sqlite`), ou `POST /api/import/database` (multipart, champ **`database`**). Remplace entièrement la base sur disque ; **non disponible** si le serveur tourne avec une base `:memory:` (tests).
+Workflow [`.github/workflows/docker-smoke.yml`](../.github/workflows/docker-smoke.yml) runs on pull requests that change Docker-related paths: it runs `npm run build`, assembles `.dockerctx/`, and **`docker buildx build --load`** for `linux/amd64` only (nothing is pushed). Use it to catch broken Dockerfiles before tagging.
 
-## Publier sur GitHub Container Registry
+## SQLite import / export
 
-1. Pousser un tag de version, par ex. `git tag v0.2.0 && git push origin v0.2.0`.
-2. Le workflow [`.github/workflows/docker-publish.yml`](../.github/workflows/docker-publish.yml) construit et pousse l’image (déclenché **uniquement** par les tags `v*`) :
+- **Export**: Settings → General, or `GET /api/export/database`.
+- **Import**: Settings → General (`.sqlite` file), or `POST /api/import/database` (multipart, field **`database`**). Replaces the on-disk database entirely; **not available** when the server uses an in-memory DB (tests).
 
-   `ghcr.io/<propriétaire>/bluetasks:<tag>`
+## GitHub Container Registry (GHCR)
 
-   (le nom d’image est mis en minuscules automatiquement.)
+For a single entry point that bumps **semver in all workspaces**, updates **CHANGELOG**, and pushes the **git tag** that triggers this pipeline, use the [**Release** workflow](../.github/workflows/release.yml) (documented in [releasing.md](releasing.md)).
 
-3. Tirer et lancer :
+### Package visibility
+
+- If the GitHub **repository** is public, you can still set the **container package** to private under **Packages → package settings → Change visibility**. For open distribution, set the package to **Public** so `docker pull` works without `docker login ghcr.io`.
+- Private packages: users must run `docker login ghcr.io` (PAT with `read:packages`, or `GITHUB_TOKEN` in CI).
+
+### Publishing
+
+**Option A — version tag (recommended for releases)**
+
+1. Tag and push: `git tag v0.2.0 && git push origin v0.2.0`.
+2. Workflow [`.github/workflows/docker-publish.yml`](../.github/workflows/docker-publish.yml) builds and pushes:
+
+   `ghcr.io/<owner>/bluetasks:<tag>`
+
+   (`<owner>/<repo>` is lowercased for the image name.)
+
+3. Pull and run:
 
    ```bash
-   docker pull ghcr.io/votre-org/bluetasks:v0.2.0
-   docker run -p 8787:8787 -v bluetasks-data:/app/.data ghcr.io/votre-org/bluetasks:v0.2.0
+   docker pull ghcr.io/your-org/bluetasks:v0.2.0
+   docker run -p 8787:8787 -v bluetasks-data:/app/.data ghcr.io/your-org/bluetasks:v0.2.0
    ```
 
-Pour un volume nommé Docker : `-v bluetasks-data:/app/.data` persiste la base dans le volume `bluetasks-data`.
+**Option B — manual workflow dispatch**
 
-## `docker-compose` avec une image publiée
+In **Actions → Docker image → Run workflow**, enter a tag (e.g. `v0.2.0-rc1`). The workflow pushes the same multi-arch tags and updates `:latest` to that build (use with care on shared repos).
 
-Vous pouvez remplacer la section `build` par une image :
+Release notes: see [CHANGELOG.md](../CHANGELOG.md).
+
+### Verify a tagged release on GitHub
+
+1. Open **Actions** → workflow **Docker image** and select the run for your tag.
+2. Confirm jobs **Image (amd64)** and **Image (arm64)** succeed, then **Publish multi-arch manifest**.
+3. On the package page (`https://github.com/<owner>?tab=packages` or the repo **Packages** sidebar), confirm the new digest and tags (`:vX.Y.Z`, `:latest`).
+
+## `docker-compose` with a published image
+
+Replace `build` with `image`:
 
 ```yaml
 services:
   bluetasks:
-    image: ghcr.io/votre-org/bluetasks:v0.2.0
+    image: ghcr.io/your-org/bluetasks:v0.2.0
     ports:
       - "8787:8787"
     volumes:
       - ./.data:/app/.data
 ```
 
-Gardez le même montage **`.data`** pour conserver les données entre mises à jour d’image.
+Keep the **`.data`** mount so data survives image upgrades.

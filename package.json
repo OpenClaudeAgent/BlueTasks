@@ -1,7 +1,8 @@
 {
   "name": "bluetasks",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.3",
+  "license": "MIT",
   "workspaces": [
     "web/app",
     "server"
@@ -14,13 +15,16 @@
     "a11y": "npm run lint --workspace web/app",
     "test": "npm run test --workspace @bluetasks/app && npm run test --workspace @bluetasks/server",
     "test:coverage": "npm run test:coverage --workspace @bluetasks/app && npm run test:coverage --workspace @bluetasks/server",
+    "test:coverage:gate": "npm run test:coverage:gate --workspace @bluetasks/app && npm run test:coverage:gate --workspace @bluetasks/server",
+    "test:e2e": "playwright test",
     "duplicates": "jscpd .",
-    "ci": "npm run lint && npm run duplicates && npm run test:coverage && npm run build",
+    "ci": "npm run lint && npm run duplicates && npm run test:coverage:gate && npm run build && npm run test:e2e",
     "check": "npm run ci",
     "docker:prepare": "bash scripts/assemble-docker-context.sh",
     "docker:release": "npm ci && npm run build && npm run docker:prepare"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "concurrently": "^9.2.1",
     "jscpd": "^4.0.8"
   }

@@ -6,18 +6,33 @@ import {
 } from './editorState';
 
 describe('createEmptyEditorState', () => {
-  it('retourne un JSON Lexical valide avec root et paragraph', () => {
+  it('returns valid Lexical JSON with root and paragraph', () => {
     const json = createEmptyEditorState();
     const parsed = JSON.parse(json);
-    expect(parsed.root).toBeDefined();
-    expect(parsed.root.type).toBe('root');
-    expect(Array.isArray(parsed.root.children)).toBe(true);
-    expect(parsed.root.children[0].type).toBe('paragraph');
+    expect(parsed).toEqual({
+      root: {
+        children: [
+          {
+            children: [],
+            direction: null,
+            format: '',
+            indent: 0,
+            type: 'paragraph',
+            version: 1,
+          },
+        ],
+        direction: null,
+        format: '',
+        indent: 0,
+        type: 'root',
+        version: 1,
+      },
+    });
   });
 });
 
 describe('extractChecklistStats', () => {
-  it('compte les listitem checklist sous root', () => {
+  it('counts checklist listitems under root', () => {
     const state = {
       root: {
         type: 'root',
@@ -44,7 +59,7 @@ describe('extractChecklistStats', () => {
     });
   });
 
-  it('compte les items checklist même si checked est absent (non coché)', () => {
+  it('counts checklist items when checked is absent (treated as unchecked)', () => {
     const state = {
       root: {
         type: 'root',
@@ -68,7 +83,7 @@ describe('extractChecklistStats', () => {
     expect(extractChecklistStats(state)).toEqual({checklistTotal: 2, checklistCompleted: 1});
   });
 
-  it('ignore les listitem des listes à puces', () => {
+  it('ignores listitems in bullet lists', () => {
     const state = {
       root: {
         type: 'root',
@@ -91,7 +106,7 @@ describe('extractChecklistStats', () => {
 });
 
 describe('lexicalDocsContentEqual', () => {
-  it('ignore les différences de formatage (espaces / retours ligne)', () => {
+  it('ignores whitespace and newline formatting differences', () => {
     const compact = '{"root":{"type":"root","version":1}}';
     const spaced = `{
   "root": { "type": "root", "version": 1 }

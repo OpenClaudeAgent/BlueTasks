@@ -30,7 +30,7 @@ function renderDialog() {
 }
 
 describe('SettingsDialog', () => {
-  it('affiche le bouton d’export SQLite dans l’onglet General', async () => {
+  it('shows SQLite export and import buttons on the General tab', async () => {
     const user = userEvent.setup();
     renderDialog();
 

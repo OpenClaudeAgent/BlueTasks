@@ -19,6 +19,7 @@ import {useTranslation} from 'react-i18next';
 import {addDaysToKey, formatDateKey, formatTaskDatePill, getDateTone, parseTaskDate, todayKey} from '../lib/date';
 import {getAreaIconComponent} from '../lib/areaIcons';
 import {createEmptyEditorState, lexicalDocsContentEqual} from '../lib/editorState';
+import {formatDurationLabel, formatEstimateMinutesLabel, formatTrackedSeconds, nextPriority} from '../lib/taskCardFormat';
 import {coercePinned, coerceRecurrence} from '../lib/tasks';
 import type {Area, RecurrenceKind, Task, TaskDraftUpdate, TaskPriority} from '../types';
 
@@ -33,51 +34,10 @@ const RECURRENCE_OPTIONS: {kind: RecurrenceKind | null; labelKey: string}[] = [
   {kind: 'yearly', labelKey: 'recurrenceYearly'},
 ];
 
-function formatEstimateMinutesLabel(minutes: number, t: (key: string, opts?: {count: number}) => string): string {
-  if (minutes >= 1440 && minutes % 1440 === 0) {
-    const days = minutes / 1440;
-    return t('estimateDays', {count: days});
-  }
-  if (minutes >= 60 && minutes % 60 === 0) {
-    return t('estimateHours', {count: minutes / 60});
-  }
-  return t('estimateMinutesShort', {count: minutes});
-}
-
-function formatTrackedSeconds(task: Task, nowMs: number): number {
-  const base = task.timeSpentSeconds ?? 0;
-  if (!task.timerStartedAt) {
-    return base;
-  }
-  const start = Date.parse(task.timerStartedAt);
-  if (Number.isNaN(start)) {
-    return base;
-  }
-  return base + Math.max(0, Math.floor((nowMs - start) / 1000));
-}
-
-function formatDurationLabel(totalSeconds: number): string {
-  const s = Math.max(0, Math.floor(totalSeconds));
-  const h = Math.floor(s / 3600);
-  const m = Math.floor((s % 3600) / 60);
-  const sec = s % 60;
-  if (h > 0) {
-    return `${h}:${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
-  }
-  return `${m}:${String(sec).padStart(2, '0')}`;
-}
-
 const LazyLexicalTaskEditor = lazy(async () => {
   const module = await import('./LexicalTaskEditor');
   return {default: module.LexicalTaskEditor};
 });
-
-const PRIORITY_ORDER: TaskPriority[] = ['low', 'normal', 'high'];
-
-function nextPriority(current: TaskPriority): TaskPriority {
-  const index = PRIORITY_ORDER.indexOf(current);
-  return PRIORITY_ORDER[(index + 1) % PRIORITY_ORDER.length];
-}
 
 function PriorityIcon({priority}: {priority: TaskPriority}) {
   if (priority === 'high') {

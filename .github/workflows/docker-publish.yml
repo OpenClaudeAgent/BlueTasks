@@ -1,14 +1,20 @@
-# Build npm (Vite + tsc + deps prod) sur le runner, puis image = copie du contexte .dockerctx/
-# (pas de npm ci / toolchain dans Docker → image beaucoup plus légère).
+# Build JS on the runner, then copy artifacts into `.dockerctx/` (no npm in the final image layer).
+# Trigger: tag push `v*` or manual `workflow_dispatch` (pushes to GHCR with the given tag).
 name: Docker image
 
 on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Image tag (e.g. v0.2.0-rc1). Creates :tag, :tag-amd64, :tag-arm64, and :latest."
+        required: true
+        type: string
 
 concurrency:
-  group: docker-${{ github.ref }}
+  group: docker-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -19,6 +25,8 @@ jobs:
   build:
     name: Image (${{ matrix.slug }})
     runs-on: ${{ matrix.runner }}
+    env:
+      IMAGE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
     strategy:
       fail-fast: false
       matrix:
@@ -43,7 +51,7 @@ jobs:
       - name: Production build (Vite + server tsc)
         run: npm run build
 
-      - name: Assembler le contexte Docker (sans node_modules)
+      - name: Assemble Docker context (no node_modules)
         run: bash scripts/assemble-docker-context.sh
 
       - name: Image name (lowercase)
@@ -63,7 +71,7 @@ jobs:
           context: .dockerctx
           push: true
           platforms: ${{ matrix.platform }}
-          tags: ${{ steps.meta.outputs.image }}:${{ github.ref_name }}-${{ matrix.slug }}
+          tags: ${{ steps.meta.outputs.image }}:${{ env.IMAGE_TAG }}-${{ matrix.slug }}
           cache-from: type=gha,scope=bluetasks-ctx-${{ matrix.slug }}
           cache-to: type=gha,mode=max,scope=bluetasks-ctx-${{ matrix.slug }}
 
@@ -71,6 +79,8 @@ jobs:
     name: Publish multi-arch manifest
     runs-on: ubuntu-latest
     needs: build
+    env:
+      IMAGE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
     steps:
       - name: Image name (lowercase)
         id: meta
@@ -84,10 +94,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create :${{ github.ref_name }} and :latest
+      - name: Create version tag and latest manifest
         run: |
           IMG="${{ steps.meta.outputs.image }}"
-          R="${{ github.ref_name }}"
+          R="${IMAGE_TAG}"
           docker buildx imagetools create -t "${IMG}:${R}" \
             "${IMG}:${R}-amd64" \
             "${IMG}:${R}-arm64"

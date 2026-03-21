@@ -18,16 +18,26 @@ import {
 import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from '../types';
 
 describe('createTask', () => {
-  it('crée une tâche avec contentJson valide (jamais vide)', () => {
+  it('creates a task with valid non-empty contentJson', () => {
     const task = createTask('Ma tâche');
-    expect(task.contentJson).toBeTruthy();
     expect(task.contentJson.trim().length).toBeGreaterThan(0);
-    const parsed = JSON.parse(task.contentJson);
-    expect(parsed.root).toBeDefined();
-    expect(parsed.root.children).toBeDefined();
+    const parsed = JSON.parse(task.contentJson) as {root: unknown};
+    expect(parsed).toMatchObject({
+      root: {
+        type: 'root',
+        version: 1,
+        children: [
+          {
+            type: 'paragraph',
+            version: 1,
+            children: [],
+          },
+        ],
+      },
+    });
   });
 
-  it('n’impose pas de date ni de zone par défaut', () => {
+  it('does not set taskDate or areaId by default', () => {
     const task = createTask('Sans date');
     expect(task.taskDate).toBeNull();
     expect(task.areaId).toBeNull();
@@ -37,7 +47,7 @@ describe('createTask', () => {
 });
 
 describe('toTaskDraftPayload', () => {
-  it('inclut contentJson dans le payload pour la sauvegarde', () => {
+  it('includes contentJson in the save payload', () => {
     const content = createEmptyEditorState();
     const task = createTask('Test');
     const taskWithContent = {...task, contentJson: content};
@@ -45,7 +55,7 @@ describe('toTaskDraftPayload', () => {
     expect(payload.contentJson).toBe(content);
   });
 
-  it('normalise pinned numérique (ex. lecture SQLite) en booléen', () => {
+  it('coerces numeric pinned (e.g. from SQLite) to boolean', () => {
     const base = createTask('Pin');
     const task = {...base, id: 'pin-test', pinned: 1 as unknown as boolean};
     expect(toTaskDraftPayload(task).pinned).toBe(true);
@@ -53,14 +63,14 @@ describe('toTaskDraftPayload', () => {
 });
 
 describe('isSaveSuperseded', () => {
-  it('détecte une édition plus récente pendant le vol du PUT', () => {
+  it('detects a newer revision while the PUT is in flight', () => {
     expect(isSaveSuperseded(1, {rev: 1})).toBe(false);
     expect(isSaveSuperseded(1, {rev: 2})).toBe(true);
   });
 });
 
 describe('coercePinned', () => {
-  it('interprète correctement les valeurs style SQLite / chaîne', () => {
+  it('coerces SQLite-style and string pinned values', () => {
     expect(coercePinned(1)).toBe(true);
     expect(coercePinned(0)).toBe(false);
     expect(coercePinned('1')).toBe(true);
@@ -71,7 +81,7 @@ describe('coercePinned', () => {
 });
 
 describe('sortTasks', () => {
-  it('met les tâches épinglées au-dessus des autres, quelle que soit la date', () => {
+  it('sorts pinned tasks above others regardless of date', () => {
     const common = {
       status: 'pending' as const,
       contentJson: createEmptyEditorState(),
@@ -103,7 +113,7 @@ describe('sortTasks', () => {
     expect(sortTasks([earlyOpen, latePinned]).map((t) => t.id)).toEqual(['p', 'u']);
   });
 
-  it('ne réordonne pas sur updatedAt (tie-break stable via createdAt)', () => {
+  it('does not reorder by updatedAt (stable tie-break via createdAt)', () => {
     const day = todayKey();
     const common = {
       status: 'pending' as const,
@@ -138,7 +148,7 @@ describe('sortTasks', () => {
 });
 
 describe('applyRecurringStatusToggle', () => {
-  it('avance la date d’échéance au lieu de passer en terminé quand une récurrence est définie', () => {
+  it('advances due date instead of completing when recurrence is set', () => {
     const day = todayKey();
     const task: Task = {
       ...createTask('X'),
@@ -151,7 +161,7 @@ describe('applyRecurringStatusToggle', () => {
     expect(next.taskDate).toBe(addDaysToKey(day, 7));
   });
 
-  it('bascule pending ↔ completed sans récurrence', () => {
+  it('toggles pending ↔ completed without recurrence', () => {
     const pending = {...createTask('S'), id: 'p1', recurrence: null};
     const done = applyRecurringStatusToggle(pending);
     expect(done.status).toBe('completed');
@@ -160,7 +170,7 @@ describe('applyRecurringStatusToggle', () => {
 });
 
 describe('filterTasks', () => {
-  it('ne mélange pas les tâches entre sections', () => {
+  it('keeps tasks in the correct section when filtering', () => {
     const today = todayKey();
     const tasks = [
       {...createTask('A'), id: '1', taskDate: today},
@@ -175,7 +185,7 @@ describe('filterTasks', () => {
     expect(anytimeTasks.map((t) => t.id)).toContain('3');
   });
 
-  it('filtre par zone et sans zone', () => {
+  it('filters by area and uncategorized', () => {
     const today = todayKey();
     const z1 = 'zone-1';
     const tasks = [
@@ -188,7 +198,7 @@ describe('filterTasks', () => {
 });
 
 describe('coerceRecurrence', () => {
-  it('accepte les kinds valides et refuse le reste', () => {
+  it('accepts valid recurrence kinds and rejects invalid ones', () => {
     expect(coerceRecurrence('weekly')).toBe('weekly');
     expect(coerceRecurrence('invalid')).toBeNull();
     expect(coerceRecurrence(null)).toBeNull();
@@ -196,7 +206,7 @@ describe('coerceRecurrence', () => {
 });
 
 describe('getTaskCounts', () => {
-  it('compte par section avec filtre de zone', () => {
+  it('counts tasks per section with area filter', () => {
     const today = todayKey();
     const z = 'z99';
     const tasks = [
@@ -214,7 +224,7 @@ describe('getTaskCounts', () => {
 });
 
 describe('getTaskSection', () => {
-  it('classe today / upcoming / anytime / done', () => {
+  it('maps tasks to today / upcoming / anytime / done', () => {
     const today = todayKey();
     const future = addDaysToKey(today, 3);
     expect(getTaskSection({...createTask(''), status: 'completed'} as Task)).toBe('done');
@@ -225,7 +235,7 @@ describe('getTaskSection', () => {
 });
 
 describe('getPreferredTaskId', () => {
-  it('retient la sélection visible ou la première tâche', () => {
+  it('keeps the visible selection or falls back to the first task', () => {
     const today = todayKey();
     const tasks = [
       {...createTask('A'), id: 'x', taskDate: today},

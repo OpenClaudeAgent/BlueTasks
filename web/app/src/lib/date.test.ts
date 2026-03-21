@@ -11,7 +11,7 @@ describe('getDateTone', () => {
     vi.useRealTimers();
   });
 
-  it('détecte en retard, aujourd’hui et à venir', () => {
+  it('classifies overdue, today, and upcoming', () => {
     expect(getDateTone(null)).toBe('none');
     expect(getDateTone('2024-06-14')).toBe('overdue');
     expect(getDateTone('2024-06-15')).toBe('today');
@@ -20,7 +20,7 @@ describe('getDateTone', () => {
 });
 
 describe('parseTaskDate / formatDateKey / addDaysToKey', () => {
-  it('boucle une date sans dériver', () => {
+  it('adds days without drifting the calendar key', () => {
     const key = '2024-03-10';
     const d = parseTaskDate(key);
     expect(formatDateKey(d)).toBe(key);
@@ -29,7 +29,7 @@ describe('parseTaskDate / formatDateKey / addDaysToKey', () => {
 });
 
 describe('todayKey', () => {
-  it('renvoie une clé YYYY-MM-DD', () => {
+  it('returns a YYYY-MM-DD key', () => {
     expect(todayKey()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
   });
 });

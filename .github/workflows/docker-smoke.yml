@@ -1,0 +1,52 @@
+# Build JS + assemble .dockerctx/ and verify the Dockerfile builds (amd64, no push).
+name: Docker smoke
+
+on:
+  pull_request:
+    paths:
+      - "Dockerfile"
+      - "docker-compose.yml"
+      - "scripts/assemble-docker-context.sh"
+      - "package.json"
+      - "package-lock.json"
+      - "server/**"
+      - "web/**"
+      - ".github/workflows/docker-smoke.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: docker-smoke-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build image context (amd64)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production build
+        run: npm run build
+
+      - name: Assemble Docker context
+        run: bash scripts/assemble-docker-context.sh
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Docker build (load amd64)
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            -f .dockerctx/Dockerfile \
+            -t bluetasks:smoke \
+            --load \
+            .dockerctx

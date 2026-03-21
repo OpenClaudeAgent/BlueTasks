@@ -11,7 +11,7 @@ import {
 } from './dbSetup.js';
 
 describe('dbSetup', () => {
-  it('openAndMigrateDatabase(:memory:) fixe user_version au schéma courant', () => {
+  it('openAndMigrateDatabase(:memory:) sets user_version to the current schema', () => {
     const db = openAndMigrateDatabase(':memory:');
     try {
       expect(getUserVersion(db)).toBe(CURRENT_SCHEMA_VERSION);
@@ -20,7 +20,7 @@ describe('dbSetup', () => {
     }
   });
 
-  it('runMigrations ajoute les colonnes manquantes sur une table tasks minimale', () => {
+  it('runMigrations adds missing columns on a minimal tasks table', () => {
     const db = new Database(':memory:');
     try {
       db.exec(`
@@ -48,7 +48,7 @@ describe('dbSetup', () => {
     }
   });
 
-  it('openAndMigrateDatabase sur fichier temporaire persiste user_version', () => {
+  it('openAndMigrateDatabase persists user_version on a temp file', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bluetasks-db-'));
     const dbPath = path.join(dir, 'test.sqlite');
     try {
@@ -73,7 +73,7 @@ describe('dbSetup', () => {
     }
   });
 
-  it('refuse une base avec user_version trop récent', () => {
+  it('rejects a database whose user_version is newer than supported', () => {
     const db = new Database(':memory:');
     try {
       db.exec(`
