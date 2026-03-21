@@ -1,9 +1,21 @@
 'use strict';
 const path = require('node:path');
 
-/** Remplacement du module appPaths pour le bundle image Docker (pas d’import.meta). */
+/** Replaces `appPaths` in CJS bundles (Docker / desktop); no `import.meta`. */
 function getAppRoot() {
+  const env = process.env.BLUETASKS_HOME?.trim();
+  if (env) {
+    return path.resolve(env);
+  }
   return path.resolve('/app');
 }
 
-module.exports = {getAppRoot};
+function getDataDir() {
+  const env = process.env.BLUETASKS_DATA_DIR?.trim();
+  if (env) {
+    return path.resolve(env);
+  }
+  return path.join(getAppRoot(), '.data');
+}
+
+module.exports = {getAppRoot, getDataDir};

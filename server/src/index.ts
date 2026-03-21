@@ -1,11 +1,11 @@
 import path from 'node:path';
 import fs from 'node:fs';
-import {getAppRoot} from './appPaths.js';
+import {getAppRoot, getDataDir} from './appPaths.js';
 import {createApp} from './createApp.js';
 import {openAndMigrateDatabase} from './dbSetup.js';
 
 const rootDir = getAppRoot();
-const dbDir = path.join(rootDir, '.data');
+const dbDir = getDataDir();
 const dbPath = path.join(dbDir, 'bluetasks.sqlite');
 const appDistDir = path.join(rootDir, 'web', 'app', 'dist');
 

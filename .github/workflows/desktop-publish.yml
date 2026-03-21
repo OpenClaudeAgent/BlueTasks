@@ -1,0 +1,194 @@
+# Build macOS + Windows Tauri bundles (unsigned) and attach installers to the GitHub Release for tag v*.
+# Trigger: tag push v* or manual dispatch with an existing tag.
+name: Desktop release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag (e.g. v0.2.0)"
+        required: true
+        type: string
+
+concurrency:
+  group: desktop-release-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
+
+jobs:
+  build-macos:
+    name: macOS (aarch64)
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            desktop/package-lock.json
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - run: npm ci
+      - run: npm ci --prefix desktop
+
+      - name: Build Tauri
+        env:
+          CI: false
+        run: npm run tauri:build --prefix desktop
+
+      - name: Zip .app
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+          APP="desktop/src-tauri/target/release/bundle/macos/BlueTasks.app"
+          test -d "$APP"
+          ditto -c -k --keepParent "$APP" "$GITHUB_WORKSPACE/BlueTasks_${VERSION}_macos_aarch64.app.zip"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bluetasks-macos
+          path: |
+            BlueTasks_*_macos_aarch64.app.zip
+            desktop/src-tauri/target/release/bundle/dmg/*.dmg
+          if-no-files-found: warn
+
+  build-windows:
+    name: Windows (x64)
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            desktop/package-lock.json
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - run: npm ci
+      - run: npm ci --prefix desktop
+
+      - name: Build Tauri
+        env:
+          CI: false
+        run: npm run tauri:build --prefix desktop
+
+      - name: Collect installers
+        shell: pwsh
+        run: |
+          $dest = Join-Path $env:GITHUB_WORKSPACE "win-installers"
+          New-Item -ItemType Directory -Force -Path $dest | Out-Null
+          $root = Join-Path $env:GITHUB_WORKSPACE "desktop/src-tauri/target/release/bundle"
+          foreach ($dir in @("nsis", "msi")) {
+            $p = Join-Path $root $dir
+            if (Test-Path $p) {
+              Get-ChildItem $p -File | Copy-Item -Destination $dest
+            }
+          }
+          Get-ChildItem $dest | ForEach-Object { Write-Host $_.FullName }
+          if (-not (Get-ChildItem $dest -File)) {
+            throw "No Windows installer found under $root/nsis or $root/msi"
+          }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bluetasks-windows
+          path: win-installers/
+
+  build-linux:
+    name: Linux (x64, .deb)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+
+      - name: Install Tauri Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libssl-dev \
+            build-essential
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            desktop/package-lock.json
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - run: npm ci
+      - run: npm ci --prefix desktop
+
+      - name: Build Tauri
+        env:
+          CI: false
+        run: npm run tauri:build --prefix desktop
+
+      - name: Collect .deb
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/linux-debs"
+          shopt -s nullglob
+          for f in desktop/src-tauri/target/release/bundle/deb/*.deb; do
+            cp "$f" "$GITHUB_WORKSPACE/linux-debs/"
+          done
+          ls -la "$GITHUB_WORKSPACE/linux-debs/"
+          test "$(find "$GITHUB_WORKSPACE/linux-debs" -name '*.deb' | wc -l)" -ge 1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bluetasks-linux
+          path: linux-debs/
+
+  publish:
+    name: Publish GitHub Release assets
+    needs: [build-macos, build-windows, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: bluetasks-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: List assets
+        run: find release-assets -type f -print
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: BlueTasks ${{ env.RELEASE_TAG }}
+          generate_release_notes: true
+          make_latest: true
+          fail_on_unmatched_files: false
+          files: release-assets/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
