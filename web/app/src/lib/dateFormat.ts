@@ -1,14 +1,5 @@
 import {parseTaskDate, todayKey} from './dateKeys';
 
-export {
-  addDaysToKey,
-  addMonthsToKey,
-  addYearsToKey,
-  formatDateKey,
-  parseTaskDate,
-  todayKey,
-} from './dateKeys';
-
 export function formatTaskDate(dateKey: string, language: string): string {
   return new Intl.DateTimeFormat(language, {
     day: 'numeric',

@@ -3,7 +3,6 @@ import {addDaysToKey, todayKey} from './dateKeys';
 import {createEmptyEditorState} from './editorState';
 import type {Task} from '../types';
 import {
-  applyRecurringStatusToggle,
   applySavedTaskPreservingLexicalShape,
   coercePinned,
   coerceRecurrence,
@@ -235,28 +234,6 @@ describe('sortTasks', () => {
     const pending: Task = {...common, id: 'pen', title: 'Open', status: 'pending'};
     const done: Task = {...common, id: 'done', title: 'Closed', status: 'completed'};
     expect(sortTasks([done, pending]).map((t) => t.id)).toEqual(['pen', 'done']);
-  });
-});
-
-describe('applyRecurringStatusToggle', () => {
-  it('advances due date instead of completing when recurrence is set', () => {
-    const day = todayKey();
-    const task: Task = {
-      ...createTask('X'),
-      id: 'r1',
-      taskDate: day,
-      recurrence: 'weekly',
-    };
-    const next = applyRecurringStatusToggle(task);
-    expect(next.status).toBe('pending');
-    expect(next.taskDate).toBe(addDaysToKey(day, 7));
-  });
-
-  it('toggles pending ↔ completed without recurrence', () => {
-    const pending = {...createTask('S'), id: 'p1', recurrence: null};
-    const done = applyRecurringStatusToggle(pending);
-    expect(done.status).toBe('completed');
-    expect(applyRecurringStatusToggle(done).status).toBe('pending');
   });
 });
 

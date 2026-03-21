@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 import {LoaderCircle, Plus} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {SettingsDialog} from './components/SettingsDialog';
@@ -11,6 +11,15 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [quickCaptureValue, setQuickCaptureValue] = useState('');
   const board = useBlueTasksBoard();
+
+  const taskCardBoardChrome = useMemo(
+    () => ({
+      datePopoverTaskId: board.datePopoverTaskId,
+      setDatePopoverTaskId: board.setDatePopoverTaskId,
+      liveTimerNowMs: board.liveTimerNowMs,
+    }),
+    [board.datePopoverTaskId, board.liveTimerNowMs, board.setDatePopoverTaskId],
+  );
 
   return (
     <div className="appShell">
@@ -98,6 +107,7 @@ function App() {
                 <TaskCard
                   key={task.id}
                   areas={board.areas}
+                  boardChrome={taskCardBoardChrome}
                   autoFocusTitle={board.titleFocusTaskId === task.id}
                   expanded={board.selectedTaskId === task.id}
                   isSaving={Boolean(board.savingIds[task.id])}

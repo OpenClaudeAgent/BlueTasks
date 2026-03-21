@@ -1,5 +1,5 @@
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {formatTaskDate, formatTaskDatePill, getDateTone} from './date';
+import {formatTaskDate, formatTaskDatePill, getDateTone} from './dateFormat';
 
 describe('getDateTone', () => {
   beforeEach(() => {

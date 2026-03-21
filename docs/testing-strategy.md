@@ -59,7 +59,7 @@ describe('Feature: Task card time display', () => {
 
 ### Unit
 
-- **Date / sections**: [`web/app/src/lib/date.ts`](../web/app/src/lib/date.test.ts), [`tasks.ts`](../web/app/src/lib/tasks.test.ts) (filtering, sorting, payloads).
+- **Date / sections**: [`web/app/src/lib/dateFormat.ts`](../web/app/src/lib/dateFormat.test.ts), [`tasks.ts`](../web/app/src/lib/tasks.test.ts) (filtering, sorting, payloads), [`taskRecurrence.ts`](../web/app/src/lib/taskRecurrence.test.ts).
 - **Recurrence / editor JSON**: [`recurrence.ts`](../web/app/src/lib/recurrence.test.ts), [`editorState.ts`](../web/app/src/lib/editorState.test.ts).
 - **Task card formatting** (extracted from UI): [`taskCardFormat.ts`](../web/app/src/lib/taskCardFormat.ts) — timer display, estimate labels, priority cycle.
 - **Server validation**: [`taskSanitize.ts`](../server/src/taskSanitize.test.ts), [`areaIconIds.ts`](../server/src/areaIconIds.test.ts).
@@ -69,7 +69,7 @@ describe('Feature: Task card time display', () => {
 - **REST API + SQLite (memory or temp file)**: [`server/src/api.integration.test.ts`](../server/src/api.integration.test.ts), [`dbSetup.test.ts`](../server/src/dbSetup.test.ts).
 - **Public API JSON (Zod)**: [`contract/`](../contract/) — Vitest ([`server/src/api.integration.test.helpers.ts`](../server/src/api.integration.test.helpers.ts)); Playwright ([`scenario/contract-expectations.ts`](../scenario/contract-expectations.ts)).
 - **Client API wrapper**: [`web/app/src/api.test.ts`](../web/app/src/api.test.ts).
-- **Components (RTL)**: settings, language toggle, task row behaviour with i18n — [`SettingsDialog.test.tsx`](../web/app/src/components/SettingsDialog.test.tsx), [`LanguageSwitcher.test.tsx`](../web/app/src/components/LanguageSwitcher.test.tsx), [`TaskCard.test.tsx`](../web/app/src/components/TaskCard.test.tsx) (mock heavy editors).
+- **Components (RTL)**: settings, language toggle, task row behaviour with i18n — [`SettingsDialog.test.tsx`](../web/app/src/components/SettingsDialog.test.tsx), [`LanguageSwitcher.test.tsx`](../web/app/src/components/LanguageSwitcher.test.tsx), [`TaskCard.test.tsx`](../web/app/src/components/TaskCard.test.tsx) (mock heavy editors), [`useTaskCardChrome.test.tsx`](../web/app/src/components/taskCard/useTaskCardChrome.test.tsx) (task card chrome hook).
 
 ### End-to-end
 

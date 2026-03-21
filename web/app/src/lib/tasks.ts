@@ -1,5 +1,4 @@
 import {todayKey} from './dateKeys';
-import {advanceRecurrenceDate} from './recurrence';
 import {createEmptyEditorState, lexicalDocsContentEqual} from './editorState';
 import {
   AREA_FILTER_ALL,
@@ -16,7 +15,7 @@ export const sectionOrder: SectionId[] = ['today', 'upcoming', 'anytime', 'done'
 
 export {coercePinned, coerceRecurrence} from './taskPropertyValidation';
 
-/** Nouvelle tâche : pas de date par défaut (ni zone imposée ailleurs) — l’utilisateur choisit dans la carte. */
+/** New task: no default due date (area is not forced here either); the user sets them on the card. */
 export function createTask(title: string, areaId: string | null = null): Task {
   const now = new Date().toISOString();
 
@@ -175,23 +174,6 @@ export function sortTasks(tasks: Task[]): Task[] {
 
     return left.id.localeCompare(right.id);
   });
-}
-
-/** When marking a recurring task “done”, advance the due date instead of moving to completed. */
-export function applyRecurringStatusToggle(task: Task): Task {
-  if (task.status !== 'pending' || !task.recurrence) {
-    return {
-      ...task,
-      status: task.status === 'completed' ? 'pending' : 'completed',
-    };
-  }
-
-  const base = task.taskDate ?? todayKey();
-  return {
-    ...task,
-    taskDate: advanceRecurrenceDate(base, task.recurrence),
-    status: 'pending',
-  };
 }
 
 export function getPreferredTaskId(

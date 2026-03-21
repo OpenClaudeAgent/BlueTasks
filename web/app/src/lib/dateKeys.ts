@@ -1,6 +1,6 @@
 /**
  * Calendar-key helpers (YYYY-MM-DD) only — no Intl or UI-oriented formatting.
- * Keeps recurrence / task section logic off the presentation-oriented `date.ts` module.
+ * Keeps recurrence / task section logic separate from presentation (`dateFormat.ts`).
  */
 
 export function todayKey(): string {

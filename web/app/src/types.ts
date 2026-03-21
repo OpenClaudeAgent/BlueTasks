@@ -8,7 +8,7 @@ export type RecurrenceKind = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'year
 
 export type SectionId = 'today' | 'upcoming' | 'anytime' | 'done';
 
-/** Filtre latéral : `AREA_FILTER_ALL`, `AREA_FILTER_UNCATEGORIZED`, ou id d’une zone. */
+/** Sidebar filter: `AREA_FILTER_ALL`, `AREA_FILTER_UNCATEGORIZED`, or an area id. */
 export const AREA_FILTER_ALL = 'all';
 export const AREA_FILTER_UNCATEGORIZED = 'uncategorized';
 export type AreaFilter = string;
@@ -36,7 +36,7 @@ export type Task = {
   timeSpentSeconds: number;
   timerStartedAt: string | null;
   recurrence: RecurrenceKind | null;
-  /** Zone / projet (optionnel). */
+  /** Area / project (optional). */
   areaId: string | null;
   createdAt: string;
   updatedAt: string;

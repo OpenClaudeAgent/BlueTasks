@@ -1,9 +1,9 @@
 import {lazy, Suspense} from 'react';
 import {useTranslation} from 'react-i18next';
 import {createEmptyEditorState, lexicalDocsContentEqual} from '../../lib/editorState';
-import type {Area, Task, TaskDraftUpdate} from '../../types';
+import type {Task} from '../../types';
 import {buildLexicalEditorLabels} from './lexicalEditorLabels';
-import {TaskCardFooter} from './TaskCardFooter';
+import {TaskCardFooter, type TaskCardFooterProps} from './TaskCardFooter';
 
 const LazyLexicalTaskEditor = lazy(async () => {
   const module = await import('../LexicalTaskEditor');
@@ -12,25 +12,10 @@ const LazyLexicalTaskEditor = lazy(async () => {
 
 export type TaskCardExpandedBodyProps = {
   task: Task;
-  areas: Area[];
-  isSaving: boolean;
-  checklistRatio: number;
-  trackedSeconds: number;
-  onChange: (taskId: string, update: TaskDraftUpdate) => void;
-  onDelete: (taskId: string) => void;
-  onOpenHeaderDatePopover: () => void;
+  footer: TaskCardFooterProps;
 };
 
-export function TaskCardExpandedBody({
-  task,
-  areas,
-  isSaving,
-  checklistRatio,
-  trackedSeconds,
-  onChange,
-  onDelete,
-  onOpenHeaderDatePopover,
-}: TaskCardExpandedBodyProps) {
+export function TaskCardExpandedBody({task, footer}: TaskCardExpandedBodyProps) {
   const {t} = useTranslation();
 
   return (
@@ -49,7 +34,7 @@ export function TaskCardExpandedBody({
             ) {
               return;
             }
-            onChange(task.id, {
+            footer.onChange(task.id, {
               contentJson: payload.json,
               contentText: payload.plainText,
               checklistTotal: payload.checklistTotal,
@@ -61,19 +46,10 @@ export function TaskCardExpandedBody({
       </Suspense>
 
       <div className="taskCard__progressTrack" aria-hidden="true">
-        <span style={{width: `${checklistRatio}%`}} />
+        <span style={{width: `${footer.checklistRatio}%`}} />
       </div>
 
-      <TaskCardFooter
-        areas={areas}
-        checklistRatio={checklistRatio}
-        isSaving={isSaving}
-        onChange={onChange}
-        onDelete={onDelete}
-        onOpenHeaderDatePopover={onOpenHeaderDatePopover}
-        task={task}
-        trackedSeconds={trackedSeconds}
-      />
+      <TaskCardFooter {...footer} />
     </div>
   );
 }

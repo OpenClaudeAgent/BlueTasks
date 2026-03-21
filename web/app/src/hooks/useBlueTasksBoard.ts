@@ -1,15 +1,17 @@
-import {useEffect, useMemo} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {filterTasks, getTaskCounts} from '../lib/tasks';
 import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from '../types';
 import {useBlueTasksTasksAndSaves} from './blueTasks/useBlueTasksTasksAndSaves';
 import {useBlueTasksUiState} from './blueTasks/useBlueTasksUiState';
+import {useBoardTimerNowMs} from './useBoardTimerNowMs';
 
 /**
  * Composes UI state + tasks/areas persistence. See `useBlueTasksUiState` and `useBlueTasksTasksAndSaves`.
  */
 export function useBlueTasksBoard() {
   const {t} = useTranslation();
+  const [rawDatePopoverTaskId, setDatePopoverTaskId] = useState<string | null>(null);
   const ui = useBlueTasksUiState();
   const {
     areaFilter,
@@ -51,6 +53,12 @@ export function useBlueTasksBoard() {
     () => filterTasks(tasks, selectedSection, areaFilter),
     [tasks, selectedSection, areaFilter],
   );
+
+  const liveTimerNowMs = useBoardTimerNowMs(visibleTasks);
+  const datePopoverTaskId =
+    rawDatePopoverTaskId !== null && visibleTasks.some((task) => task.id === rawDatePopoverTaskId)
+      ? rawDatePopoverTaskId
+      : null;
   const counts = useMemo(() => getTaskCounts(tasks, areaFilter), [tasks, areaFilter]);
 
   const taskCountByAreaId = useMemo(() => {
@@ -123,5 +131,8 @@ export function useBlueTasksBoard() {
     handleTaskDraftChange,
     handleToggleRecurringStatus,
     handleDelete,
+    datePopoverTaskId,
+    setDatePopoverTaskId,
+    liveTimerNowMs,
   };
 }

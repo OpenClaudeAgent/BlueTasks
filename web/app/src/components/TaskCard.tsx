@@ -1,21 +1,18 @@
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {enUS, fr as frLocale} from 'date-fns/locale';
+import {useRef} from 'react';
 import {useTranslation} from 'react-i18next';
-import {formatTaskDatePill, getDateTone} from '../lib/date';
-import {formatTrackedSeconds} from '../lib/taskCardFormat';
-import {getAreaIconComponent} from '../lib/areaIcons';
-import {coercePinned, coerceRecurrence} from '../lib/taskPropertyValidation';
 import type {Area, Task, TaskDraftUpdate} from '../types';
 import {TaskCardExpandedBody} from './taskCard/TaskCardExpandedBody';
 import {TaskCardHeaderRow} from './taskCard/TaskCardHeaderRow';
-import {areaNameByIdMap, checklistCompletionRatio} from './taskCard/taskCardModel';
 import {useAutoFocusTaskTitle} from './taskCard/useAutoFocusTaskTitle';
+import type {TaskCardBoardChrome} from './taskCard/useTaskCardChrome';
+import {useTaskCardChrome} from './taskCard/useTaskCardChrome';
 
 type TaskCardProps = {
   task: Task;
   areas: Area[];
+  boardChrome: TaskCardBoardChrome;
   expanded: boolean;
-  /** Premier rendu étendu : focus sur le champ titre (ex. après « Ajouter »). */
+  /** First expanded render: focus the title field (e.g. after Add). */
   autoFocusTitle?: boolean;
   onAutoFocusTitleConsumed?: () => void;
   isSaving: boolean;
@@ -28,6 +25,7 @@ type TaskCardProps = {
 export function TaskCard({
   task,
   areas,
+  boardChrome,
   expanded,
   autoFocusTitle = false,
   onAutoFocusTitleConsumed,
@@ -39,23 +37,7 @@ export function TaskCard({
 }: TaskCardProps) {
   const {i18n} = useTranslation();
   const titleInputRef = useRef<HTMLInputElement>(null);
-  const [dateOpen, setDateOpen] = useState(false);
-  /** Wall clock for live timer label; updated from the interval (avoids impure `Date.now()` during render). */
-  const [timerNowMs, setTimerNowMs] = useState(0);
-
-  useEffect(() => {
-    if (!task.timerStartedAt) {
-      return;
-    }
-    const tick = () => {
-      setTimerNowMs(Date.now());
-    };
-    tick();
-    const id = window.setInterval(tick, 1000);
-    return () => window.clearInterval(id);
-  }, [task.timerStartedAt, task.id]);
-
-  const trackedSeconds = formatTrackedSeconds(task, task.timerStartedAt ? timerNowMs : 0);
+  const chrome = useTaskCardChrome(task, areas, i18n.language, isSaving, onChange, onDelete, boardChrome);
 
   useAutoFocusTaskTitle({
     autoFocusTitle,
@@ -65,67 +47,29 @@ export function TaskCard({
     titleInputRef,
   });
 
-  const checklistRatio = useMemo(
-    () => checklistCompletionRatio(task.checklistCompleted, task.checklistTotal),
-    [task.checklistCompleted, task.checklistTotal],
-  );
-
-  const datePillLabel = task.taskDate ? formatTaskDatePill(task.taskDate, i18n.language) : null;
-  const dateTone = getDateTone(task.taskDate);
-  const pinned = coercePinned(task.pinned);
-  const recurrence = coerceRecurrence(task.recurrence);
-
-  const areaNameById = useMemo(() => areaNameByIdMap(areas), [areas]);
-
-  const areaDisplayName = task.areaId ? areaNameById[task.areaId] ?? null : null;
-
-  const AreaGlyph = useMemo(
-    () => getAreaIconComponent(task.areaId ? areas.find((a) => a.id === task.areaId)?.icon : undefined),
-    [areas, task.areaId],
-  );
-
-  const updateDate = useCallback(
-    (dateKey: string | null) => {
-      onChange(task.id, {taskDate: dateKey, recurrence: null});
-      setDateOpen(false);
-    },
-    [onChange, task.id],
-  );
-
   return (
     <article className={`taskCard ${expanded ? 'is-expanded' : ''} ${task.status === 'completed' ? 'is-completed' : ''}`}>
       <TaskCardHeaderRow
-        AreaGlyph={AreaGlyph}
-        areaDisplayName={areaDisplayName}
-        dateOpen={dateOpen}
-        datePillLabel={datePillLabel}
-        dateTone={dateTone}
-        dayPickerLocale={i18n.language === 'fr' ? frLocale : enUS}
+        AreaGlyph={chrome.AreaGlyph}
+        areaDisplayName={chrome.areaDisplayName}
+        dateOpen={chrome.dateOpen}
+        datePillLabel={chrome.datePillLabel}
+        dateTone={chrome.dateTone}
+        dayPickerLocale={chrome.dayPickerLocale}
         expanded={expanded}
         onChange={onChange}
-        onDateOpenChange={setDateOpen}
-        onSelectDate={updateDate}
+        onDateOpenChange={chrome.setDateOpen}
+        onSelectDate={chrome.updateDate}
         onToggleExpand={onToggleExpand}
         onToggleStatus={onToggleStatus}
-        pinned={pinned}
-        recurrence={recurrence}
+        pinned={chrome.pinned}
+        recurrence={chrome.recurrence}
         task={task}
         titleInputRef={titleInputRef}
-        trackedSeconds={trackedSeconds}
+        trackedSeconds={chrome.trackedSeconds}
       />
 
-      {expanded ? (
-        <TaskCardExpandedBody
-          areas={areas}
-          checklistRatio={checklistRatio}
-          isSaving={isSaving}
-          onChange={onChange}
-          onDelete={onDelete}
-          onOpenHeaderDatePopover={() => setDateOpen(true)}
-          task={task}
-          trackedSeconds={trackedSeconds}
-        />
-      ) : null}
+      {expanded ? <TaskCardExpandedBody footer={chrome.footerProps} task={task} /> : null}
     </article>
   );
 }

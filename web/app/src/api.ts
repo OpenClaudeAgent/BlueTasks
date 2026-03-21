@@ -1,9 +1,9 @@
 import type {Area, CreateTaskPayload, Task, TaskDraftPayload} from './types';
 
 /**
- * Base URL de l’API Express. Vide = chemins relatifs (même origine, ex. prod sur :8787).
- * En `vite` / `vite preview`, sans proxy fiable, Vite renvoie « Cannot GET /api/… » : on
- * cible donc explicitement le backend (CORS déjà ouvert côté serveur).
+ * Express API base URL. Empty string = same-origin relative paths (e.g. production on :8787).
+ * In `vite` / `vite preview`, without a reliable proxy Vite returns "Cannot GET /api/…", so we
+ * point at the backend explicitly (CORS is already open on the server).
  */
 function apiOrigin(): string {
   const fromEnv = import.meta.env.VITE_API_ORIGIN?.trim();
@@ -93,11 +93,8 @@ export const areasApi = {
 };
 
 /**
- * Télécharge une copie cohérente de la base SQLite (VACUUM INTO côté serveur).
- */
-/**
- * Remplace la base serveur par un fichier .sqlite exporté (POST multipart, champ `database`).
- * Après succès, recharger les listes côté client (tâches + zones).
+ * Replace the server database with an exported `.sqlite` file (multipart POST, field `database`).
+ * After success, refresh task and area lists on the client.
  */
 export async function uploadDatabaseImport(file: File): Promise<void> {
   const form = new FormData();
@@ -120,6 +117,7 @@ export async function uploadDatabaseImport(file: File): Promise<void> {
   }
 }
 
+/** Download a consistent SQLite snapshot (server-side VACUUM INTO). */
 export async function downloadDatabaseExport(): Promise<void> {
   const response = await fetch(apiUrl('/api/export/database'));
   if (!response.ok) {

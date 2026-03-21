@@ -1,5 +1,6 @@
 /** @vitest-environment jsdom */
 import {describe, expect, it, vi} from 'vitest';
+import {useMemo, useState, type ComponentProps} from 'react';
 import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {I18nextProvider} from 'react-i18next';
@@ -11,13 +12,26 @@ vi.mock('./LexicalTaskEditor', () => ({
   LexicalTaskEditor: () => <div data-testid="lexical-editor-mock" />,
 }));
 
+function TaskCardHarness(props: Omit<ComponentProps<typeof TaskCard>, 'boardChrome'>) {
+  const [datePopoverTaskId, setDatePopoverTaskId] = useState<string | null>(null);
+  const boardChrome = useMemo(
+    () => ({
+      datePopoverTaskId,
+      setDatePopoverTaskId,
+      liveTimerNowMs: 0,
+    }),
+    [datePopoverTaskId],
+  );
+  return <TaskCard {...props} boardChrome={boardChrome} />;
+}
+
 describe('Feature: Task card (collapsed)', () => {
   describe('Scenario: User sees a task in the list', () => {
     it('given a pending task with a title, when the card is collapsed, then the title is visible', () => {
       const task = createTask('Buy milk');
       render(
         <I18nextProvider i18n={i18n}>
-          <TaskCard
+          <TaskCardHarness
             areas={[]}
             expanded={false}
             isSaving={false}
@@ -45,7 +59,7 @@ describe('Feature: Task card (collapsed)', () => {
 
       render(
         <I18nextProvider i18n={i18n}>
-          <TaskCard
+          <TaskCardHarness
             areas={[]}
             expanded={false}
             isSaving={false}
@@ -73,7 +87,7 @@ describe('Feature: Task card (collapsed)', () => {
 
       render(
         <I18nextProvider i18n={i18n}>
-          <TaskCard
+          <TaskCardHarness
             areas={[]}
             expanded={false}
             isSaving={false}
@@ -102,7 +116,7 @@ describe('Feature: Task card (collapsed)', () => {
 
       render(
         <I18nextProvider i18n={i18n}>
-          <TaskCard
+          <TaskCardHarness
             areas={[]}
             expanded={false}
             isSaving={false}
@@ -130,7 +144,7 @@ describe('Feature: Task card (expanded)', () => {
 
       render(
         <I18nextProvider i18n={i18n}>
-          <TaskCard
+          <TaskCardHarness
             areas={[]}
             expanded
             isSaving={false}

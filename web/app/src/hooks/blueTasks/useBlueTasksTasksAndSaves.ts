@@ -3,8 +3,8 @@ import type {TFunction} from 'i18next';
 import {areasApi, tasksApi} from '../../api';
 import {addDaysToKey, todayKey} from '../../lib/dateKeys';
 import {coerceAreaIcon} from '../../lib/areaIcons';
+import {applyRecurringStatusToggle} from '../../lib/taskRecurrence';
 import {
-  applyRecurringStatusToggle,
   applySavedTaskPreservingLexicalShape,
   createTask,
   getTaskSection,
