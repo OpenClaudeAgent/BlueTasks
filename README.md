@@ -1,62 +1,99 @@
 # BlueTasks
 
-BlueTasks is a local-web-first task app rebuilt to deliver a focused tasks experience with:
+Application de tâches **local-first** : panneau unique, cartes extensibles, notes riches (Lexical), date de suivi, **SQLite** sur disque, interface **FR / EN**.
 
-- a left sidebar and a single main panel
-- expandable task cards
-- permanent editing in place
-- rich notes with Lexical
-- one follow-up date per task
-- local SQLite persistence
-- FR/EN support from day one
+---
 
-For a concise map of folders, API vs SQLite, export endpoint, Docker layout, and the shared area-icon contract, see [docs/architecture.md](docs/architecture.md). Accessibility linting notes: [docs/a11y.md](docs/a11y.md). **Quality** (tests, coverage, jscpd, CI): [docs/quality.md](docs/quality.md). **MCP RPG** (index sémantique) : [docs/rpg.md](docs/rpg.md).
+## Installer et lancer (sans cloner le code)
 
-## Local development
+### Avec l’image publiée (recommandé)
 
-Install dependencies:
+1. **Télécharger** l’image (remplace `v0.1.3` par le [tag](https://github.com/OpenClaudeAgent/BlueTasks/tags) voulu) :
 
-```sh
+   ```bash
+   docker pull ghcr.io/openclaudeagent/bluetasks:v0.1.3
+   ```
+
+   Si le dépôt du package est privé : `docker login ghcr.io` avant le `pull`.
+
+2. **Créer un dossier** pour la base (sur ta machine) :
+
+   ```bash
+   mkdir -p ./bluetasks-data
+   ```
+
+3. **Démarrer** le conteneur en liant le **port 8787** et le volume de données :
+
+   ```bash
+   docker run --rm -d \
+     --name bluetasks \
+     -p 8787:8787 \
+     -v "$(pwd)/bluetasks-data:/app/.data" \
+     ghcr.io/openclaudeagent/bluetasks:v0.1.3
+   ```
+
+4. Ouvrir **http://localhost:8787** dans le navigateur.
+
+5. **Arrêter** :
+
+   ```bash
+   docker stop bluetasks
+   ```
+
+`docker pull` ne suffit pas : sans `docker run` (avec **`-p 8787:8787`**), rien n’écoute sur ton Mac.
+
+---
+
+## Depuis une copie du dépôt (Docker Compose)
+
+Prérequis : [Node.js 22](https://nodejs.org/) et Docker.
+
+```bash
+git clone https://github.com/OpenClaudeAgent/BlueTasks.git
+cd BlueTasks
+npm run docker:release
+docker compose up --build -d
+```
+
+Puis **http://localhost:8787**. Les données sont dans **`./.data`** à la racine du projet (monté dans le conteneur).
+
+---
+
+## Sans Docker (Node uniquement)
+
+```bash
+git clone https://github.com/OpenClaudeAgent/BlueTasks.git
+cd BlueTasks
 npm install
-```
-
-Run the frontend and the local API together:
-
-```sh
-npm run dev
-```
-
-The frontend runs on [http://localhost:5173](http://localhost:5173) and proxies API requests to [http://localhost:8787](http://localhost:8787).
-
-The web client calls the API **directly** at `http://localhost:8787` during `vite` dev and on **`vite preview`** (port 4173), so you must have the BlueTasks server listening there (or set `VITE_API_ORIGIN` in `web/app/.env` to your API base URL, without trailing slash).
-
-## Production-style local run
-
-Build everything:
-
-```sh
 npm run build
-```
-
-Then start the local server:
-
-```sh
 npm run start
 ```
 
-The server exposes the built app on [http://localhost:8787](http://localhost:8787).
+Puis **http://localhost:8787**. La base est créée sous **`.data/bluetasks.sqlite`** à la racine du repo.
 
-## Docker
+---
 
-Production image (Express serves the Vite build; port **8787**). Build flow: **npm** builds the app locally/CI, then Docker copies artifacts and runs **`npm ci --omit=dev`** for Linux in a `deps` stage (correct `better-sqlite3` binary).
+## Sauvegarde des données
 
-```sh
-npm run docker:release
-docker compose build && docker compose up -d
+- **Interface** : Paramètres → Général → exporter / importer une base **`.sqlite`**.
+- **Fichiers** : copier le dossier **`.data`** (ou `bluetasks-data` si tu as utilisé l’exemple `docker run` ci-dessus).
+
+---
+
+## Développement
+
+```bash
+npm install
+npm run dev
 ```
 
-Open [http://localhost:8787](http://localhost:8787). SQLite lives in `./.data` on the host (mounted at `/app/.data` in the container).
+- Front : **http://localhost:5173** (Vite).
+- API : **http://localhost:8787** — le client appelle l’API sur ce port en dev ; il faut que le serveur tourne en parallèle (`npm run dev` à la racine lance les deux).
 
-**Settings → General** : export (`GET /api/export/database`) and import (`POST /api/import/database`, multipart field `database`) of the full `.sqlite` file.
+Optionnel : fichier `web/app/.env` avec `VITE_API_ORIGIN=https://ton-api` (sans slash final) si l’API n’est pas sur `localhost:8787`.
 
-Multi-stage image, GHCR publish on tags `v*`, and `docker run` examples: [docs/docker.md](docs/docker.md).
+Qualité / CI / couverture : [docs/quality.md](docs/quality.md).  
+Architecture, API, SQLite : [docs/architecture.md](docs/architecture.md).  
+Accessibilité (lint) : [docs/a11y.md](docs/a11y.md).  
+Docker détaillé (multi-arch, GHCR, tags `v*`) : [docs/docker.md](docs/docker.md).  
+Index MCP RPG : [docs/rpg.md](docs/rpg.md).
