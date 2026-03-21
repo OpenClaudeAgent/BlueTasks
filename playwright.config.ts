@@ -1,7 +1,7 @@
 import {defineConfig, devices} from '@playwright/test';
 
 /**
- * E2E smoke: production server (built SPA + API) on port 8787.
+ * E2E: production-shaped server (built SPA + API) on port 8787.
  * Locally, `webServer` runs `npm run build` then `npm run start` unless reuseExistingServer.
  */
 export default defineConfig({

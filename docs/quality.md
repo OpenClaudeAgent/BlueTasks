@@ -9,7 +9,7 @@
 | `npm run test:coverage` | Vitest with the broader web thresholds ([`web/app/vitest.config.ts`](../web/app/vitest.config.ts)) |
 | `npm run test:coverage:gate` | **CI gate — ≥80%** lines, statements, branches, functions on [`web/app/src/lib/**`](../web/app/src/lib) and on [`server/src/**`](../server/src) except `index.ts` ([gate configs](../web/app/vitest.coverage-gate.config.ts)) |
 | `npm run duplicates` | [jscpd](https://github.com/kucherenko/jscpd) — copy-paste clones (global threshold in `.jscpd.json`) |
-| `npm run test:e2e` | Playwright — built SPA + server smoke ([`e2e/`](../e2e/), [`playwright.config.ts`](../playwright.config.ts)) |
+| `npm run test:e2e` | Playwright — built SPA + real server ([`e2e/`](../e2e/), [`playwright.config.ts`](../playwright.config.ts)) |
 | `npm run ci` | `lint` → `duplicates` → **`test:coverage:gate`** → `build` → `test:e2e` |
 | `npm run check` | Alias for `ci` |
 
@@ -23,7 +23,7 @@ To mirror this in another repository (e.g. **OpenClaudeAgent/open-flow**), copy 
 
 Related checks:
 
-- **[Docker smoke](../.github/workflows/docker-smoke.yml)** — on pull requests that touch Docker/build inputs, builds the `.dockerctx` image for `linux/amd64` without pushing.
+- **[Docker build check](../.github/workflows/docker-build-check.yml)** — on pull requests that touch Docker/build inputs, verifies the `.dockerctx` image builds for `linux/amd64` (nothing is pushed).
 - **[Docker image](../.github/workflows/docker-publish.yml)** — builds and pushes multi-arch images on `v*` tags or manual dispatch with a tag input.
 - **[Release](../.github/workflows/release.yml)** — `workflow_dispatch` with a semver input: syncs all workspace `package.json` versions, updates `CHANGELOG.md`, refreshes the lockfile, commits, and pushes `v*` (starts Docker publish). See [releasing.md](releasing.md).
 

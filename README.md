@@ -1,7 +1,7 @@
 # BlueTasks
 
 [![CI](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml)
-[![Docker smoke](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-smoke.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-smoke.yml)
+[![Docker build check](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-build-check.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-build-check.yml)
 
 **Local-first** task app: single main panel, expandable cards, rich notes (Lexical), one follow-up date per task, on-disk **SQLite**, **FR / EN** UI.
 
@@ -95,7 +95,7 @@ Optional: `web/app/.env` with `VITE_API_ORIGIN=https://your-api` (no trailing sl
 
 ### Quality gate (same as CI)
 
-Runs lint, duplication scan, **Vitest coverage gate (≥80% on web `src/lib/**` and server `src/`)**, production build, and Playwright smoke tests.
+Runs lint, duplication scan, **Vitest coverage gate (≥80% on web `src/lib/**` and server `src/`)**, production build, and Playwright end-to-end tests.
 
 ```bash
 npm run ci

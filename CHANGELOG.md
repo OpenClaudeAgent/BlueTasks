@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Release: [`.github/workflows/release.yml`](.github/workflows/release.yml) — enter semver (e.g. `0.2.0`) to sync all workspace `package.json` versions, update this file, refresh `package-lock.json`, commit, push tag `v*`, and trigger Docker publish (see [docs/releasing.md](docs/releasing.md)).
 - CI: optional manual runs (`workflow_dispatch`) for [CI](.github/workflows/ci.yml) and [Docker image](.github/workflows/docker-publish.yml).
-- CI: [Docker smoke](.github/workflows/docker-smoke.yml) builds the image context on relevant PRs (amd64, no push).
+- CI: [Docker build check](.github/workflows/docker-build-check.yml) verifies the image builds on relevant PRs (amd64, no push).
 
 ## [0.1.3] - 2026-03-20
 

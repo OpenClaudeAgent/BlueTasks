@@ -45,4 +45,4 @@ If `main` rejects pushes from `github-actions[bot]`, either allow the bot to byp
 
 ## Docker without a new git tag
 
-You can still run [**Docker image**](../.github/workflows/docker-publish.yml) manually with a **tag** input (e.g. `v0.2.0-rc1`) without bumping `package.json` — useful for smoke images. Prefer the **Release** workflow for real versions so **code, lockfile, changelog, and tag** stay aligned.
+You can still run [**Docker image**](../.github/workflows/docker-publish.yml) manually with a **tag** input (e.g. `v0.2.0-rc1`) without bumping `package.json` — useful for one-off or preview builds. Prefer the **Release** workflow for real versions so **code, lockfile, changelog, and tag** stay aligned.

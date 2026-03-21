@@ -20,9 +20,9 @@ Useful env vars: `HOST` (default `0.0.0.0`), `PORT` (default `8787`).
 - **Dockerfile**: **`deps`** stage (Alpine + native toolchain only to compile/download `better-sqlite3`), **`runtime`** stage without gcc/python — copies `node_modules` + `server/dist` + `web/app/dist` + `shared/`. Entrypoint: `node server/dist/index.js`.
 - **Platforms**: **Docker image** workflow runs **amd64** (`ubuntu-latest`) and **arm64** (`ubuntu-24.04-arm`) in parallel, then publishes a multi-arch manifest `:tag` and `:latest`. Per-arch tags `:tag-amd64` / `:tag-arm64`. Buildx **GHA** cache on the context.
 
-## PR smoke build
+## PR: verify Docker build
 
-Workflow [`.github/workflows/docker-smoke.yml`](../.github/workflows/docker-smoke.yml) runs on pull requests that change Docker-related paths: it runs `npm run build`, assembles `.dockerctx/`, and **`docker buildx build --load`** for `linux/amd64` only (nothing is pushed). Use it to catch broken Dockerfiles before tagging.
+Workflow [`.github/workflows/docker-build-check.yml`](../.github/workflows/docker-build-check.yml) runs on pull requests that change Docker-related paths: it runs `npm run build`, assembles `.dockerctx/`, and **`docker buildx build --load`** for `linux/amd64` only (nothing is pushed). Use it to catch broken Dockerfiles before tagging.
 
 ## SQLite import / export
 

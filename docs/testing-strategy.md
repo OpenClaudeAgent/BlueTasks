@@ -6,7 +6,7 @@ We describe behaviour with **Feature → Scenario → Given / When / Then** (Ghe
 |--------|--------|--------|-------------|
 | **Unit** | Pure logic, small helpers, domain rules | Vitest (`node` or `jsdom`) | Fast feedback; no I/O; stable contracts |
 | **Integration** | HTTP API + DB (or React + mocked boundaries) | Vitest + `supertest`; RTL + `vi.mock` for `fetch`/modules | Verify wiring, serializers, persistence, critical UI flows |
-| **End-to-end (E2E)** | Full stack: built SPA + real server | Playwright | Smoke paths, regressions across static serving + API |
+| **End-to-end (E2E)** | Full stack: built SPA + real server | Playwright | Main user paths, regressions across static serving + API |
 
 Avoid repeating the same assertion at every layer: e.g. task sorting rules stay in **unit** tests; **E2E** checks that the app loads and core endpoints respond.
 
@@ -62,7 +62,7 @@ describe('Feature: Task card time display', () => {
 
 - **Production-shaped server**: [`e2e/app.spec.ts`](../e2e/app.spec.ts) — `GET /api/tasks` and `/` with built assets (see [`playwright.config.ts`](../playwright.config.ts)).
 
-Expand E2E only for flows that **integration tests cannot trust** (e.g. full OAuth, file upload across browsers). Prefer more **integration** tests for business rules.
+Expand E2E only for flows that **integration tests cannot trust** (e.g. full OAuth, file upload across browsers). Prefer more **integration** tests for business rules. The Playwright suite stays intentionally small: it checks that the built app and API respond, not every UI interaction.
 
 ---
 
