@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {addTaskWithTitle, firstCard, resetBoard} from './task-flow-helpers';
+import {addTaskWithTitle, firstCard, resetBoard, sleepMs} from './task-flow-helpers';
 
 test.describe('Task timer', () => {
   test.describe.configure({mode: 'serial'});
@@ -25,16 +25,22 @@ test.describe('Task timer', () => {
 
     const card = firstCard(page);
     await card.getByRole('button', {name: 'Start timer'}).click();
+    // While running, only timerStartedAt is persisted; timeSpentSeconds updates on stop.
     await expect
       .poll(
         async () => {
           const res = await page.request.get('/api/tasks');
-          const rows = (await res.json()) as {title: string; timeSpentSeconds: number}[];
-          return rows.find((t) => t.title === title)?.timeSpentSeconds ?? 0;
+          const rows = (await res.json()) as {
+            title: string;
+            timerStartedAt: string | null;
+          }[];
+          return rows.find((t) => t.title === title)?.timerStartedAt ?? '';
         },
         {timeout: 5000},
       )
-      .toBeGreaterThan(0);
+      .toMatch(/^\d{4}-/);
+    // Same wall-clock second → 0s delta; the app floors elapsed time to whole seconds.
+    await sleepMs(1100);
     await card.getByRole('button', {name: 'Stop timer'}).click();
     await page.waitForResponse(
       (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),

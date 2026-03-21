@@ -1,3 +1,5 @@
+import {setTimeout as delay} from 'node:timers/promises';
+
 import {expect, type Page} from '@playwright/test';
 import type {APIRequestContext} from '@playwright/test';
 import {deleteAllAreas, deleteAllTasks} from './api-helpers';
@@ -5,6 +7,11 @@ import {gotoWithEnglish} from './helpers';
 
 /** Debounced save delay in the SPA + network slack */
 export const AUTOSAVE_SETTLE_MS = 900;
+
+/** Wall-clock wait (Playwright has no built-in sleep). Use when the UI counts whole seconds (e.g. task timer). */
+export function sleepMs(ms: number): Promise<void> {
+  return delay(ms);
+}
 
 export async function resetBoard(page: Page, request: APIRequestContext): Promise<void> {
   await deleteAllAreas(request);
