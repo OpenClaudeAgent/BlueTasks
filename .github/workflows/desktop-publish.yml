@@ -115,9 +115,62 @@ jobs:
           name: bluetasks-windows
           path: win-installers/
 
+  build-linux:
+    name: Linux (x64, .deb)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ env.RELEASE_TAG }}
+
+      - name: Install Tauri Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            libayatana-appindicator3-dev \
+            librsvg2-dev \
+            patchelf \
+            libssl-dev \
+            build-essential
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            desktop/package-lock.json
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - run: npm ci
+      - run: npm ci --prefix desktop
+
+      - name: Build Tauri
+        env:
+          CI: false
+        run: npm run tauri:build --prefix desktop
+
+      - name: Collect .deb
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/linux-debs"
+          shopt -s nullglob
+          for f in desktop/src-tauri/target/release/bundle/deb/*.deb; do
+            cp "$f" "$GITHUB_WORKSPACE/linux-debs/"
+          done
+          ls -la "$GITHUB_WORKSPACE/linux-debs/"
+          test "$(find "$GITHUB_WORKSPACE/linux-debs" -name '*.deb' | wc -l)" -ge 1
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bluetasks-linux
+          path: linux-debs/
+
   publish:
     name: Publish GitHub Release assets
-    needs: [build-macos, build-windows]
+    needs: [build-macos, build-windows, build-linux]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4

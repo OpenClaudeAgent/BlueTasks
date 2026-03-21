@@ -2,7 +2,7 @@
 
 Native shell around the same stack as Docker: **embedded Node.js** runs `server/dist/docker-bundle.cjs` (Express + SQLite), and the window loads **http://127.0.0.1:8787`.
 
-**Scope (for now):** desktop only (**macOS**, **Windows**, and optionally **Linux**). **No** iOS or Android in this repo yet — Tauri mobile is not set up.
+**Scope (for now):** desktop only (**macOS**, **Windows**, **Linux**). **No** iOS or Android in this repo yet — Tauri mobile is not set up. PR **CI** builds all three; Linux release artifact is **`.deb`** (see `src-tauri/tauri.linux.conf.json`).
 
 ## Prerequisites
 

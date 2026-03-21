@@ -23,6 +23,7 @@ What it does:
 - [**Desktop release**](../.github/workflows/desktop-publish.yml) builds in parallel on **`macos-latest`** and **`windows-latest`**, then attaches artifacts to the release (unsigned). **No** mobile (iOS/Android) for now.
   - **macOS:** `BlueTasks_X.Y.Z_macos_aarch64.app.zip` and DMG if produced.
   - **Windows:** NSIS `.exe` (and `.msi` if the bundle produced one).
+  - **Linux:** `.deb` (x64) from `bundle/deb/` (see [`tauri.linux.conf.json`](../desktop/src-tauri/tauri.linux.conf.json)).
 - If you push a tag **`v*`** yourself (escape hatch), `push: tags` still runs **Docker** and **Desktop** workflows without a manual dispatch.
 
 That pipeline is the **source of truth** for a release—not a local bump by hand or by tooling unless you are in the escape hatch below.
