@@ -8,7 +8,6 @@
     "**/coverage/**",
     "**/.dockerctx/**",
     "**/.github/**",
-    "**/scenario/**",
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/package-lock.json",

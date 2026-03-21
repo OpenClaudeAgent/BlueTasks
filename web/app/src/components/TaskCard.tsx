@@ -40,19 +40,22 @@ export function TaskCard({
   const {i18n} = useTranslation();
   const titleInputRef = useRef<HTMLInputElement>(null);
   const [dateOpen, setDateOpen] = useState(false);
-  const [, setTimerTick] = useState(0);
+  /** Wall clock for live timer label; updated from the interval (avoids impure `Date.now()` during render). */
+  const [timerNowMs, setTimerNowMs] = useState(0);
 
   useEffect(() => {
     if (!task.timerStartedAt) {
       return;
     }
-    const id = window.setInterval(() => setTimerTick((n) => n + 1), 1000);
+    const tick = () => {
+      setTimerNowMs(Date.now());
+    };
+    tick();
+    const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
   }, [task.timerStartedAt, task.id]);
 
-  /* Live timer label uses wall clock; `setTimerTick` forces re-renders each second while running. */
-  // eslint-disable-next-line react-hooks/purity -- Date.now() only meaningful with interval-driven updates above
-  const trackedSeconds = formatTrackedSeconds(task, Date.now());
+  const trackedSeconds = formatTrackedSeconds(task, task.timerStartedAt ? timerNowMs : 0);
 
   useAutoFocusTaskTitle({
     autoFocusTitle,

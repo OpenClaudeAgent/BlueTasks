@@ -1,6 +1,7 @@
 import {expect, test} from '@playwright/test';
 import {deleteAllAreas, deleteAllTasks} from './api-helpers';
 import {expectApiTaskRow} from './contract-expectations';
+import {addTaskWithTitle} from './task-flow-helpers';
 import {gotoWithEnglish} from './helpers';
 
 test.describe('End-to-end: task lifecycle', () => {
@@ -153,22 +154,7 @@ test.describe('End-to-end: task lifecycle', () => {
   test('user reopens a completed task from Done', async ({page}) => {
     const title = `E2E reopen ${Date.now()}`;
 
-    await gotoWithEnglish(page, '/');
-    await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
-
-    const post = page.waitForResponse(
-      (r) => r.url().includes('/api/tasks') && r.request().method() === 'POST' && r.ok(),
-    );
-    await page.getByRole('button', {name: 'Add task'}).click();
-    await post;
-
-    const titleInput = page.getByRole('textbox', {name: 'Task title'});
-    await titleInput.fill(title);
-    const putTitle = page.waitForResponse(
-      (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
-    );
-    await titleInput.blur();
-    await putTitle;
+    await addTaskWithTitle(page, title);
 
     await page.getByRole('button', {name: 'Collapse task'}).click();
     const putDone = page.waitForResponse(
@@ -194,22 +180,7 @@ test.describe('End-to-end: task lifecycle', () => {
   test('user deletes a task from the expanded card', async ({page}) => {
     const title = `E2E delete ${Date.now()}`;
 
-    await gotoWithEnglish(page, '/');
-    await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
-
-    const postDel = page.waitForResponse(
-      (r) => r.url().includes('/api/tasks') && r.request().method() === 'POST' && r.ok(),
-    );
-    await page.getByRole('button', {name: 'Add task'}).click();
-    await postDel;
-
-    const titleInput = page.getByRole('textbox', {name: 'Task title'});
-    await titleInput.fill(title);
-    const putDel = page.waitForResponse(
-      (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
-    );
-    await titleInput.blur();
-    await putDel;
+    await addTaskWithTitle(page, title);
 
     page.once('dialog', (dialog) => {
       expect(dialog.type()).toBe('confirm');
@@ -231,22 +202,7 @@ test.describe('End-to-end: task lifecycle', () => {
   test('user expands and collapses a task card', async ({page}) => {
     const title = `E2E expand ${Date.now()}`;
 
-    await gotoWithEnglish(page, '/');
-    await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
-
-    const post = page.waitForResponse(
-      (r) => r.url().includes('/api/tasks') && r.request().method() === 'POST' && r.ok(),
-    );
-    await page.getByRole('button', {name: 'Add task'}).click();
-    await post;
-
-    const titleInput = page.getByRole('textbox', {name: 'Task title'});
-    await titleInput.fill(title);
-    const put = page.waitForResponse(
-      (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
-    );
-    await titleInput.blur();
-    await put;
+    await addTaskWithTitle(page, title);
 
     await page.getByRole('button', {name: 'Collapse task'}).click();
     const card = page.locator('article.taskCard').first();
