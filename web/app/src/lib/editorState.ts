@@ -39,9 +39,9 @@ export function extractChecklistStats(editorStateJson: unknown): {
   let checklistCompleted = 0;
 
   /**
-   * On ne compte que les `listitem` dont le parent direct est une liste `listType: 'check'`.
-   * Sinon les items sans clé `checked` (omise après sérialisation) n'étaient pas comptés,
-   * et le % restait à 0 ou faux.
+   * Only count `listitem` nodes whose direct parent is a list with `listType: 'check'`.
+   * Otherwise items without a `checked` key (omitted after serialization) were skipped,
+   * and the completion ratio stayed at 0 or was wrong.
    */
   function visit(node: unknown, parent: Record<string, unknown> | null): void {
     if (!node || typeof node !== 'object') {

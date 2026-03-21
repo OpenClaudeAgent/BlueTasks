@@ -25,9 +25,9 @@ export type DatabaseContext = {
 };
 
 export type CreateAppOptions = {
-  /** Dossier du build Vite ; si absent ou inexistant, pas de static / SPA fallback */
+  /** Vite build output directory; if omitted or missing on disk, no static / SPA fallback. */
   staticDir?: string | null;
-  /** Fichier SQLite persistant. Requis pour `POST /api/import/database`. */
+  /** Persistent SQLite file path. Required for `POST /api/import/database`. */
   dbFilePath?: string | null;
 };
 
