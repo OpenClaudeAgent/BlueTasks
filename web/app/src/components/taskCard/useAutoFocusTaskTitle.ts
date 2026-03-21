@@ -10,7 +10,10 @@ type Args = {
 
 export function useAutoFocusTaskTitle({expanded, autoFocusTitle, taskId, titleInputRef, onConsumed}: Args): void {
   const onConsumedRef = useRef(onConsumed);
-  onConsumedRef.current = onConsumed;
+
+  useEffect(() => {
+    onConsumedRef.current = onConsumed;
+  });
 
   useEffect(() => {
     if (!expanded || !autoFocusTitle) {

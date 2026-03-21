@@ -1,7 +1,8 @@
-import {useCallback, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {enUS, fr as frLocale} from 'date-fns/locale';
 import {useTranslation} from 'react-i18next';
 import {formatTaskDatePill, getDateTone} from '../lib/date';
+import {formatTrackedSeconds} from '../lib/taskCardFormat';
 import {getAreaIconComponent} from '../lib/areaIcons';
 import {coercePinned, coerceRecurrence} from '../lib/tasks';
 import type {Area, Task, TaskDraftUpdate} from '../types';
@@ -9,7 +10,6 @@ import {TaskCardExpandedBody} from './taskCard/TaskCardExpandedBody';
 import {TaskCardHeaderRow} from './taskCard/TaskCardHeaderRow';
 import {areaNameByIdMap, checklistCompletionRatio} from './taskCard/taskCardModel';
 import {useAutoFocusTaskTitle} from './taskCard/useAutoFocusTaskTitle';
-import {useTaskCardLiveTrackedSeconds} from './taskCard/useTaskCardLiveTrackedSeconds';
 
 type TaskCardProps = {
   task: Task;
@@ -40,8 +40,17 @@ export function TaskCard({
   const {i18n} = useTranslation();
   const titleInputRef = useRef<HTMLInputElement>(null);
   const [dateOpen, setDateOpen] = useState(false);
+  const [, setTimerTick] = useState(0);
 
-  const trackedSeconds = useTaskCardLiveTrackedSeconds(task);
+  useEffect(() => {
+    if (!task.timerStartedAt) {
+      return;
+    }
+    const id = window.setInterval(() => setTimerTick((n) => n + 1), 1000);
+    return () => window.clearInterval(id);
+  }, [task.timerStartedAt, task.id]);
+
+  const trackedSeconds = formatTrackedSeconds(task, Date.now());
 
   useAutoFocusTaskTitle({
     autoFocusTitle,
