@@ -145,6 +145,27 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+  desktop-tauri:
+    name: Tauri desktop (macOS, unsigned)
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            desktop/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+      - run: npm ci
+      - run: npm ci --prefix desktop
+      - name: Build Tauri (beforeBuildCommand runs desktop:prep)
+        env:
+          CI: false
+        run: npm run tauri:build --prefix desktop
+
   scenario:
     name: Scenario tests (Playwright ${{ matrix.shard }}/2)
     runs-on: ubuntu-latest

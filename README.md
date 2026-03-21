@@ -54,6 +54,12 @@ npm run start
 
 ---
 
+## Desktop app (Tauri + embedded Node)
+
+Experimental native wrapper: **Tauri** starts an **embedded Node.js** runtime (same `docker-bundle.cjs` stack) and opens **http://127.0.0.1:8787** in the system webview. See [desktop/README.md](desktop/README.md) for Rust prerequisites, `npm run desktop:prep`, and `tauri dev` / `tauri build`.
+
+---
+
 ## Data backup
 
 - **In-app**: Settings → General → export / import a **`.sqlite`** database file.

@@ -1,6 +1,6 @@
 # Releases and version alignment
 
-BlueTasks uses **one semver** for the whole monorepo: root [`package.json`](../package.json), [`web/app/package.json`](../web/app/package.json), and [`server/package.json`](../server/package.json) must stay **identical**. [`package-lock.json`](../package-lock.json) is refreshed with `npm install` after any version bump.
+BlueTasks uses **one semver** for the whole monorepo: root [`package.json`](../package.json), [`web/app/package.json`](../web/app/package.json), [`server/package.json`](../server/package.json), [`desktop/package.json`](../desktop/package.json), [`desktop/src-tauri/tauri.conf.json`](../desktop/src-tauri/tauri.conf.json), and [`desktop/src-tauri/Cargo.toml`](../desktop/src-tauri/Cargo.toml) must stay **aligned** (see [`sync-package-version.mjs`](../scripts/sync-package-version.mjs)). [`package-lock.json`](../package-lock.json) is refreshed with `npm install` after any version bump.
 
 ## How releases actually ship
 
@@ -15,11 +15,15 @@ BlueTasks uses **one semver** for the whole monorepo: root [`package.json`](../p
 What it does:
 
 - Refuses invalid semver or an **existing** `v*` tag.
-- Sets the same `version` in all three `package.json` files ([`sync-package-version.mjs`](../scripts/sync-package-version.mjs)).
+- Sets the same `version` in workspace `package.json` files plus desktop Tauri manifests ([`sync-package-version.mjs`](../scripts/sync-package-version.mjs)).
 - Inserts the new section into `CHANGELOG.md` and updates compare links ([`changelog-release.mjs`](../scripts/changelog-release.mjs)).
 - Runs `npm install` to sync `package-lock.json`.
 - Commits `chore(release): vX.Y.Z`, creates tag `vX.Y.Z`, and **pushes** commit + tag.
-- Runs a follow-up job that **dispatches** [**Docker image**](../.github/workflows/docker-publish.yml) with `tag=vX.Y.Z`, so GHCR gets `:vX.Y.Z` and `:latest`. (Pushes with the default `GITHUB_TOKEN` do not trigger other workflows; Release works around that with `gh workflow run`.)
+- Runs follow-up jobs that **dispatch** [**Docker image**](../.github/workflows/docker-publish.yml) and [**Desktop release**](../.github/workflows/desktop-publish.yml) with `tag=vX.Y.Z` (GHCR gets `:vX.Y.Z` and `:latest`; desktop builds upload to the GitHub Release). The bot’s tag push does **not** trigger other workflows, so both pipelines are started explicitly via `gh workflow run`.
+- [**Desktop release**](../.github/workflows/desktop-publish.yml) builds in parallel on **`macos-latest`** and **`windows-latest`**, then attaches artifacts to the release (unsigned). **No** mobile (iOS/Android) for now.
+  - **macOS:** `BlueTasks_X.Y.Z_macos_aarch64.app.zip` and DMG if produced.
+  - **Windows:** NSIS `.exe` (and `.msi` if the bundle produced one).
+- If you push a tag **`v*`** yourself (escape hatch), `push: tags` still runs **Docker** and **Desktop** workflows without a manual dispatch.
 
 That pipeline is the **source of truth** for a release—not a local bump by hand or by tooling unless you are in the escape hatch below.
 
@@ -31,7 +35,7 @@ Use this **only** if the **Release** workflow cannot run (e.g. bot blocked by br
 node scripts/sync-package-version.mjs 0.2.0
 # optional: edit CHANGELOG.md by hand
 npm install --no-audit --no-fund
-git add package.json package-lock.json web/app/package.json server/package.json CHANGELOG.md
+git add package.json package-lock.json web/app/package.json server/package.json desktop/package.json desktop/src-tauri/tauri.conf.json desktop/src-tauri/Cargo.toml CHANGELOG.md
 git commit -m "chore(release): v0.2.0"
 git tag v0.2.0
 git push origin main && git push origin v0.2.0

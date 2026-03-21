@@ -28,7 +28,10 @@
     "check": "npm run ci",
     "docker:prepare": "bash scripts/assemble-docker-context.sh",
     "package:docker": "npm run build && npm run docker:prepare",
-    "docker:release": "npm ci && npm run package:docker"
+    "docker:release": "npm ci && npm run package:docker",
+    "desktop:assemble-runtime": "node scripts/assemble-desktop-runtime.mjs",
+    "desktop:fetch-node": "node scripts/fetch-embedded-node.mjs",
+    "desktop:prep": "npm run build && npm run desktop:assemble-runtime && npm run desktop:fetch-node"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",

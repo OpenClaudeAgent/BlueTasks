@@ -1,0 +1,16 @@
+{
+  "name": "@bluetasks/desktop",
+  "private": true,
+  "version": "0.1.8",
+  "type": "module",
+  "scripts": {
+    "tauri": "tauri",
+    "prep": "cd .. && npm run desktop:prep",
+    "tauri:build": "cross-env CI=false tauri build",
+    "icon": "tauri icon ./src-tauri/icons/bluetasks-icon.svg -o ./src-tauri/icons"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2",
+    "cross-env": "^7.0.3"
+  }
+}
