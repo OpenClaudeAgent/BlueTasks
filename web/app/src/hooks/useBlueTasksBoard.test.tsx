@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import {describe, expect, it, vi, beforeEach} from 'vitest';
-import {renderHook, waitFor} from '@testing-library/react';
+import {act, renderHook, waitFor} from '@testing-library/react';
 import {I18nextProvider} from 'react-i18next';
 import i18n from '../i18n';
 import {useBlueTasksBoard} from './useBlueTasksBoard';
@@ -77,5 +77,91 @@ describe('Feature: useBlueTasksBoard composition', () => {
     await waitFor(() => {
       expect(mockUi.setAreaFilter).toHaveBeenCalledWith(AREA_FILTER_ALL);
     });
+  });
+
+  it('Scenario: No visible tasks — selection updater clears selected task id', async () => {
+    const {rerender} = renderBoard();
+    await waitFor(() => {
+      expect(mockUi.setSelectedTaskId).toHaveBeenCalled();
+    });
+    vi.clearAllMocks();
+    mockCore.tasks = [];
+    rerender();
+    await waitFor(() => {
+      expect(mockUi.setSelectedTaskId).toHaveBeenCalled();
+    });
+    const updater = mockUi.setSelectedTaskId.mock.calls.at(-1)?.[0];
+    expect(typeof updater).toBe('function');
+    expect((updater as (current: string | null) => string | null)('t1')).toBe(null);
+  });
+
+  it('Scenario: Date popover task — null when id not in visibleTasks', async () => {
+    const {result} = renderBoard();
+    await waitFor(() => {
+      expect(result.current.visibleTasks.some((t) => t.id === 't1')).toBe(true);
+    });
+    act(() => {
+      result.current.setDatePopoverTaskId('not-in-list');
+    });
+    expect(result.current.datePopoverTaskId).toBe(null);
+  });
+
+  it('Scenario: Date popover task — set when id matches a visible task', async () => {
+    const {result} = renderBoard();
+    await waitFor(() => {
+      expect(result.current.visibleTasks.some((t) => t.id === 't1')).toBe(true);
+    });
+    act(() => {
+      result.current.setDatePopoverTaskId('t1');
+    });
+    expect(result.current.datePopoverTaskId).toBe('t1');
+  });
+
+  it('Scenario: Selection sync — updater keeps id when task still visible', async () => {
+    const {result} = renderBoard();
+    await waitFor(() => {
+      expect(result.current.visibleTasks.some((t) => t.id === 't1')).toBe(true);
+    });
+    const updater = mockUi.setSelectedTaskId.mock.calls.at(-1)?.[0] as (
+      current: string | null,
+    ) => string | null;
+    expect(updater('t1')).toBe('t1');
+  });
+
+  it('Scenario: Selection sync — updater picks first visible when current missing', async () => {
+    const {result} = renderBoard();
+    await waitFor(() => {
+      expect(result.current.visibleTasks.some((t) => t.id === 't1')).toBe(true);
+    });
+    const updater = mockUi.setSelectedTaskId.mock.calls.at(-1)?.[0] as (
+      current: string | null,
+    ) => string | null;
+    expect(updater('ghost')).toBe('t1');
+  });
+
+  it('Scenario: Add task — calls core handleAddTask with current area filter', async () => {
+    const {result} = renderBoard();
+    await waitFor(() => {
+      expect(result.current.visibleTasks.length).toBeGreaterThan(0);
+    });
+    result.current.handleAddTask();
+    expect(mockCore.handleAddTask).toHaveBeenCalledWith(AREA_FILTER_ALL);
+  });
+
+  it('Scenario: Task counts by area — includes tasks with areaId', async () => {
+    mockCore.tasks = [{...taskToday, areaId: 'a1'}];
+    const {result} = renderBoard();
+    await waitFor(() => {
+      expect(result.current.taskCountByAreaId.a1).toBe(1);
+    });
+  });
+
+  it('Scenario: Quick capture — forwards title, area filter and section to core', async () => {
+    const {result} = renderBoard();
+    await waitFor(() => {
+      expect(result.current.visibleTasks.length).toBeGreaterThan(0);
+    });
+    result.current.handleQuickCapture('Inbox note');
+    expect(mockCore.handleQuickCapture).toHaveBeenCalledWith('Inbox note', AREA_FILTER_ALL, 'today');
   });
 });

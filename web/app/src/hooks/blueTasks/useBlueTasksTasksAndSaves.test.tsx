@@ -27,6 +27,7 @@ import {createTask, mergeTaskFromApi} from '../../lib/tasks';
 import {addDaysToKey, todayKey} from '../../lib/dateKeys';
 import {AREA_FILTER_ALL} from '../../types';
 import {tasksApi, areasApi} from '../../api';
+import {SAVE_DELAY_MS} from './constants';
 
 function wrapper({children}: {children: ReactNode}) {
   return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
@@ -47,6 +48,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.clearAllMocks();
   });
 
@@ -183,5 +185,145 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
 
     const call = vi.mocked(tasksApi.create).mock.calls[0]?.[0] as {taskDate: string | null};
     expect(call.taskDate).toBe(addDaysToKey(todayKey(), 1));
+  });
+
+  it('Scenario: Quick capture with blank or whitespace only — does not call create', async () => {
+    const {result} = renderHook(
+      () => {
+        const {t} = useTranslation();
+        return useBlueTasksTasksAndSaves(bridge, t);
+      },
+      {wrapper},
+    );
+    await waitFor(() => expect(bridge.setLoading).toHaveBeenCalledWith(false));
+
+    await act(async () => {
+      await result.current.handleQuickCapture('', AREA_FILTER_ALL, 'today');
+    });
+    await act(async () => {
+      await result.current.handleQuickCapture('   \t\n', AREA_FILTER_ALL, 'today');
+    });
+
+    expect(tasksApi.create).not.toHaveBeenCalled();
+  });
+
+  it('Scenario: Refresh lists fails — bridge receives the error message', async () => {
+    const {result} = renderHook(
+      () => {
+        const {t} = useTranslation();
+        return useBlueTasksTasksAndSaves(bridge, t);
+      },
+      {wrapper},
+    );
+    await waitFor(() => expect(bridge.setLoading).toHaveBeenCalledWith(false));
+
+    vi.mocked(tasksApi.list).mockRejectedValueOnce(new Error('refresh failed'));
+
+    await act(async () => {
+      await result.current.refreshTasksAndAreas();
+    });
+
+    expect(bridge.setErrorMessage).toHaveBeenCalledWith('refresh failed');
+  });
+
+  it('Scenario: User edits a task — debounced save calls update after delay', async () => {
+    const row = mergeTaskFromApi({...createTask('Before'), id: 'edit-1'} as never);
+    vi.mocked(tasksApi.list).mockResolvedValue([row as never]);
+    vi.mocked(areasApi.list).mockResolvedValue([]);
+    vi.mocked(tasksApi.update).mockImplementation(async (_id, payload) =>
+      mergeTaskFromApi({...(row as never), ...payload, title: 'After'} as never),
+    );
+
+    const {result} = renderHook(
+      () => {
+        const {t} = useTranslation();
+        return useBlueTasksTasksAndSaves(bridge, t);
+      },
+      {wrapper},
+    );
+    await waitFor(() => expect(result.current.tasks.some((t) => t.id === 'edit-1')).toBe(true));
+
+    vi.useFakeTimers();
+
+    await act(async () => {
+      result.current.handleTaskDraftChange('edit-1', {title: 'After'});
+    });
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SAVE_DELAY_MS + 80);
+    });
+    vi.useRealTimers();
+
+    await waitFor(() => {
+      expect(tasksApi.update).toHaveBeenCalledWith(
+        'edit-1',
+        expect.objectContaining({title: 'After'}),
+      );
+    });
+  });
+
+  it('Scenario: Toggle recurring on a recurring task — debounced update persists recurrence change', async () => {
+    const row = mergeTaskFromApi({
+      ...createTask('Weekly'),
+      id: 'rec-1',
+      recurrence: 'weekly',
+      taskDate: todayKey(),
+    } as never);
+    vi.mocked(tasksApi.list).mockResolvedValue([row as never]);
+    vi.mocked(areasApi.list).mockResolvedValue([]);
+    vi.mocked(tasksApi.update).mockImplementation(async (id, payload) =>
+      mergeTaskFromApi({...(row as never), ...payload, id} as never),
+    );
+
+    const {result} = renderHook(
+      () => {
+        const {t} = useTranslation();
+        return useBlueTasksTasksAndSaves(bridge, t);
+      },
+      {wrapper},
+    );
+    await waitFor(() => expect(result.current.tasks.some((t) => t.id === 'rec-1')).toBe(true));
+
+    vi.useFakeTimers();
+
+    await act(async () => {
+      result.current.handleToggleRecurringStatus('rec-1');
+    });
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SAVE_DELAY_MS + 80);
+    });
+    vi.useRealTimers();
+
+    await waitFor(() => {
+      expect(tasksApi.update).toHaveBeenCalledWith('rec-1', expect.any(Object));
+    });
+    const updatePayload = vi.mocked(tasksApi.update).mock.calls[0]?.[1] as {taskDate: string | null};
+    expect(updatePayload.taskDate).not.toBe(row.taskDate);
+    expect(updatePayload.taskDate).toBeTruthy();
+  });
+
+  it('Scenario: Delete task — when remove rejects, task is restored and error is set', async () => {
+    const row = mergeTaskFromApi({...createTask('Keep'), id: 'del-fail-1'} as never);
+    vi.mocked(tasksApi.list).mockResolvedValue([row as never]);
+    vi.mocked(areasApi.list).mockResolvedValue([]);
+    vi.mocked(tasksApi.remove).mockRejectedValue(new Error('delete blocked'));
+
+    const {result} = renderHook(
+      () => {
+        const {t} = useTranslation();
+        return useBlueTasksTasksAndSaves(bridge, t);
+      },
+      {wrapper},
+    );
+    await waitFor(() => expect(result.current.tasks.length).toBe(1));
+
+    await act(async () => {
+      await result.current.handleDelete('del-fail-1');
+    });
+
+    expect(bridge.setErrorMessage).toHaveBeenCalledWith('delete blocked');
+    expect(result.current.tasks.find((t) => t.id === 'del-fail-1')).toBeDefined();
+    expect(tasksApi.remove).toHaveBeenCalledWith('del-fail-1');
   });
 });

@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import {describe, expect, it, vi, beforeEach} from 'vitest';
-import {render, screen, within} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {I18nextProvider} from 'react-i18next';
 import i18n from './i18n';
@@ -57,17 +57,17 @@ describe('Feature: App shell', () => {
     expect(screen.getByRole('heading', {level: 1, name: /today/i})).toBeVisible();
   });
 
-  it('Scenario: Load error — shows appError with message from board', () => {
+  it('Scenario: Board errorMessage — renders appError banner', () => {
     vi.mocked(useBlueTasksBoard).mockReturnValue({
       ...baseBoard(),
-      errorMessage: 'Failed to load',
+      errorMessage: 'Sync failed',
     });
     render(
       <I18nextProvider i18n={i18n}>
         <App />
       </I18nextProvider>,
     );
-    const banner = screen.getByText('Failed to load');
+    const banner = screen.getByText('Sync failed');
     expect(banner).toHaveClass('appError');
   });
 
@@ -85,7 +85,7 @@ describe('Feature: App shell', () => {
     expect(screen.getByText('Loading tasks...')).toBeVisible();
   });
 
-  it('Scenario: Quick capture Enter — calls handleQuickCapture with trimmed title', async () => {
+  it('Scenario: Quick capture — Enter with text calls handleQuickCapture', async () => {
     const user = userEvent.setup();
     const handleQuickCapture = vi.fn().mockResolvedValue(undefined);
     vi.mocked(useBlueTasksBoard).mockReturnValue({
@@ -101,6 +101,108 @@ describe('Feature: App shell', () => {
     await user.type(input, '  Hi  ');
     await user.keyboard('{Enter}');
     expect(handleQuickCapture).toHaveBeenCalledWith('Hi');
+  });
+
+  it('Scenario: Quick capture — Enter does not submit while board is loading', () => {
+    const handleQuickCapture = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(useBlueTasksBoard).mockReturnValue({
+      ...baseBoard(),
+      loading: true,
+      handleQuickCapture,
+    });
+    render(
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>,
+    );
+    const input = screen.getByRole('textbox', {name: /capture a task/i});
+    fireEvent.change(input, {target: {value: 'Later'}});
+    fireEvent.keyDown(input, {key: 'Enter'});
+    expect(handleQuickCapture).not.toHaveBeenCalled();
+  });
+
+  it('Scenario: Header add task — calls handleAddTask', async () => {
+    const user = userEvent.setup();
+    const handleAddTask = vi.fn();
+    vi.mocked(useBlueTasksBoard).mockReturnValue({
+      ...baseBoard(),
+      handleAddTask,
+    });
+    render(
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>,
+    );
+    await user.click(screen.getByRole('button', {name: /add task/i}));
+    expect(handleAddTask).toHaveBeenCalled();
+  });
+
+  it('Scenario: Sidebar settings — opens settings dialog', async () => {
+    const user = userEvent.setup();
+    render(
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>,
+    );
+    await user.click(within(screen.getByRole('complementary')).getByRole('button', {name: /settings/i}));
+    expect(screen.getByRole('dialog')).toBeVisible();
+  });
+
+  it('Scenario: Task title autofocus — clears titleFocusTaskId after consume', async () => {
+    const setTitleFocusTaskId = vi.fn();
+    const task = createTask('Autofocus');
+    vi.mocked(useBlueTasksBoard).mockReturnValue({
+      ...baseBoard(),
+      visibleTasks: [task],
+      selectedTaskId: task.id,
+      titleFocusTaskId: task.id,
+      setTitleFocusTaskId,
+    });
+    render(
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>,
+    );
+    await waitFor(() => {
+      expect(setTitleFocusTaskId).toHaveBeenCalledWith(null);
+    });
+  });
+
+  it('Scenario: Task card expand — toggles selected task via board setter', async () => {
+    const user = userEvent.setup();
+    const setSelectedTaskId = vi.fn();
+    const task = createTask('Expand me');
+    vi.mocked(useBlueTasksBoard).mockReturnValue({
+      ...baseBoard(),
+      visibleTasks: [task],
+      selectedTaskId: null,
+      setSelectedTaskId,
+    });
+    render(
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>,
+    );
+    await user.click(screen.getByRole('button', {name: /expand task/i}));
+    expect(setSelectedTaskId).toHaveBeenCalled();
+    const updater = setSelectedTaskId.mock.calls.at(-1)?.[0];
+    expect(typeof updater).toBe('function');
+    expect((updater as (c: string | null) => string | null)(null)).toBe(task.id);
+    expect((updater as (c: string | null) => string | null)(task.id)).toBe(null);
+  });
+
+  it('Scenario: Empty task list — shows section empty state message', () => {
+    vi.mocked(useBlueTasksBoard).mockReturnValue({
+      ...baseBoard(),
+      visibleTasks: [],
+      loading: false,
+    });
+    render(
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>,
+    );
+    expect(screen.getByText('Nothing urgent is waiting right now.')).toBeVisible();
   });
 
   it('Scenario: One visible task — renders TaskCard', () => {

@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import {I18nextProvider} from 'react-i18next';
 import i18n from '../i18n';
 import {Sidebar} from './Sidebar';
-import {AREA_FILTER_ALL} from '../types';
+import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from '../types';
 
 const baseCounts = {all: 3, today: 1, upcoming: 0, anytime: 2, done: 0};
 
@@ -80,6 +80,50 @@ describe('Feature: Sidebar', () => {
     const group = screen.getByRole('group', {name: /areas/i});
     await user.click(within(group).getByRole('button', {name: (n) => n.startsWith('Work')}));
     expect(onAreaFilterChange).toHaveBeenCalledWith('z1');
+  });
+
+  it('Scenario: User filters all areas — calls onAreaFilterChange with ALL', async () => {
+    const user = userEvent.setup();
+    const onAreaFilterChange = vi.fn();
+    render(
+      <I18nextProvider i18n={i18n}>
+        <Sidebar
+          areaFilter={AREA_FILTER_UNCATEGORIZED}
+          areaRowCounts={{all: 2, uncategorized: 1, byId: {}}}
+          areas={[]}
+          counts={baseCounts}
+          onAreaFilterChange={onAreaFilterChange}
+          onOpenSettings={vi.fn()}
+          onSelect={vi.fn()}
+          selectedSection="today"
+        />
+      </I18nextProvider>,
+    );
+    const group = screen.getByRole('group', {name: /areas/i});
+    await user.click(within(group).getByRole('button', {name: (n) => n.startsWith('All areas')}));
+    expect(onAreaFilterChange).toHaveBeenCalledWith(AREA_FILTER_ALL);
+  });
+
+  it('Scenario: User filters unassigned — calls onAreaFilterChange with UNCATEGORIZED', async () => {
+    const user = userEvent.setup();
+    const onAreaFilterChange = vi.fn();
+    render(
+      <I18nextProvider i18n={i18n}>
+        <Sidebar
+          areaFilter={AREA_FILTER_ALL}
+          areaRowCounts={{all: 2, uncategorized: 1, byId: {}}}
+          areas={[]}
+          counts={baseCounts}
+          onAreaFilterChange={onAreaFilterChange}
+          onOpenSettings={vi.fn()}
+          onSelect={vi.fn()}
+          selectedSection="today"
+        />
+      </I18nextProvider>,
+    );
+    const group = screen.getByRole('group', {name: /areas/i});
+    await user.click(within(group).getByRole('button', {name: (n) => n.startsWith('Unassigned')}));
+    expect(onAreaFilterChange).toHaveBeenCalledWith(AREA_FILTER_UNCATEGORIZED);
   });
 
   it('Scenario: User opens settings — calls onOpenSettings', async () => {
