@@ -1,5 +1,6 @@
 # Quality gates mirror `npm run ci` pieces, each as its own job for clear Actions output.
 # Any failing step exits non-zero → that job fails → the workflow run is red (unless a step sets continue-on-error).
+# Desktop (Tauri) bundles are built only on release — see desktop-publish.yml (not in this workflow).
 name: CI
 
 on:
@@ -144,79 +145,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-
-  desktop-tauri-macos:
-    name: Tauri desktop (macOS aarch64)
-    runs-on: macos-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            desktop/package-lock.json
-      - uses: dtolnay/rust-toolchain@stable
-      - run: npm ci
-      - run: npm ci --prefix desktop
-      - name: Build Tauri (beforeBuildCommand runs desktop:prep)
-        env:
-          CI: false
-        run: npm run tauri:build --prefix desktop
-
-  desktop-tauri-windows:
-    name: Tauri desktop (Windows x64)
-    runs-on: windows-latest
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            desktop/package-lock.json
-      - uses: dtolnay/rust-toolchain@stable
-      - run: npm ci
-      - run: npm ci --prefix desktop
-      - name: Build Tauri
-        env:
-          CI: false
-        run: npm run tauri:build --prefix desktop
-
-  desktop-tauri-linux:
-    name: Tauri desktop (Linux x64, .deb)
-    runs-on: ubuntu-latest
-    timeout-minutes: 45
-    steps:
-      - uses: actions/checkout@v6
-      - name: Install Tauri Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            libwebkit2gtk-4.1-dev \
-            libayatana-appindicator3-dev \
-            librsvg2-dev \
-            patchelf \
-            libssl-dev \
-            build-essential
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            desktop/package-lock.json
-      - uses: dtolnay/rust-toolchain@stable
-      - run: npm ci
-      - run: npm ci --prefix desktop
-      - name: Build Tauri
-        env:
-          CI: false
-        run: npm run tauri:build --prefix desktop
 
   scenario:
     name: Scenario tests (Playwright ${{ matrix.shard }}/2)
