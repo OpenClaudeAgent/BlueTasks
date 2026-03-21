@@ -52,19 +52,32 @@ jobs:
           CI: false
         run: npm run tauri:build --prefix desktop
 
-      - name: Zip .app
+      - name: Ad-hoc sign .app (deep)
+        run: |
+          APP="desktop/src-tauri/target/release/bundle/macos/BlueTasks.app"
+          test -d "$APP"
+          codesign --sign - --force --deep "$APP"
+
+      - name: Zip signed .app
         run: |
           VERSION="${RELEASE_TAG#v}"
           APP="desktop/src-tauri/target/release/bundle/macos/BlueTasks.app"
-          test -d "$APP"
           ditto -c -k --keepParent "$APP" "$GITHUB_WORKSPACE/BlueTasks_${VERSION}_macos_aarch64.app.zip"
+
+      - name: DMG from signed .app
+        run: |
+          VERSION="${RELEASE_TAG#v}"
+          APP="desktop/src-tauri/target/release/bundle/macos/BlueTasks.app"
+          DMG="$GITHUB_WORKSPACE/BlueTasks_${VERSION}_aarch64.dmg"
+          rm -f "$DMG"
+          hdiutil create -volname "BlueTasks" -srcfolder "$APP" -ov -format UDZO -imagekey zlib-level=9 "$DMG"
 
       - uses: actions/upload-artifact@v7
         with:
           name: bluetasks-macos
           path: |
             BlueTasks_*_macos_aarch64.app.zip
-            desktop/src-tauri/target/release/bundle/dmg/*.dmg
+            BlueTasks_*_aarch64.dmg
           if-no-files-found: warn
 
   build-windows:

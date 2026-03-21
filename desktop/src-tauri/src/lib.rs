@@ -92,9 +92,10 @@ fn spawn_embedded_server(app: &AppHandle) -> Result<Child, String> {
         .join(".data");
     std::fs::create_dir_all(&data_dir).map_err(|e| format!("create data dir: {e}"))?;
 
+    // Prefer canonical path for Node; fall back if the OS refuses (e.g. some bundle layouts).
     let bluetasks_home = runtime_home
         .canonicalize()
-        .map_err(|e| format!("canonicalize runtime home: {e}"))?;
+        .unwrap_or_else(|_| runtime_home.clone());
     let home_str = bluetasks_home
         .to_str()
         .ok_or("BLUETASKS_HOME path is not valid UTF-8")?;
