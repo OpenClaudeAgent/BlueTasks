@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+- Docker: slimmer image — server bundled with esbuild (`docker-bundle.cjs`); runtime `node_modules` reduced to `better-sqlite3` + runtime deps only (prune script in build). CI unchanged flow: `package:docker` then `docker build`.
+- Dev: `npm run package:docker` — production build + `.dockerctx/` in one step; `docker:release` now runs `npm ci` then `package:docker`. CI Docker workflows use the same script.
 - Docs: English-only pass; expanded [`docs/user-journeys.md`](docs/user-journeys.md) and [`docs/data-model.md`](docs/data-model.md); removed internal roadmap, MVP scope, and MCP RPG notes from `docs/`.
 - Scenario tests: Playwright specs under [`scenario/`](scenario/) (formerly `e2e/`); `npm run test:scenario` (replaces `test:e2e`). Split files: [`api.production.spec.ts`](scenario/api.production.spec.ts), [`task-lifecycle.spec.ts`](scenario/task-lifecycle.spec.ts), [`navigation-settings.spec.ts`](scenario/navigation-settings.spec.ts); helpers [`helpers.ts`](scenario/helpers.ts), [`api-helpers.ts`](scenario/api-helpers.ts); English UI via `localStorage` + `locale: en-US`.
 - Scenario scaffolds (skipped): priority/pin, estimate/recurrence, timer, notes persistence, Upcoming, area filters, assign area, Settings areas CRUD, language/import, quick capture — plus Vitest todos in [`server/src/api.task-fields.integration.test.ts`](server/src/api.task-fields.integration.test.ts).

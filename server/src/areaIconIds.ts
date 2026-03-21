@@ -1,10 +1,8 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import {fileURLToPath} from 'node:url';
+import {getAppRoot} from './appPaths.js';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const rootDir = path.resolve(__dirname, '..', '..');
-const idsPath = path.join(rootDir, 'shared', 'area-icon-ids.json');
+const idsPath = path.join(getAppRoot(), 'shared', 'area-icon-ids.json');
 
 const raw = fs.readFileSync(idsPath, 'utf8');
 const parsed = JSON.parse(raw) as unknown;

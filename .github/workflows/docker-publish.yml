@@ -48,11 +48,8 @@ jobs:
       - name: Install (dev + prod)
         run: npm ci
 
-      - name: Production build (Vite + server tsc)
-        run: npm run build
-
-      - name: Assemble Docker context (no node_modules)
-        run: bash scripts/assemble-docker-context.sh
+      - name: Build and assemble Docker context
+        run: npm run package:docker
 
       - name: Image name (lowercase)
         id: meta

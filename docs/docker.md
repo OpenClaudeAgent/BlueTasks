@@ -5,9 +5,15 @@
 The **JS build** (Vite + `tsc`) runs **on the host** (or on GitHub Actions), not in the final image layer. The Docker context is only ~1 MB of artifacts plus `package-lock.json`; **`npm ci --omit=dev`** for the server runs in an intermediate **Linux** stage so `better-sqlite3` matches the target OS (avoids *Exec format error* when building on macOS).
 
 ```bash
-npm run docker:release    # npm ci + build + .dockerctx/
+npm run docker:release    # npm ci + build + .dockerctx/ (package prêt pour l’image)
 docker compose build
 docker compose up -d
+```
+
+Si les dépendances sont déjà installées (`npm ci` ou `npm install`) :
+
+```bash
+npm run package:docker    # build (Vite + tsc) + .dockerctx/ en une commande
 ```
 
 The app listens on **8787**. SQLite data lives in **`./.data`** on the host (`bluetasks.sqlite`).
@@ -16,8 +22,9 @@ Useful env vars: `HOST` (default `0.0.0.0`), `PORT` (default `8787`).
 
 ## What is in the image
 
-- **CI / GitHub Actions**: `npm ci` → `npm run build` → `scripts/assemble-docker-context.sh` → `docker build` on `.dockerctx/`. No second Vite build inside Docker.
-- **Dockerfile**: **`deps`** stage (Alpine + native toolchain only to compile/download `better-sqlite3`), **`runtime`** stage without gcc/python — copies `node_modules` + `server/dist` + `web/app/dist` + `shared/`. Entrypoint: `node server/dist/index.js`.
+- **CI / GitHub Actions**: `npm ci` → `npm run package:docker` → `docker build` on `.dockerctx/`. No second Vite build inside Docker.
+- **Dockerfile**: **`deps`** runs `npm ci --omit=dev -w @bluetasks/server` on Linux, then **`docker-prune-native-deps.mjs`** copies only **`better-sqlite3` + deps runtime** (sans `prebuild-install`). **`runtime`** copie ce sous-ensemble + **`server/dist/docker-bundle.cjs`** (esbuild : Express, CORS, Multer, etc. en un seul fichier) + `web/app/dist` + `shared/`. Pas de `package.json` dans l’image finale. Entrée : `node server/dist/docker-bundle.cjs`.
+- **Taille**: la colonne **CONTENT SIZE** (~60–65 Mo typiquement) reflète surtout la base **`node:22-alpine`** + l’addon natif SQLite ; les assets web + le bundle JS sont de l’ordre de **~2–3 Mo**. La donnée SQLite vit dans le volume `.data`, **pas** dans l’image. Descendre à « quelques mégaoctets » au total impliquerait une autre stack (pas d’image Node officielle, binaire autonome, etc.).
 - **Platforms**: **Docker image** workflow runs **amd64** (`ubuntu-latest`) and **arm64** (`ubuntu-24.04-arm`) in parallel, then publishes a multi-arch manifest `:tag` and `:latest`. Per-arch tags `:tag-amd64` / `:tag-arm64`. Buildx **GHA** cache on the context.
 
 ## PR: verify Docker build
