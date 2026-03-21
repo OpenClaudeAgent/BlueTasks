@@ -1,7 +1,7 @@
 # BlueTasks
 
 [![CI](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml)
-[![Docker build check](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-build-check.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-build-check.yml)
+[![Docker image](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml)
 
 **Local-first** task app: single main panel, expandable cards, rich notes (Lexical), one follow-up date per task, on-disk **SQLite**, **FR / EN** UI.
 

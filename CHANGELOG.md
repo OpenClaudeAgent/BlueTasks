@@ -14,7 +14,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Scenario: [`scenario/editor-toolbar.spec.ts`](scenario/editor-toolbar.spec.ts) — Lexical toolbar (bold, italic, heading, bullet + checklist, table, markdown `[] `, quote, code block, divider).
 - Release: [`.github/workflows/release.yml`](.github/workflows/release.yml) — enter semver (e.g. `0.2.0`) to sync all workspace `package.json` versions, update this file, refresh `package-lock.json`, commit, push tag `v*`, and trigger Docker publish (see [docs/releasing.md](docs/releasing.md)).
 - CI: optional manual runs (`workflow_dispatch`) for [CI](.github/workflows/ci.yml) and [Docker image](.github/workflows/docker-publish.yml).
-- CI: [Docker build check](.github/workflows/docker-build-check.yml) verifies the image builds on relevant PRs (amd64, no push).
+- CI: removed standalone **Docker build check** workflow; the image is built and pushed only via [Docker image](.github/workflows/docker-publish.yml) (tag or dispatch).
 
 ## [0.1.5] - 2026-03-21
 

@@ -21,11 +21,10 @@ To mirror this in another repository (e.g. **OpenClaudeAgent/open-flow**), copy 
 
 **BDD layers and what to test where**: [testing-strategy.md](testing-strategy.md).
 
-Related checks:
+Related workflows:
 
-- **[Docker build check](../.github/workflows/docker-build-check.yml)** — on pull requests that touch Docker/build inputs, verifies the `.dockerctx` image builds for `linux/amd64` (nothing is pushed).
-- **[Docker image](../.github/workflows/docker-publish.yml)** — builds and pushes multi-arch images on `v*` tags or manual dispatch with a tag input.
-- **[Release](../.github/workflows/release.yml)** — `workflow_dispatch` with a semver input: syncs all workspace `package.json` versions, updates `CHANGELOG.md`, refreshes the lockfile, commits, and pushes `v*` (starts Docker publish). See [releasing.md](releasing.md).
+- **[Docker image](../.github/workflows/docker-publish.yml)** — **build** multi-arch et **push** GHCR sur tag `v*` ou dispatch manuel (saisie du tag d’image).
+- **[Release](../.github/workflows/release.yml)** — `workflow_dispatch` avec un semver : synchronise les `package.json`, met à jour `CHANGELOG.md`, rafraîchit le lockfile, commit, pousse le tag `v*` (déclenche **Docker image**). Voir [releasing.md](releasing.md).
 
 ## Front-end coverage strategy
 

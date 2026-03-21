@@ -27,9 +27,9 @@ Useful env vars: `HOST` (default `0.0.0.0`), `PORT` (default `8787`).
 - **Taille**: la colonne **CONTENT SIZE** (~60–65 Mo typiquement) reflète surtout la base **`node:22-alpine`** + l’addon natif SQLite ; les assets web + le bundle JS sont de l’ordre de **~2–3 Mo**. La donnée SQLite vit dans le volume `.data`, **pas** dans l’image. Descendre à « quelques mégaoctets » au total impliquerait une autre stack (pas d’image Node officielle, binaire autonome, etc.).
 - **Platforms**: **Docker image** workflow runs **amd64** (`ubuntu-latest`) and **arm64** (`ubuntu-24.04-arm`) in parallel, then publishes a multi-arch manifest `:tag` and `:latest`. Per-arch tags `:tag-amd64` / `:tag-arm64`. Buildx **GHA** cache on the context.
 
-## PR: verify Docker build
+## Build / push (pas de workflow « check » séparé)
 
-Workflow [`.github/workflows/docker-build-check.yml`](../.github/workflows/docker-build-check.yml) runs on pull requests that change Docker-related paths: it runs `npm run build`, assembles `.dockerctx/`, and **`docker buildx build --load`** for `linux/amd64` only (nothing is pushed). Use it to catch broken Dockerfiles before tagging.
+L’image est **construite et poussée** uniquement par le workflow [**Docker image**](../.github/workflows/docker-publish.yml) (tag `v*` ou lancement manuel avec un tag). Un Dockerfile cassé apparaîtra à ce moment-là (ou en local avec `npm run package:docker` + `docker build`).
 
 ## SQLite import / export
 
