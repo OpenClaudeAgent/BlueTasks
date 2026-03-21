@@ -1,103 +1,133 @@
-# Plan d’amélioration d’architecture (analyse cycles / graphe sémantique)
+# Architecture improvement plan
 
-Document de travail : objectifs par phase, livrables et critères de succès. À mettre à jour après chaque incrément.
-
-## État au dépôt (snapshot)
-
-| Élément | Statut |
-|--------|--------|
-| Commentaires FR → EN (`createApp.ts`, `editorState.ts`) | Fait (commits précédents) |
-| Gate couverture serveur + tests `expectApiTaskRow` | Fait |
-| Découpe `useBlueTasksBoard` → `useBlueTasksUiState` + `useBlueTasksTasksAndSaves` (`hooks/blueTasks/`) | Fait |
-| Reste du plan (formatting/, ESLint DAG, etc.) | Non démarré |
-
-## Ajustements de réalité (à lire avant d’exécuter)
-
-1. **Les hooks ne suppriment pas les cycles de modules à eux seuls.** Tant que `tasks.ts` importe `editorState` et que `TaskCard` importe `tasks`, le graphe d’imports TypeScript reste cyclique. Il faut **déplacer du code** (types purs, fonctions sans dépendance inverse) ou **inverser une dépendance** (injection, façade). `useTaskOperations` utile pour la lisibilité et les tests, mais ce n’est pas un remède magique aux cycles.
-
-2. **`filterTasks` / `sortTasks` dans `tasks.ts`.** Ce ne sont pas des dépendances mutuelles problématiques : ce sont des fonctions du même module. Les outils de cycles comptent souvent des **chemins longs** qui repassent par le même fichier ; la priorité est de couper les arêtes **UI → domaine** et **domaine → UI**, pas de « séparer » deux exports du même fichier.
-
-3. **`eslint-plugin-depend` / DAG strict.** Puissant mais coûteux à faire respecter d’un coup. Mieux : **règles incrémentales** (interdire `components/` → hors `lib/` pour certains sous-chemins) ou une première passe manuelle + revue.
-
-4. **Métriques « 48 → &lt;20 cycles ».** À recalculer avec le **même outil et les mêmes entrées** après chaque phase ; sinon les chiffres ne sont pas comparables.
+Working document: phased goals, deliverables, and how we measure progress. Update this file when scope changes or a milestone ships.
 
 ---
 
-## Phase 1 — Problèmes critiques (semaine 1)
+## Current status (repository snapshot)
 
-### 1.1 Commentaires en français
-
-- **Impact** : faible complexité, forte visibilité.
-- **Action** : traduire JSDoc / blocs techniques restants en anglais.
-- **Effort** : ~15 min (déjà traité sur les deux fichiers identifiés ; revue globale optionnelle).
-
-### 1.2 Analyse des cycles cross-fichiers (cause racine)
-
-- **Constat** : nombre élevé de cycles, concentration UI / tâches / utilitaires.
-- **Actions** : cartographier les 10 cycles les plus fréquents ; isoler formatters purs vs logique métier.
-- **Effort** : ~2 h.
-- **Livrable** : graphe ou liste exportée (outil utilisé + commande).
+| Item | Status | Notes |
+|------|--------|--------|
+| French → English in hot-path code comments (`createApp.ts`, `editorState.ts`, Docker files) | Done | Broader doc translation (e.g. `docs/architecture.md`) optional |
+| Server coverage gate + `expectApiTaskRow` contract tests | Done | [`server/vitest.coverage-gate.config.ts`](../server/vitest.coverage-gate.config.ts), [`server/src/api.integration.test.ts`](../server/src/api.integration.test.ts) |
+| Split board hook: `useBlueTasksUiState` + `useBlueTasksTasksAndSaves` | Done | [`web/app/src/hooks/blueTasks/`](../web/app/src/hooks/blueTasks/), thin [`useBlueTasksBoard.ts`](../web/app/src/hooks/useBlueTasksBoard.ts) |
+| CI naming (“Docker build check”, no “smoke” jargon) | Done | [`.github/workflows/docker-build-check.yml`](../.github/workflows/docker-build-check.yml) |
+| Playwright: real user flows (not only “app loads”) | Done | [`e2e/bluetasks.spec.ts`](../e2e/bluetasks.spec.ts), [`e2e/helpers.ts`](../e2e/helpers.ts) |
+| `lib/formatting/` tree (dates + task card formatters) | Not started | Optional refactor; see Phase 2.1 |
+| ESLint / dependency DAG enforcement | Not started | Optional; see Phase 3 |
+| Formal cycle baseline in repo | Not started | Run tooling below and paste results + date into [Metrics](#metrics) |
 
 ---
 
-## Phase 2 — Découplage des dépendances (semaines 2–3)
+## Reality check (before large refactors)
 
-### 2.1 Couche utilitaire « pure »
+1. **Hooks alone do not remove TypeScript import cycles.** If `TaskCard` imports `tasks` and `tasks` imports `editorState`, the graph stays cyclic until code moves or a dependency is inverted (pure types, facades, injection). Extracting `useBlueTasksBoard` improves readability and test seams; it does not rewrite the module graph by itself.
 
-- Regrouper formatage / dates / icônes dans une arborescence claire (`lib/formatting/`, etc.) **sans** y importer de composants React.
-- **Condition de succès** : aucun fichier sous `components/` importé depuis ces modules.
+2. **`filterTasks` / `sortTasks` in one file** are not a “mutual dependency bug”; cycle tools still count long paths through that module. Focus on **UI ↔ domain** edges, not splitting two exports in the same file.
 
-### 2.2 Séparer rendu UI et logique métier
+3. **Strict DAG tooling** (e.g. dependency plugins) is valuable but expensive to adopt in one step. Prefer incremental rules (forbid specific `components/` → `lib/` imports) or manual review first.
 
-- Extraire des hooks ou services testables ; faire consommer les composants via ces API.
-- **Rappel** : déplacer les imports ne suffit pas — il faut que les modules feuilles n’importent pas les couches hautes.
-
-### 2.3 Découper l’état (`useBlueTasksBoard`)
-
-- Scinder en hooks plus petits (`useTasksState`, `useAreasState`, `useUIState`) avec un composeur fin pour limiter les régressions.
-- **Bénéfice** : testabilité et lecture ; cycles réduits seulement si les dépendances entre modules changent.
+4. **Cycle counts are only comparable** if the same tool, entry files, and ignores are used each time. Record the exact command in [Metrics](#metrics).
 
 ---
 
-## Phase 3 — Restructuration (semaine 4)
+## Phase 1 — Critical hygiene
 
-- Hiérarchie cible : Utilities → DataModels → Domain → State → UI → (client API / persistance côté serveur déjà séparé).
-- **Règles d’import** : DAG strict (pas d’import « vers le haut »).
-- **Enforcement** : ESLint ciblé ou plugin de dépendances, adopté progressivement.
+### 1.1 Comments and developer-facing copy
 
----
+- **Goal**: Technical comments and Docker/CI wording in English where developers look first.
+- **Status**: Done for identified server/web/Docker hotspots; periodic grep for non-English in `src/` optional.
 
-## Phase 4 — Validation (semaines 4–5)
+### 1.2 Cross-file cycle analysis (root cause)
 
-- Re-lancer la détection de cycles ; viser une baisse nette et des cycles courts « acceptables » (barils, réexports).
-- Maintenir la **suite de tests + gate de couverture** verte à chaque PR.
-- Optionnel : taille de bundle / temps de compilation avant-après.
+- **Goal**: Named list of top cycles (e.g. top 10) and whether each is benign (re-exports) or worth breaking.
+- **Effort**: ~2 h once tooling is chosen.
+- **Deliverable**: Exported graph or text report committed under `docs/` *or* pasted into [Metrics](#metrics) with date + command.
 
----
+**Suggested commands** (pick one and standardize):
 
-## Quick wins (ordre suggéré)
+```bash
+# Example: madge (install devDependency or use npx)
+npx madge --circular --extensions ts,tsx web/app/src
 
-1. ~~Traductions commentaires~~ (fait sur les fichiers listés).
-2. Clarifier dossiers `lib/` (formatting vs domain) **sans** tout renommer d’un coup — une PR à la fois.
-3. Découper `useBlueTasksBoard` par blocs cohérents (le plus gros gain lisibilité).
-4. Mesure de cycles après 2–3 PR (même outil qu’au départ).
+# Example: dependency-cruiser (config can exclude tests)
+npx depcruise --config .dependency-cruiser.js web/app/src
+```
 
----
-
-## Risques (rappel)
-
-- Régressions d’API composants → migration progressive, wrappers temporaires.
-- Régressions perf → comparer bundle / profils sur un chemin critique.
-- Cas limites hooks → tests d’intégration existants + nouveaux tests ciblés.
+*(No tool is wired in CI yet; adding one is optional and should not block feature work.)*
 
 ---
 
-## Métriques (à remplir après mesure)
+## Phase 2 — Dependency decoupling (optional, incremental)
 
-| Métrique | Actuel (à noter) | Cible indicatif | Échéance |
-|----------|------------------|-----------------|----------|
-| Cycles cross-fichiers | 48 (outil ?) | &lt; 20 | S3 |
-| Longueur max de cycle | 10+ | 2–3 idéalement | S3 |
-| Indépendance couche utilitaires | Non | Oui | S2 |
-| Couverture domaine (si scope défini) | — | ↑ | S4 |
-| Taille bundle | baseline | stable ou ↓ | S5 |
+### 2.1 Pure utility layer
+
+- Group **formatting** (dates, duration labels, icons map) under something like `web/app/src/lib/formatting/` with **no** imports from `components/`.
+- **Success**: `rg "from '\\.\\./components" web/app/src/lib/formatting` returns nothing.
+
+### 2.2 UI vs domain
+
+- Keep domain logic in `lib/` and hooks; components stay mostly presentation. Further extractions only where it reduces cycles or duplication.
+
+### 2.3 Board state decomposition
+
+- **Status**: First increment done (`useBlueTasksUiState`, `useBlueTasksTasksAndSaves`). Further splits (e.g. dedicated areas hook) only if a clear pain appears.
+
+---
+
+## Phase 3 — Structure & enforcement (optional)
+
+- Target mental model: **Utilities → types/models → domain (`lib/`) → hooks → components → API client**.
+- **Enforcement**: ESLint `no-restricted-imports` zones or a dependency plugin, rolled out file-by-file.
+
+---
+
+## Phase 4 — Validation
+
+- Re-run cycle detection after meaningful refactors; compare to the last saved baseline.
+- Keep **`npm run test`**, **`npm run test:coverage:gate`**, and **`npm run test:e2e`** green on `main` (see [testing-strategy.md](testing-strategy.md)).
+- Optional: compare production bundle size / build time before vs after large moves.
+
+---
+
+## Quick wins (ordered)
+
+1. ~~Comment / Docker English pass~~ — done for scoped files.
+2. ~~Split `useBlueTasksBoard`~~ — done (see snapshot table).
+3. Next optional: **`lib/formatting/`** in a single small PR (move + re-export to limit churn).
+4. Next optional: **one** cycle baseline commit in [Metrics](#metrics).
+
+---
+
+## Risks
+
+- **Component API churn** — prefer small PRs and temporary wrappers.
+- **Performance** — spot-check bundle and one critical interaction after refactors.
+- **Hook edge cases** — rely on existing Vitest + Playwright coverage; add tests when extracting new hooks.
+
+---
+
+## Metrics
+
+Fill when you baseline; do not erase history—append a dated row.
+
+| Date | Tool & command | Cross-file cycles | Max cycle length | Notes |
+|------|----------------|-------------------|------------------|--------|
+| — | *e.g. `npx madge --circular web/app/src`* | *TBD* | *TBD* | Initial RPG-style report cited “48 cycles / 17 files”; re-verify with chosen tool. |
+
+**Targets (indicative, not CI-gated today)**
+
+| Metric | Indicative target | When |
+|--------|-------------------|------|
+| Cross-file cycles | Lower than baseline; no single huge cluster | After Phase 2 increments |
+| Utility layer | No `components` imports under `lib/formatting/**` | Phase 2.1 |
+| Tests + coverage gate | Green | Every PR |
+
+---
+
+## Document history
+
+| Change | Summary |
+|--------|---------|
+| 2026-03 | Plan created from cycle/RPG analysis; French draft |
+| 2026-03 | Finalized: English, completed-work table, metrics template, tooling hints, phased backlog |

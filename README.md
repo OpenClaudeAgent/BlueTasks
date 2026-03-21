@@ -110,6 +110,7 @@ npm run ci
 | Quality, tests, coverage, workflows | [docs/quality.md](docs/quality.md) |
 | BDD layers (unit / integration / E2E) | [docs/testing-strategy.md](docs/testing-strategy.md) |
 | Architecture, API, SQLite | [docs/architecture.md](docs/architecture.md) |
+| Architecture roadmap (cycles, phases) | [docs/architecture-improvement-plan.md](docs/architecture-improvement-plan.md) |
 | Accessibility (lint) | [docs/a11y.md](docs/a11y.md) |
 | Docker, GHCR, tags `v*`, manual dispatch | [docs/docker.md](docs/docker.md) |
 | Versioning, Release workflow, CHANGELOG | [docs/releasing.md](docs/releasing.md) |
