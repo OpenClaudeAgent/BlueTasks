@@ -4,7 +4,7 @@
 # Contexte = `npm run package:docker` : docker-bundle.mjs, web/app/dist, shared,
 # fichiers npm + script de prune (pas de node_modules dans le contexte hôte).
 
-FROM node:22-alpine AS deps
+FROM node:25-alpine AS deps
 RUN apk add --no-cache python3 make g++
 WORKDIR /app
 COPY package.json package-lock.json ./
@@ -14,7 +14,7 @@ RUN npm ci --omit=dev -w @bluetasks/server
 COPY docker-prune-native-deps.mjs ./
 RUN node docker-prune-native-deps.mjs /app/node_modules /opt/pruned
 
-FROM node:22-alpine AS runtime
+FROM node:25-alpine AS runtime
 WORKDIR /app
 
 ENV NODE_ENV=production
