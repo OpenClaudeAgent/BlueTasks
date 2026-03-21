@@ -15,7 +15,7 @@ Variables utiles : `HOST` (défaut `0.0.0.0`), `PORT` (défaut `8787`).
 
 ## Contenu de l’image
 
-- **Plateformes** : le workflow GitHub publie une image **multi-arch** (`linux/amd64` et **`linux/arm64`**) pour les Mac Apple Silicon et les serveurs ARM.
+- **Plateformes** : le workflow **Docker image** construit **en parallèle** une image par arch sur des runners **natifs** (`ubuntu-latest` pour amd64, `ubuntu-24.04-arm` pour arm64 — réservé aux dépôts **publics** sur GitHub Free), puis publie un **manifest** multi-arch (`:tag` et `:latest`). Des tags intermédiaires `:tag-amd64` / `:tag-arm64` existent aussi sur le registre (utiles pour le debug). Le cache **GHA** (`type=gha`) accélère les rebuilds.
 - **Build multi-étapes** : compilation Vite + `tsc` dans une étape `builder`, image finale avec `npm ci --omit=dev` limité au workspace **`@bluetasks/server`** et les artefacts `server/dist` + `web/app/dist` + `shared/`.
 - Point d’entrée : `npm run start` (racine), comme en local.
 

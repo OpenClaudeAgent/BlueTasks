@@ -6,11 +6,15 @@ on:
   pull_request:
     branches: [main, master]
 
-jobs:
-  quality:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
+jobs:
+  lint:
+    name: Lint & duplicates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -22,17 +26,29 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: ESLint (web + jsx-a11y)
+      - name: ESLint (web + server)
         run: npm run lint
 
       - name: Duplication scan (jscpd)
         run: npm run duplicates
 
+  test:
+    name: Tests & coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Tests with coverage
         run: npm run test:coverage
-
-      - name: Production build
-        run: npm run build
 
       - name: Upload web coverage
         uses: actions/upload-artifact@v4
@@ -49,3 +65,21 @@ jobs:
           name: coverage-server
           path: server/coverage
           if-no-files-found: ignore
+
+  build:
+    name: Production build
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Production build
+        run: npm run build

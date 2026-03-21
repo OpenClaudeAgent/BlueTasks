@@ -1,3 +1,5 @@
+# Build AMD64 et ARM64 en parallèle (runners natifs, sans QEMU).
+# Puis assemblage d’un manifest multi-arch pour :tag et :latest.
 name: Docker image
 
 on:
@@ -5,22 +7,34 @@ on:
     tags:
       - "v*"
 
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
   packages: write
 
 jobs:
-  push:
-    runs-on: ubuntu-latest
+  build:
+    name: Build (${{ matrix.slug }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - slug: amd64
+            platform: linux/amd64
+            runner: ubuntu-latest
+          - slug: arm64
+            platform: linux/arm64
+            runner: ubuntu-24.04-arm
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set image name (lowercase)
+      - name: Image name (lowercase)
         id: meta
-        run: |
-          echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
-
-      - uses: docker/setup-qemu-action@v3
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
 
       - uses: docker/setup-buildx-action@v3
 
@@ -34,7 +48,35 @@ jobs:
         with:
           context: .
           push: true
-          platforms: linux/amd64,linux/arm64
-          tags: |
-            ${{ steps.meta.outputs.image }}:${{ github.ref_name }}
-            ${{ steps.meta.outputs.image }}:latest
+          platforms: ${{ matrix.platform }}
+          tags: ${{ steps.meta.outputs.image }}:${{ github.ref_name }}-${{ matrix.slug }}
+          cache-from: type=gha,scope=bluetasks-${{ matrix.slug }}
+          cache-to: type=gha,mode=max,scope=bluetasks-${{ matrix.slug }}
+
+  merge:
+    name: Publish multi-arch manifest
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Image name (lowercase)
+        id: meta
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create :${{ github.ref_name }} and :latest
+        run: |
+          IMG="${{ steps.meta.outputs.image }}"
+          R="${{ github.ref_name }}"
+          docker buildx imagetools create -t "${IMG}:${R}" \
+            "${IMG}:${R}-amd64" \
+            "${IMG}:${R}-arm64"
+          docker buildx imagetools create -t "${IMG}:latest" \
+            "${IMG}:${R}-amd64" \
+            "${IMG}:${R}-arm64"
