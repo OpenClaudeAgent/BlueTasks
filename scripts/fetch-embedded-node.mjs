@@ -4,8 +4,13 @@
  * `desktop/src-tauri/resources/node/` for bundling with the Tauri app.
  *
  * Set EMBEDDED_NODE_VERSION to override (default: 22.14.0, Node 22 line).
+ *
+ * Unix archives use relative symlinks under `bin/` (e.g. corepack → ../lib/...).
+ * Copying from a temp extract dir with `cpSync(..., { dereference: true })` and
+ * then deleting that dir can leave broken absolute symlinks on Linux. We extract
+ * straight into `resources/` and rename the versioned folder to `node` instead.
  */
-import {createWriteStream, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync} from 'node:fs';
+import {createWriteStream, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, join} from 'node:path';
 import {pipeline} from 'node:stream/promises';
@@ -15,6 +20,7 @@ import {execSync} from 'node:child_process';
 const VERSION = process.env.EMBEDDED_NODE_VERSION?.trim() || '22.14.0';
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = join(repoRoot, 'desktop', 'src-tauri', 'resources', 'node');
+const resourcesParent = dirname(outDir);
 
 function platformKey() {
   const p = process.platform;
@@ -35,6 +41,20 @@ async function downloadFile(url, dest) {
   await pipeline(res.body, createWriteStream(dest));
 }
 
+/** Move a directory tree; fall back to recursive copy if rename crosses devices (EXDEV). */
+function moveExtractedTree(from, to) {
+  try {
+    renameSync(from, to);
+  } catch (e) {
+    if (e && typeof e === 'object' && 'code' in e && e.code === 'EXDEV') {
+      rmSync(to, {recursive: true, force: true});
+      cpSync(from, to, {recursive: true});
+    } else {
+      throw e;
+    }
+  }
+}
+
 const key = platformKey();
 const isWin = key.startsWith('win');
 const archiveBase = `node-v${VERSION}-${key}`;
@@ -47,27 +67,34 @@ const archivePath = join(tmp, archiveName);
 console.log('[fetch-node] downloading', distUrl);
 await downloadFile(distUrl, archivePath);
 
+mkdirSync(resourcesParent, {recursive: true});
+rmSync(outDir, {recursive: true, force: true});
+
 if (isWin) {
   execSync(
     `powershell -NoProfile -Command "Expand-Archive -LiteralPath '${archivePath.replace(/'/g, "''")}' -DestinationPath '${tmp.replace(/'/g, "''")}'"`,
     {stdio: 'inherit'},
   );
+  const extractedDir = join(tmp, archiveBase);
+  if (!existsSync(extractedDir)) {
+    const entries = readdirSync(tmp).filter((n) => n.startsWith('node-v'));
+    throw new Error(
+      `Expected extracted folder ${archiveBase} under ${tmp}, found: ${entries.join(', ') || '(none)'}`,
+    );
+  }
+  moveExtractedTree(extractedDir, outDir);
 } else {
-  execSync(`tar -xzf "${archivePath}" -C "${tmp}"`, {stdio: 'inherit'});
+  const staged = join(resourcesParent, archiveBase);
+  rmSync(staged, {recursive: true, force: true});
+  execSync(`tar -xzf "${archivePath}" -C "${resourcesParent}"`, {stdio: 'inherit'});
+  if (!existsSync(staged)) {
+    const entries = readdirSync(resourcesParent).filter((n) => n.startsWith('node-v'));
+    throw new Error(
+      `Expected extracted folder ${archiveBase} under ${resourcesParent}, found: ${entries.join(', ') || '(none)'}`,
+    );
+  }
+  renameSync(staged, outDir);
 }
-
-const extractedDir = join(tmp, archiveBase);
-if (!existsSync(extractedDir)) {
-  const entries = readdirSync(tmp).filter((n) => n.startsWith('node-v'));
-  throw new Error(
-    `Expected extracted folder ${archiveBase} under ${tmp}, found: ${entries.join(', ') || '(none)'}`,
-  );
-}
-
-rmSync(outDir, {recursive: true, force: true});
-mkdirSync(outDir, {recursive: true});
-// Dereference symlinks (npm/corepack/npx in official tar point into the tree; default cp would keep dead links to tmp).
-cpSync(extractedDir, outDir, {recursive: true, dereference: true});
 
 rmSync(tmp, {recursive: true, force: true});
 console.log('[fetch-node] OK ->', outDir);
