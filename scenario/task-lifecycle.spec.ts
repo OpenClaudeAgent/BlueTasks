@@ -250,7 +250,7 @@ test.describe('End-to-end: task lifecycle', () => {
 
     await page.getByRole('button', {name: 'Collapse task'}).click();
     const card = page.locator('article.taskCard').first();
-    await expect(card.getByRole('textbox', {name: 'Task title'})).not.toBeVisible();
+    await expect(card.getByRole('textbox', {name: 'Task title'})).toBeHidden();
     await expect(card.getByRole('button', {name: 'Expand task'})).toBeVisible();
 
     await card.getByRole('button', {name: 'Expand task'}).click();

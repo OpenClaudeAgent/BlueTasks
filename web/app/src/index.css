@@ -1707,7 +1707,7 @@ html:lang(fr) .editor__codeBlock::before {
   color: var(--danger);
 }
 
-@media (max-width: 560px) {
+@media (width <= 560px) {
   .settingsDialog__content--split {
     width: calc(100vw - 20px);
     max-height: min(85vh, 720px);
@@ -1719,8 +1719,7 @@ html:lang(fr) .editor__codeBlock::before {
   }
 
   .settingsDialog__sideNav {
-    flex-direction: row;
-    flex-wrap: wrap;
+    flex-flow: row wrap;
   }
 
   .settingsDialog__navBtn {

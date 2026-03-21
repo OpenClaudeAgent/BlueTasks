@@ -19,7 +19,16 @@ test.describe('Notes', () => {
     await editor.pressSequentially(noteSnippet);
     await page.locator('.mainHeader__title').click();
     await expect(editor).toContainText(noteSnippet);
-    await page.waitForTimeout(AUTOSAVE_SETTLE_MS + 600);
+    await expect
+      .poll(
+        async () => {
+          const res = await page.request.get('/api/tasks');
+          const rows = (await res.json()) as {title: string; contentText: string}[];
+          return rows.find((t) => t.title === title)?.contentText.includes(noteSnippet) ?? false;
+        },
+        {timeout: AUTOSAVE_SETTLE_MS + 8000},
+      )
+      .toBe(true);
 
     await page.reload();
     await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
@@ -47,13 +56,15 @@ test.describe('Checklist', () => {
     await card.getByRole('button', {name: 'Checklist'}).click();
     await editor.pressSequentially('Line one');
 
-    await page.waitForTimeout(AUTOSAVE_SETTLE_MS);
     await expect
-      .poll(async () => {
-        const res = await page.request.get('/api/tasks');
-        const rows = (await res.json()) as {title: string; checklistTotal: number}[];
-        return rows.find((t) => t.title === title)?.checklistTotal ?? 0;
-      })
+      .poll(
+        async () => {
+          const res = await page.request.get('/api/tasks');
+          const rows = (await res.json()) as {title: string; checklistTotal: number}[];
+          return rows.find((t) => t.title === title)?.checklistTotal ?? 0;
+        },
+        {timeout: AUTOSAVE_SETTLE_MS + 8000},
+      )
       .toBeGreaterThanOrEqual(1);
   });
 
@@ -67,7 +78,16 @@ test.describe('Checklist', () => {
     await card.getByRole('button', {name: 'Checklist'}).click();
     await editor.pressSequentially('Todo item');
 
-    await page.waitForTimeout(AUTOSAVE_SETTLE_MS);
+    await expect
+      .poll(
+        async () => {
+          const res = await page.request.get('/api/tasks');
+          const rows = (await res.json()) as {title: string; checklistTotal: number}[];
+          return rows.find((t) => t.title === title)?.checklistTotal ?? 0;
+        },
+        {timeout: AUTOSAVE_SETTLE_MS + 8000},
+      )
+      .toBeGreaterThanOrEqual(1);
 
     const checkbox = card.locator('.editor__list--check .editor__listItem--unchecked').first();
     await checkbox.click();

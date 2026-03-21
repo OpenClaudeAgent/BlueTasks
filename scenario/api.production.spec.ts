@@ -105,7 +105,7 @@ test.describe('API (production server)', () => {
     expect(list.status()).toBe(200);
     const areas = (await list.json()) as Record<string, unknown>[];
     const found = areas.find((a) => a.id === created.id);
-    expect(found).toBeDefined();
+    expect(found).toEqual(expect.objectContaining({id: created.id, name: 'API area'}));
     expectApiAreaRow(found);
 
     const del = await request.delete(`/api/areas/${created.id as string}`);

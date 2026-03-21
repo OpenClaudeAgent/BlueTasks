@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+- Tooling: ESLint Vitest + Testing Library (web/server), Playwright rules for `scenario/`, Stylelint on `web/app`, jscpd duplicate gate + Semgrep (Docker) in CI lint job; `npm run semgrep:docker` for the same scans locally; stronger assertions in scenario + integration tests; [`docs/quality.md`](docs/quality.md) updated.
 - Docker: slimmer image — server bundled with esbuild (`docker-bundle.cjs`); runtime `node_modules` reduced to `better-sqlite3` + runtime deps only (prune script in build). CI unchanged flow: `package:docker` then `docker build`.
 - Dev: `npm run package:docker` — production build + `.dockerctx/` in one step; `docker:release` now runs `npm ci` then `package:docker`. CI Docker workflows use the same script.
 - Docs: English-only pass; expanded [`docs/user-journeys.md`](docs/user-journeys.md) and [`docs/data-model.md`](docs/data-model.md); removed internal roadmap, MVP scope, and MCP RPG notes from `docs/`.

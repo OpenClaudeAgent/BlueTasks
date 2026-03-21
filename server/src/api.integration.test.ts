@@ -53,10 +53,10 @@ describe('API HTTP', () => {
     const list = await request(app).get('/api/tasks');
     expect(list.status).toBe(200);
     const found = list.body.find((t: {id: string}) => t.id === task.body.id);
-    expect(found).toBeDefined();
+    expect(found).toEqual(
+      expect.objectContaining({id: task.body.id, title: 'Linked task', areaId}),
+    );
     expectApiTaskRow(found);
-    expect(found.title).toBe('Linked task');
-    expect(found.areaId).toBe(areaId);
   });
 
   it('PUT /api/tasks/:id updates title and preserves createdAt', async () => {
@@ -284,10 +284,10 @@ describe('API HTTP', () => {
 
     const tasks = await request(app).get('/api/tasks');
     const row = tasks.body.find((t: {id: string}) => t.id === task.body.id);
-    expect(row).toBeDefined();
+    expect(row).toEqual(
+      expect.objectContaining({id: task.body.id, areaId: null, title: 'Linked'}),
+    );
     expectApiTaskRow(row);
-    expect(row.areaId).toBeNull();
-    expect(row.title).toBe('Linked');
   });
 
   it('POST /api/import/database without file returns 400 when db is file-backed', async () => {
@@ -353,37 +353,41 @@ function contractBaseRow(overrides: Record<string, unknown> = {}): Record<string
 
 describe('expectApiTaskRow', () => {
   it('accepts a minimal valid row', () => {
-    expectApiTaskRow(contractBaseRow());
+    expect(() => expectApiTaskRow(contractBaseRow())).not.toThrow();
   });
 
   it('accepts taskDate as YYYY-MM-DD', () => {
-    expectApiTaskRow(contractBaseRow({taskDate: '2025-06-15'}));
+    expect(() => expectApiTaskRow(contractBaseRow({taskDate: '2025-06-15'}))).not.toThrow();
   });
 
   it('accepts numeric estimateMinutes', () => {
-    expectApiTaskRow(contractBaseRow({estimateMinutes: 90}));
+    expect(() => expectApiTaskRow(contractBaseRow({estimateMinutes: 90}))).not.toThrow();
   });
 
   it('accepts timerStartedAt as ISO string', () => {
-    expectApiTaskRow(contractBaseRow({timerStartedAt: '2025-03-01T08:30:00.000Z'}));
+    expect(() =>
+      expectApiTaskRow(contractBaseRow({timerStartedAt: '2025-03-01T08:30:00.000Z'})),
+    ).not.toThrow();
   });
 
   it('accepts areaId as a UUID string', () => {
-    expectApiTaskRow(contractBaseRow({areaId: '6ba7b810-9dad-11d1-80b4-00c04fd430c8'}));
+    expect(() =>
+      expectApiTaskRow(contractBaseRow({areaId: '6ba7b810-9dad-11d1-80b4-00c04fd430c8'})),
+    ).not.toThrow();
   });
 
   it('accepts completed status', () => {
-    expectApiTaskRow(contractBaseRow({status: 'completed'}));
+    expect(() => expectApiTaskRow(contractBaseRow({status: 'completed'}))).not.toThrow();
   });
 
   it.each(['low', 'high'] as const)('accepts priority %s', (priority) => {
-    expectApiTaskRow(contractBaseRow({priority}));
+    expect(() => expectApiTaskRow(contractBaseRow({priority}))).not.toThrow();
   });
 
   it.each(['daily', 'weekly', 'biweekly', 'monthly', 'yearly'] as const)(
     'accepts recurrence %s',
     (recurrence) => {
-      expectApiTaskRow(contractBaseRow({recurrence}));
+      expect(() => expectApiTaskRow(contractBaseRow({recurrence}))).not.toThrow();
     },
   );
 

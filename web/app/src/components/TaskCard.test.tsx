@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import {describe, expect, it, vi} from 'vitest';
-import {render, within} from '@testing-library/react';
+import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {I18nextProvider} from 'react-i18next';
 import i18n from '../i18n';
@@ -15,7 +15,7 @@ describe('Feature: Task card (collapsed)', () => {
   describe('Scenario: User sees a task in the list', () => {
     it('given a pending task with a title, when the card is collapsed, then the title is visible', () => {
       const task = createTask('Buy milk');
-      const {container} = render(
+      render(
         <I18nextProvider i18n={i18n}>
           <TaskCard
             areas={[]}
@@ -30,12 +30,10 @@ describe('Feature: Task card (collapsed)', () => {
         </I18nextProvider>,
       );
 
-      const card = container.querySelector('article.taskCard');
-      expect(card).not.toBeNull();
-      expect(card!.tagName).toBe('ARTICLE');
+      const card = screen.getByRole('article');
       expect(card).toHaveClass('taskCard');
       expect(card).not.toHaveClass('is-expanded');
-      expect(within(card!).getByRole('button', {name: /buy milk/i})).toBeInTheDocument();
+      expect(within(card).getByRole('button', {name: /buy milk/i})).toBeInTheDocument();
     });
   });
 
@@ -45,7 +43,7 @@ describe('Feature: Task card (collapsed)', () => {
       const onToggleExpand = vi.fn();
       const task = createTask('Review');
 
-      const {container} = render(
+      render(
         <I18nextProvider i18n={i18n}>
           <TaskCard
             areas={[]}
@@ -60,11 +58,9 @@ describe('Feature: Task card (collapsed)', () => {
         </I18nextProvider>,
       );
 
-      const card = container.querySelector('article.taskCard');
-      expect(card).not.toBeNull();
-      expect(card!.tagName).toBe('ARTICLE');
+      const card = screen.getByRole('article');
       expect(card).toHaveClass('taskCard');
-      await user.click(within(card!).getByRole('button', {name: /expand task/i}));
+      await user.click(within(card).getByRole('button', {name: /expand task/i}));
       expect(onToggleExpand).toHaveBeenCalledTimes(1);
     });
   });
@@ -75,7 +71,7 @@ describe('Feature: Task card (collapsed)', () => {
       const onToggleStatus = vi.fn();
       const task = createTask('Ship feature');
 
-      const {container} = render(
+      render(
         <I18nextProvider i18n={i18n}>
           <TaskCard
             areas={[]}
@@ -90,11 +86,9 @@ describe('Feature: Task card (collapsed)', () => {
         </I18nextProvider>,
       );
 
-      const card = container.querySelector('article.taskCard');
-      expect(card).not.toBeNull();
-      expect(card!.tagName).toBe('ARTICLE');
+      const card = screen.getByRole('article');
       expect(card).toHaveClass('taskCard');
-      await user.click(within(card!).getByRole('button', {name: /mark as done/i}));
+      await user.click(within(card).getByRole('button', {name: /mark as done/i}));
       expect(onToggleStatus).toHaveBeenCalledTimes(1);
       expect(onToggleStatus).toHaveBeenCalledWith(task.id);
     });
@@ -106,7 +100,7 @@ describe('Feature: Task card (collapsed)', () => {
       const onToggleStatus = vi.fn();
       const task = {...createTask('Ship fix'), status: 'completed' as const};
 
-      const {container} = render(
+      render(
         <I18nextProvider i18n={i18n}>
           <TaskCard
             areas={[]}
@@ -121,9 +115,8 @@ describe('Feature: Task card (collapsed)', () => {
         </I18nextProvider>,
       );
 
-      const card = container.querySelector('article.taskCard');
-      expect(card).not.toBeNull();
-      await user.click(within(card!).getByRole('button', {name: /reopen task/i}));
+      const card = screen.getByRole('article');
+      await user.click(within(card).getByRole('button', {name: /reopen task/i}));
       expect(onToggleStatus).toHaveBeenCalledTimes(1);
       expect(onToggleStatus).toHaveBeenCalledWith(task.id);
     });
@@ -135,7 +128,7 @@ describe('Feature: Task card (expanded)', () => {
     it('given expanded true, when rendered, then the lazy editor placeholder is shown', async () => {
       const task = createTask('Draft');
 
-      const {container} = render(
+      render(
         <I18nextProvider i18n={i18n}>
           <TaskCard
             areas={[]}
@@ -150,11 +143,9 @@ describe('Feature: Task card (expanded)', () => {
         </I18nextProvider>,
       );
 
-      const card = container.querySelector('article.taskCard');
-      expect(card).not.toBeNull();
-      expect(card!.tagName).toBe('ARTICLE');
+      const card = screen.getByRole('article');
       expect(card).toHaveClass('taskCard', 'is-expanded');
-      expect(await within(card!).findByTestId('lexical-editor-mock')).toBeInTheDocument();
+      expect(await within(card).findByTestId('lexical-editor-mock')).toBeInTheDocument();
     });
   });
 });

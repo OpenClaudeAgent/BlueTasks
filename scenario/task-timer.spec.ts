@@ -25,7 +25,16 @@ test.describe('Task timer', () => {
 
     const card = firstCard(page);
     await card.getByRole('button', {name: 'Start timer'}).click();
-    await page.waitForTimeout(1500);
+    await expect
+      .poll(
+        async () => {
+          const res = await page.request.get('/api/tasks');
+          const rows = (await res.json()) as {title: string; timeSpentSeconds: number}[];
+          return rows.find((t) => t.title === title)?.timeSpentSeconds ?? 0;
+        },
+        {timeout: 5000},
+      )
+      .toBeGreaterThan(0);
     await card.getByRole('button', {name: 'Stop timer'}).click();
     await page.waitForResponse(
       (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),

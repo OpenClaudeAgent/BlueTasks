@@ -17,6 +17,7 @@ test.describe('Assign task to area', () => {
   test('user assigns an unscheduled task to an existing area from the card', async ({page, request}) => {
     const areaRes = await request.post('/api/areas', {data: {name: 'My Area', icon: 'heart'}});
     expect(areaRes.ok()).toBe(true);
+    const {id: areaId} = (await areaRes.json()) as {id: string};
     await reloadPageAfterApiSeed(page);
 
     await addTaskWithTitle(page, 'Link me');
@@ -34,7 +35,7 @@ test.describe('Assign task to area', () => {
     const list = await request.get('/api/tasks');
     const rows = (await list.json()) as {title: string; areaId: string | null}[];
     const row = rows.find((t) => t.title === 'Link me');
-    expect(row?.areaId).toBeTruthy();
+    expect(row).toEqual(expect.objectContaining({title: 'Link me', areaId}));
   });
 
   test('user moves task back to “No area”', async ({page, request}) => {
