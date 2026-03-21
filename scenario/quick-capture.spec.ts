@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {resetBoard, taskCardByTitle} from './task-flow-helpers';
+import {quickCaptureTextbox, resetBoard, taskCardByTitle, waitForTaskCreateResponse} from './task-flow-helpers';
 
 test.describe('Quick capture', () => {
   test.describe.configure({mode: 'serial'});
@@ -13,9 +13,15 @@ test.describe('Quick capture', () => {
     await expect(page.getByRole('heading', {level: 1, name: 'Anytime'})).toBeVisible();
 
     const title = `QC ${Date.now()}`;
-    const field = page.getByRole('textbox', {name: /Capture a task without breaking focus/i});
+    const field = quickCaptureTextbox(page);
+    await expect(field).toBeVisible();
+    const created = waitForTaskCreateResponse(page);
     await field.fill(title);
     await page.keyboard.press('Enter');
+    const res = await created;
+    expect(res.status()).toBe(201);
+    const row: unknown = await res.json();
+    expect(row).toMatchObject({title, status: 'pending'});
 
     await expect(page.getByRole('heading', {level: 1, name: 'Anytime'})).toBeVisible();
     await expect(taskCardByTitle(page, title)).toBeVisible();
@@ -27,9 +33,14 @@ test.describe('Quick capture', () => {
     await expect(page.getByRole('heading', {level: 1, name: 'Upcoming'})).toBeVisible();
 
     const title = `QC up ${Date.now()}`;
-    const field = page.getByRole('textbox', {name: /Capture a task/i});
+    const field = quickCaptureTextbox(page);
+    const created = waitForTaskCreateResponse(page);
     await field.fill(title);
     await page.keyboard.press('Enter');
+    const res = await created;
+    expect(res.status()).toBe(201);
+    const row = (await res.json()) as {taskDate: string | null};
+    expect(row.taskDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
 
     await expect(taskCardByTitle(page, title)).toBeVisible();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
