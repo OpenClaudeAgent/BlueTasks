@@ -5,15 +5,15 @@
 The **JS build** (Vite + `tsc`) runs **on the host** (or on GitHub Actions), not in the final image layer. The Docker context is only ~1 MB of artifacts plus `package-lock.json`; **`npm ci --omit=dev`** for the server runs in an intermediate **Linux** stage so `better-sqlite3` matches the target OS (avoids *Exec format error* when building on macOS).
 
 ```bash
-npm run docker:release    # npm ci + build + .dockerctx/ (package prêt pour l’image)
+npm run docker:release    # npm ci + build + .dockerctx/ (ready for the image)
 docker compose build
 docker compose up -d
 ```
 
-Si les dépendances sont déjà installées (`npm ci` ou `npm install`) :
+If dependencies are already installed (`npm ci` or `npm install`):
 
 ```bash
-npm run package:docker    # build (Vite + tsc) + .dockerctx/ en une commande
+npm run package:docker    # production build + .dockerctx/ in one step
 ```
 
 The app listens on **8787**. SQLite data lives in **`./.data`** on the host (`bluetasks.sqlite`).
@@ -23,13 +23,13 @@ Useful env vars: `HOST` (default `0.0.0.0`), `PORT` (default `8787`).
 ## What is in the image
 
 - **CI / GitHub Actions**: `npm ci` → `npm run package:docker` → `docker build` on `.dockerctx/`. No second Vite build inside Docker.
-- **Dockerfile**: **`deps`** runs `npm ci --omit=dev -w @bluetasks/server` on Linux, then **`docker-prune-native-deps.mjs`** copies only **`better-sqlite3` + deps runtime** (sans `prebuild-install`). **`runtime`** copie ce sous-ensemble + **`server/dist/docker-bundle.cjs`** (esbuild : Express, CORS, Multer, etc. en un seul fichier) + `web/app/dist` + `shared/`. Pas de `package.json` dans l’image finale. Entrée : `node server/dist/docker-bundle.cjs`.
-- **Taille**: la colonne **CONTENT SIZE** (~60–65 Mo typiquement) reflète surtout la base **`node:22-alpine`** + l’addon natif SQLite ; les assets web + le bundle JS sont de l’ordre de **~2–3 Mo**. La donnée SQLite vit dans le volume `.data`, **pas** dans l’image. Descendre à « quelques mégaoctets » au total impliquerait une autre stack (pas d’image Node officielle, binaire autonome, etc.).
+- **Dockerfile**: **`deps`** runs `npm ci --omit=dev -w @bluetasks/server` on Linux, then **`docker-prune-native-deps.mjs`** copies only **`better-sqlite3` and its runtime dependencies** (excluding install-only tooling such as `prebuild-install`). **`runtime`** copies that subset plus **`server/dist/docker-bundle.cjs`** (esbuild bundle: Express, CORS, Multer, etc.), `web/app/dist`, and `shared/`. No `package.json` in the final image. Entrypoint: `node server/dist/docker-bundle.cjs`.
+- **Size**: **CONTENT SIZE** (~60–65 MB) is mostly **`node:22-alpine`** plus the native SQLite addon; web assets and the JS bundle are on the order of **~2–3 MB**. SQLite **data** lives in the **`.data` volume**, not in the image. Getting down to “a few MB” total would require a different stack (no stock Node image, single static binary, etc.).
 - **Platforms**: **Docker image** workflow runs **amd64** (`ubuntu-latest`) and **arm64** (`ubuntu-24.04-arm`) in parallel, then publishes a multi-arch manifest `:tag` and `:latest`. Per-arch tags `:tag-amd64` / `:tag-arm64`. Buildx **GHA** cache on the context.
 
-## Build / push (pas de workflow « check » séparé)
+## Build and push
 
-L’image est **construite et poussée** uniquement par le workflow [**Docker image**](../.github/workflows/docker-publish.yml) (tag `v*` ou lancement manuel avec un tag). Un Dockerfile cassé apparaîtra à ce moment-là (ou en local avec `npm run package:docker` + `docker build`).
+Images are **built and pushed** only by the [**Docker image**](../.github/workflows/docker-publish.yml) workflow (`v*` tag push, or manual **Run workflow** with a tag). A broken Dockerfile shows up there (or locally via `npm run package:docker` + `docker build`).
 
 ## SQLite import / export
 
@@ -38,7 +38,7 @@ L’image est **construite et poussée** uniquement par le workflow [**Docker im
 
 ## GitHub Container Registry (GHCR)
 
-For a single entry point that bumps **semver in all workspaces**, updates **CHANGELOG**, and pushes the **git tag** that triggers this pipeline, use the [**Release** workflow](../.github/workflows/release.yml) (documented in [releasing.md](releasing.md)).
+For a single entry point that bumps **semver in all workspaces**, updates **CHANGELOG**, and pushes the **git tag**, use the [**Release** workflow](../.github/workflows/release.yml) (documented in [releasing.md](releasing.md)). After Release, run **Docker image** manually with the same tag if needed (see [releasing.md](releasing.md) — `GITHUB_TOKEN` limitation).
 
 ### Package visibility
 

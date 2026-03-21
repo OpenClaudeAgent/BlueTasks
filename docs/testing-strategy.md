@@ -94,11 +94,4 @@ Coverage is a **guardrail**, not the goal: prefer scenarios that document behavi
 
 - **CI workflow**: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — parallel jobs for lint, tests + coverage, build, and **scenario tests** (Chromium + system deps on Ubuntu).
 
----
-
-## Backlog ideas (prioritised)
-
-1. **Hook integration test**: `useBlueTasksBoard` with mocked `tasksApi` / `areasApi` (debounced save, error path).
-2. **Server**: extra API cases (import/export boundaries) if not already covered.
-3. **Scenario tests**: extra UI paths once stable selectors / `data-testid` policy exists.
-4. Optional **Gherkin files** + cucumber runner only if the team wants non-developers to author scenarios — not required today.
+New features follow the same layers: add unit, integration, or scenario tests alongside the code; prefer the lightest layer that still proves the behaviour.

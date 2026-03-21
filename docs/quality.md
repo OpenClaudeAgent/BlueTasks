@@ -23,8 +23,8 @@ To mirror this in another repository (e.g. **OpenClaudeAgent/open-flow**), copy 
 
 Related workflows:
 
-- **[Docker image](../.github/workflows/docker-publish.yml)** — **build** multi-arch et **push** GHCR sur tag `v*` ou dispatch manuel (saisie du tag d’image).
-- **[Release](../.github/workflows/release.yml)** — `workflow_dispatch` avec un semver : synchronise les `package.json`, met à jour `CHANGELOG.md`, rafraîchit le lockfile, commit, pousse le tag `v*` (déclenche **Docker image**). Voir [releasing.md](releasing.md).
+- **[Docker image](../.github/workflows/docker-publish.yml)** — multi-arch **build** and **push** to GHCR on `v*` tag or manual dispatch (image tag input).
+- **[Release](../.github/workflows/release.yml)** — manual `workflow_dispatch` with a semver: syncs workspace `package.json` files, updates `CHANGELOG.md`, refreshes the lockfile, commits, pushes `v*` (then run **Docker image** as documented in [releasing.md](releasing.md)).
 
 ## Front-end coverage strategy
 

@@ -36,7 +36,7 @@ Requires [Node.js 22](https://nodejs.org/) and Docker.
 ```bash
 git clone https://github.com/OpenClaudeAgent/BlueTasks.git
 cd BlueTasks
-npm run docker:release   # installe, build, prépare .dockerctx/
+npm run docker:release   # npm ci + build + .dockerctx/
 docker compose up --build -d
 ```
 

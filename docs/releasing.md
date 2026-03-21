@@ -18,7 +18,7 @@ The job will:
 - Run `npm install` to sync `package-lock.json`.
 - Commit `chore(release): vX.Y.Z`, create tag `vX.Y.Z`, and **push** commit + tag.
 
-Pushing tag **`v*`** starts the [**Docker image**](../.github/workflows/docker-publish.yml) workflow (multi-arch image on GHCR, `:latest` updated).
+**Docker after Release:** a tag push performed with the workflow’s default `GITHUB_TOKEN` **does not** start another workflow (GitHub limitation). After **Release**, run **Actions → Docker image → Run workflow** once with the same tag (e.g. `v0.2.0`) to push the image to GHCR (including `:latest`). A tag pushed **from your machine** or with a PAT that has `contents` scope **will** trigger [**Docker image**](../.github/workflows/docker-publish.yml) automatically.
 
 ## Manual release (local)
 
