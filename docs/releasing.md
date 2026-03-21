@@ -2,24 +2,30 @@
 
 BlueTasks uses **one semver** for the whole monorepo: root [`package.json`](../package.json), [`web/app/package.json`](../web/app/package.json), and [`server/package.json`](../server/package.json) must stay **identical**. [`package-lock.json`](../package-lock.json) is refreshed with `npm install` after any version bump.
 
-## Automated release (recommended)
+## How releases actually ship
 
-1. Merge your work to the default branch (`main`).
-2. Open **Actions** → **Release** → **Run workflow**.
-3. Fill **version** with semver **only** (e.g. `0.2.0`, no leading `v`).
-4. Optionally add a one-line **release_notes** bullet (shown in [`CHANGELOG.md`](../CHANGELOG.md)).
+**Routine releases are done only through GitHub Actions**, not by bumping versions locally (and not by agents or scripts in a dev environment “doing a release” for you).
+
+1. Merge feature work to the default branch (`main`).
+2. In the repo: **Actions** → workflow **[Release](../.github/workflows/release.yml)** → **Run workflow**.
+3. Set **version** to semver **only** (e.g. `0.2.0`, no leading `v`).
+4. Optionally set **release_notes** (one line; appended under that version in [`CHANGELOG.md`](../CHANGELOG.md)).
 5. Run the workflow.
 
-The job will:
+What it does:
 
-- Refuse invalid semver or an **existing** `v*` tag.
-- Set the same `version` in all three `package.json` files.
-- Insert the new section into `CHANGELOG.md` and update compare links.
-- Run `npm install` to sync `package-lock.json`.
-- Commit `chore(release): vX.Y.Z`, create tag `vX.Y.Z`, and **push** commit + tag.
-- Run a follow-up job that **dispatches** [**Docker image**](../.github/workflows/docker-publish.yml) with `tag=vX.Y.Z`, so GHCR gets `:vX.Y.Z` and `:latest` with no manual step. (Pushes performed with the default `GITHUB_TOKEN` do not trigger other workflows; Release works around that by calling `gh workflow run`.)
+- Refuses invalid semver or an **existing** `v*` tag.
+- Sets the same `version` in all three `package.json` files ([`sync-package-version.mjs`](../scripts/sync-package-version.mjs)).
+- Inserts the new section into `CHANGELOG.md` and updates compare links ([`changelog-release.mjs`](../scripts/changelog-release.mjs)).
+- Runs `npm install` to sync `package-lock.json`.
+- Commits `chore(release): vX.Y.Z`, creates tag `vX.Y.Z`, and **pushes** commit + tag.
+- Runs a follow-up job that **dispatches** [**Docker image**](../.github/workflows/docker-publish.yml) with `tag=vX.Y.Z`, so GHCR gets `:vX.Y.Z` and `:latest`. (Pushes with the default `GITHUB_TOKEN` do not trigger other workflows; Release works around that with `gh workflow run`.)
 
-## Manual release (local)
+That pipeline is the **source of truth** for a release—not a local bump by hand or by tooling unless you are in the escape hatch below.
+
+## Manual release (local, escape hatch only)
+
+Use this **only** if the **Release** workflow cannot run (e.g. bot blocked by branch rules, Actions outage). For normal shipping, use **Actions → Release** above.
 
 ```bash
 node scripts/sync-package-version.mjs 0.2.0
