@@ -50,6 +50,8 @@ export function TaskCard({
     return () => window.clearInterval(id);
   }, [task.timerStartedAt, task.id]);
 
+  /* Live timer label uses wall clock; `setTimerTick` forces re-renders each second while running. */
+  // eslint-disable-next-line react-hooks/purity -- Date.now() only meaningful with interval-driven updates above
   const trackedSeconds = formatTrackedSeconds(task, Date.now());
 
   useAutoFocusTaskTitle({
