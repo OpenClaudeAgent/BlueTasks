@@ -1,6 +1,7 @@
 # Bump workspace versions, update CHANGELOG, commit, push tag v*, then dispatch Docker image workflow.
 # (Tag push with GITHUB_TOKEN does not trigger other workflows; we call workflow_dispatch explicitly.)
 name: Release
+run-name: Release v${{ inputs.version }}
 
 on:
   workflow_dispatch:
