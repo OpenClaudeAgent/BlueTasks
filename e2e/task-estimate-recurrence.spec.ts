@@ -1,6 +1,7 @@
 import {expect, test} from '@playwright/test';
 import {
   addTaskWithTitle,
+  applyWeeklyRecurrenceOnCard,
   expandTaskCardIfCollapsed,
   firstCard,
   resetBoard,
@@ -51,12 +52,7 @@ test.describe('Recurrence', () => {
     await addTaskWithTitle(page, title);
 
     const card = firstCard(page);
-    const putRec = page.waitForResponse(
-      (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
-    );
-    await card.locator('button[title="Repeat"]').click();
-    await page.locator('.footerPopover').getByRole('button', {name: 'Weekly'}).click();
-    await putRec;
+    await applyWeeklyRecurrenceOnCard(page, card);
 
     // Weekly sets implicit due date → task moves to Today while the section may still be Anytime.
     await page
@@ -72,12 +68,7 @@ test.describe('Recurrence', () => {
     await addTaskWithTitle(page, title);
 
     const card = firstCard(page);
-    const putRec = page.waitForResponse(
-      (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
-    );
-    await card.locator('button[title="Repeat"]').click();
-    await page.locator('.footerPopover').getByRole('button', {name: 'Weekly'}).click();
-    await putRec;
+    await applyWeeklyRecurrenceOnCard(page, card);
 
     await page
       .getByRole('navigation', {name: 'Primary navigation'})

@@ -3,6 +3,7 @@ import {
   addTaskWithTitle,
   AUTOSAVE_SETTLE_MS,
   firstCard,
+  reopenTaskByTitleAfterReload,
   resetBoard,
   sleepMs,
   taskCardByTitle,
@@ -59,13 +60,7 @@ test.describe('Task timer', () => {
       (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
     );
 
-    await page.reload();
-    await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
-    await page
-      .getByRole('navigation', {name: 'Primary navigation'})
-      .getByRole('button', {name: /^Anytime\b/})
-      .click();
-    await page.getByRole('button', {name: title}).click();
+    await reopenTaskByTitleAfterReload(page, title);
 
     const after = firstCard(page);
     await expect
@@ -94,13 +89,7 @@ test.describe('Task timer', () => {
     await put;
     await sleepMs(AUTOSAVE_SETTLE_MS);
 
-    await page.reload();
-    await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
-    await page
-      .getByRole('navigation', {name: 'Primary navigation'})
-      .getByRole('button', {name: /^Anytime\b/})
-      .click();
-    await page.getByRole('button', {name: title}).click();
+    await reopenTaskByTitleAfterReload(page, title);
 
     await expect
       .poll(

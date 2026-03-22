@@ -1,6 +1,6 @@
 import {setTimeout as delay} from 'node:timers/promises';
 
-import {expect, type Page} from '@playwright/test';
+import {expect, type Locator, type Page} from '@playwright/test';
 import type {APIRequestContext} from '@playwright/test';
 import {deleteAllAreas, deleteAllTasks} from './api-helpers';
 import {gotoWithEnglish} from './helpers';
@@ -121,10 +121,80 @@ export async function expandTaskCardIfCollapsed(page: Page, title: string): Prom
   }
 }
 
-function waitForTaskPutOk(page: Page) {
+export function waitForTaskPutOk(page: Page) {
   return page.waitForResponse(
     (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
   );
+}
+
+/** Reload, open a primary section, expand the task whose collapsed title matches `title`. */
+export async function reopenTaskByTitleAfterReload(
+  page: Page,
+  title: string,
+  sectionNavButton: RegExp = /^Anytime\b/,
+): Promise<void> {
+  await page.reload();
+  await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
+  await page
+    .getByRole('navigation', {name: 'Primary navigation'})
+    .getByRole('button', {name: sectionNavButton})
+    .click();
+  await page.getByRole('button', {name: title}).click();
+}
+
+/** Collapse card, then mark done; waits for successful task PUT. */
+export async function markTaskDoneAfterCollapse(page: Page, title: string): Promise<void> {
+  const card = taskCardByTitle(page, title);
+  await card.getByRole('button', {name: 'Collapse task'}).click();
+  const markDonePut = waitForTaskPutOk(page);
+  await card.getByRole('button', {name: 'Mark as done'}).click();
+  await markDonePut;
+}
+
+export async function pollTaskChecklistTotalAtLeast(
+  page: Page,
+  title: string,
+  atLeast: number,
+  timeoutMs: number = AUTOSAVE_SETTLE_MS + 8000,
+): Promise<void> {
+  await expect
+    .poll(
+      async () => {
+        const res = await page.request.get('/api/tasks');
+        const rows = (await res.json()) as {title: string; checklistTotal: number}[];
+        return rows.find((t) => t.title === title)?.checklistTotal ?? 0;
+      },
+      {timeout: timeoutMs},
+    )
+    .toBeGreaterThanOrEqual(atLeast);
+}
+
+export async function setCardDueDateTomorrow(page: Page, card: Locator): Promise<void> {
+  await card.locator('.taskCard__datePill').click();
+  const put = waitForTaskPutOk(page);
+  await page
+    .locator('.datePopover__quickActions')
+    .getByRole('button', {name: 'Tomorrow'})
+    .click();
+  await put;
+}
+
+export async function applyWeeklyRecurrenceOnCard(page: Page, card: Locator): Promise<void> {
+  const putRec = waitForTaskPutOk(page);
+  await card.locator('button[title="Repeat"]').click();
+  await page.locator('.footerPopover').getByRole('button', {name: 'Weekly'}).click();
+  await putRec;
+}
+
+/** English UI: Settings → General → Français (does not close the dialog). */
+export async function switchLanguageToFrenchFromEnglishShell(page: Page): Promise<void> {
+  await page.getByRole('button', {name: 'Settings'}).click();
+  const dialog = page.getByRole('dialog', {name: 'Settings'});
+  await dialog.getByRole('button', {name: 'General'}).click();
+  await dialog
+    .getByRole('group', {name: 'Language'})
+    .getByRole('button', {name: 'Français'})
+    .click();
 }
 
 /** Footer area popover → pick a zone → wait for successful task PUT. */

@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {resetBoard} from './task-flow-helpers';
+import {resetBoard, switchLanguageToFrenchFromEnglishShell} from './task-flow-helpers';
 
 test.describe('Language', () => {
   test.beforeEach(async ({page, request}) => {
@@ -7,13 +7,7 @@ test.describe('Language', () => {
   });
 
   test('user switches to French and primary labels use FR locale', async ({page}) => {
-    await page.getByRole('button', {name: 'Settings'}).click();
-    const dialog = page.getByRole('dialog', {name: 'Settings'});
-    await dialog.getByRole('button', {name: 'General'}).click();
-    await dialog
-      .getByRole('group', {name: 'Language'})
-      .getByRole('button', {name: 'Français'})
-      .click();
+    await switchLanguageToFrenchFromEnglishShell(page);
     await page.keyboard.press('Escape');
 
     await expect(page.getByRole('heading', {level: 1, name: "Aujourd'hui"})).toBeVisible();
@@ -21,13 +15,7 @@ test.describe('Language', () => {
   });
 
   test('user switches back to English', async ({page}) => {
-    await page.getByRole('button', {name: 'Settings'}).click();
-    const dialog = page.getByRole('dialog', {name: 'Settings'});
-    await dialog.getByRole('button', {name: 'General'}).click();
-    await dialog
-      .getByRole('group', {name: 'Language'})
-      .getByRole('button', {name: 'Français'})
-      .click();
+    await switchLanguageToFrenchFromEnglishShell(page);
     await page.keyboard.press('Escape');
 
     await page.getByRole('button', {name: 'Paramètres'}).click();

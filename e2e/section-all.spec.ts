@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {addTaskWithTitle, resetBoard, taskCardByTitle} from './task-flow-helpers';
+import {addTaskWithTitle, markTaskDoneAfterCollapse, resetBoard} from './task-flow-helpers';
 
 test.describe('All section', () => {
   test.describe.configure({mode: 'serial'});
@@ -15,13 +15,7 @@ test.describe('All section', () => {
     await addTaskWithTitle(page, openTitle);
     await addTaskWithTitle(page, doneTitle);
 
-    const doneCard = taskCardByTitle(page, doneTitle);
-    await doneCard.getByRole('button', {name: 'Collapse task'}).click();
-    const markDonePut = page.waitForResponse(
-      (r) => r.request().method() === 'PUT' && /\/api\/tasks\/[^/]+$/.test(r.url()) && r.ok(),
-    );
-    await doneCard.getByRole('button', {name: 'Mark as done'}).click();
-    await markDonePut;
+    await markTaskDoneAfterCollapse(page, doneTitle);
 
     await page
       .getByRole('navigation', {name: 'Primary navigation'})

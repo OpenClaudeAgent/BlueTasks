@@ -29,7 +29,8 @@ test.describe('End-to-end: navigation and settings', () => {
     await expect(dialog.getByRole('heading', {level: 3, name: 'Language'})).toBeVisible();
     await expect(dialog.getByRole('heading', {level: 3, name: 'Your data'})).toBeVisible();
     await expect(dialog.getByRole('button', {name: 'Export SQLite database'})).toBeVisible();
-    await expect(dialog.getByRole('button', {name: 'Import SQLite database'})).toBeEnabled();
+    // Hidden file input shares the same accessible name as the visible trigger (a11y label).
+    await expect(dialog.locator('button.settingsDialog__importBtn')).toBeEnabled();
   });
 
   test('user creates an area from Settings', async ({page, request}) => {

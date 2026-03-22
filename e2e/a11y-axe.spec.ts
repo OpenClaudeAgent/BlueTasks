@@ -7,8 +7,8 @@ import {
   addTaskWithTitle,
   createAreaViaSettingsUi,
   firstCard,
+  markTaskDoneAfterCollapse,
   resetBoard,
-  taskCardByTitle,
 } from './task-flow-helpers';
 
 test.describe('Accessibility (axe)', () => {
@@ -159,13 +159,7 @@ test.describe('Accessibility (axe)', () => {
     const doneTitle = `A11y all done ${Date.now()}`;
     await addTaskWithTitle(page, openTitle);
     await addTaskWithTitle(page, doneTitle);
-    const doneCard = taskCardByTitle(page, doneTitle);
-    await doneCard.getByRole('button', {name: 'Collapse task'}).click();
-    const markDonePut = page.waitForResponse(
-      (r) => r.request().method() === 'PUT' && /\/api\/tasks\/[^/]+$/.test(r.url()) && r.ok(),
-    );
-    await doneCard.getByRole('button', {name: 'Mark as done'}).click();
-    await markDonePut;
+    await markTaskDoneAfterCollapse(page, doneTitle);
     await goToPrimarySection(page, /^All\b/);
     await expect(page.getByRole('heading', {level: 1, name: 'All'})).toBeVisible();
     await expectNoAxeViolations(page);
@@ -175,13 +169,7 @@ test.describe('Accessibility (axe)', () => {
     await resetBoard(page, request);
     const title = `A11y done ${Date.now()}`;
     await addTaskWithTitle(page, title);
-    const card = taskCardByTitle(page, title);
-    await card.getByRole('button', {name: 'Collapse task'}).click();
-    const markDonePut = page.waitForResponse(
-      (r) => r.request().method() === 'PUT' && /\/api\/tasks\/[^/]+$/.test(r.url()) && r.ok(),
-    );
-    await card.getByRole('button', {name: 'Mark as done'}).click();
-    await markDonePut;
+    await markTaskDoneAfterCollapse(page, title);
     await goToPrimarySection(page, /^Done\b/);
     await expect(page.getByRole('heading', {level: 1, name: 'Done'})).toBeVisible();
     await expect(page.getByRole('button', {name: title})).toBeVisible();

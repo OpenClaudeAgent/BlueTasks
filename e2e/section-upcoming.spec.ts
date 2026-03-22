@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {addTaskWithTitle, firstCard, resetBoard} from './task-flow-helpers';
+import {addTaskWithTitle, firstCard, resetBoard, setCardDueDateTomorrow} from './task-flow-helpers';
 
 test.describe('Upcoming section', () => {
   test.describe.configure({mode: 'serial'});
@@ -13,14 +13,7 @@ test.describe('Upcoming section', () => {
     await addTaskWithTitle(page, title);
 
     const card = firstCard(page);
-    await card.locator('.taskCard__datePill').click();
-    await page
-      .locator('.datePopover__quickActions')
-      .getByRole('button', {name: 'Tomorrow'})
-      .click();
-    await page.waitForResponse(
-      (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
-    );
+    await setCardDueDateTomorrow(page, card);
 
     await page
       .getByRole('navigation', {name: 'Primary navigation'})
@@ -36,14 +29,7 @@ test.describe('Upcoming section', () => {
     await addTaskWithTitle(page, title);
 
     const card = firstCard(page);
-    await card.locator('.taskCard__datePill').click();
-    await page
-      .locator('.datePopover__quickActions')
-      .getByRole('button', {name: 'Tomorrow'})
-      .click();
-    await page.waitForResponse(
-      (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
-    );
+    await setCardDueDateTomorrow(page, card);
 
     await page
       .getByRole('navigation', {name: 'Primary navigation'})
