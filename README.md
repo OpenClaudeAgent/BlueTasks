@@ -15,23 +15,18 @@ License [MIT](LICENSE) · [Changelog](CHANGELOG.md)
 
 ## Screenshots
 
-Real UI (English) — same app you get from the **[latest release](https://github.com/OpenClaudeAgent/BlueTasks/releases/latest)**.  
-Paths are **relative to the repo root** so they resolve correctly in **GitHub’s README preview** on `github.com`.
+Real UI (English) — same app you get from the **[latest release](https://github.com/OpenClaudeAgent/BlueTasks/releases/latest)**.
 
 ### Board views
 
-
-
-
-| **Today**                                             | **Anytime**                                          | **Upcoming**                                            |
-| ----------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------- |
-|                                                       |                                                      |                                                         |
-| *What needs attention now — scan the day in seconds.* | *Ideas and someday tasks without forced scheduling.* | *Light list of what’s next, including recurring items.* |
-
+| **Today** | **Anytime** | **Upcoming** |
+| :---: | :---: | :---: |
+| ![Today: priorities, pins, dates, recurrence](docs/screenshots/readme-01-board-today.png) | ![Anytime: backlog without a due date](docs/screenshots/readme-02-board-anytime.png) | ![Upcoming: next due dates and recurrence](docs/screenshots/readme-03-board-upcoming.png) |
+| *What needs attention now — scan the day in seconds.* | *Ideas and someday tasks without forced scheduling.* | *Light list of what's next, including recurring items.* |
 
 ### Rich notes inside a task
 
-
+![Expanded task: rich text toolbar, notes, and footer with estimate, priority, pin, dates, timer](docs/screenshots/readme-04-task-expanded.png)
 
 *Open a card for headings, lists, checklists, quotes, code, tables — plus estimate, area, priority, pin, schedule, repeat, and timer in the footer.*
 
