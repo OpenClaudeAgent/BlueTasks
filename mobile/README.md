@@ -32,6 +32,11 @@ An iOS entry point exists (`MainViewController`). Wire it in an Xcode project pe
 
 Task bodies are edited as **plain text** (`contentText`). The server’s Lexical `contentJson` is preserved on save so the web app stays consistent. Full Lexical UI on mobile is a later phase (WebView or native editor).
 
+### Toolchain notes
+
+- **Kotlin / AGP**: This repo pins **Android Gradle Plugin 8.5.x** and **compileSdk/targetSdk 34** so Kotlin **2.0.21** KMP stays within the versions JetBrains tests. To move to **compileSdk 35** and newer AndroidX (e.g. `core-ktx` 1.15+), upgrade **Kotlin** (and Compose) to a release that officially supports **AGP 8.7+**, then bump AGP and `compileSdk` together.
+- **Gradle 9**: You may still see a generic “deprecated Gradle features” notice from plugins; fixing it means upgrading Gradle + Android/Kotlin plugins when you are ready.
+
 ## GitHub Actions
 
 No mobile workflow runs on every push (keeps CI cost down). When you want automation, add a job with `on: workflow_dispatch` and `actions/setup-java@v4` (Java 21) running the same `./gradlew` lines as above.

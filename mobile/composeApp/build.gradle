@@ -54,11 +54,12 @@ kotlin {
 
 android {
     namespace = 'com.bluetasks.mobile'
-    compileSdk = 35
+    // Match AGP 8.5.x tested API level (see Android Gradle Plugin release notes).
+    compileSdk = 34
     defaultConfig {
         applicationId = 'com.bluetasks.mobile'
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = '0.1.0'
     }

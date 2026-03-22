@@ -55,7 +55,7 @@ kotlin {
 
 android {
     namespace = 'com.bluetasks.mobile.shared'
-    compileSdk = 35
+    compileSdk = 34
     defaultConfig {
         minSdk = 26
     }
