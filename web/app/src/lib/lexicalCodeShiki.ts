@@ -9,7 +9,7 @@ import {
 } from '@lexical/code-shiki';
 
 /** Dark theme aligned with `.editor__codeBlock`; shared by LexicalTaskEditor and tests. */
-export const taskEditorShikiTokenizer: Tokenizer = {
+const taskEditorShikiTokenizer: Tokenizer = {
   ...ShikiTokenizer,
   defaultTheme: 'github-dark',
 };

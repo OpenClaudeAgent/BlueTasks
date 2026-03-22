@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import vitest from '@vitest/eslint-plugin';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import {complexityPlugins, complexityRules} from '../../eslint.complexity.mjs';
 import globals from 'globals';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -20,6 +21,7 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
+    plugins: complexityPlugins,
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -29,10 +31,18 @@ export default defineConfig([
       },
     },
     rules: {
+      ...complexityRules,
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': [
         'error',
         {checksVoidReturn: {attributes: false, arguments: false}},
+      ],
+      // Type-aware checks that catch real logic bugs (not the full strict preset)
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
+      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
+      '@typescript-eslint/no-confusing-void-expression': [
+        'error',
+        {ignoreArrowShorthand: true, ignoreVoidOperator: true},
       ],
     },
   },

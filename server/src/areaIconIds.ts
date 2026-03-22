@@ -11,7 +11,7 @@ if (!Array.isArray(parsed) || !parsed.every((x) => typeof x === 'string')) {
 }
 
 export const AREA_ICON_IDS = parsed as readonly string[];
-export const ALLOWED_AREA_ICONS = new Set<string>(AREA_ICON_IDS);
+const ALLOWED_AREA_ICONS = new Set<string>(AREA_ICON_IDS);
 
 export function normalizeAreaIcon(value: unknown): string {
   if (typeof value !== 'string') {

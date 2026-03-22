@@ -11,7 +11,7 @@ export function getUserVersion(database: Database.Database): number {
   return Number.isFinite(n) ? n : 0;
 }
 
-export function migrateTasksTable(database: Database.Database) {
+function migrateTasksTable(database: Database.Database) {
   const columns = database.prepare('PRAGMA table_info(tasks)').all() as {name: string}[];
   const names = new Set(columns.map((c) => c.name));
   if (!names.has('priority')) {
@@ -37,7 +37,7 @@ export function migrateTasksTable(database: Database.Database) {
   }
 }
 
-export function migrateAreasTable(database: Database.Database) {
+function migrateAreasTable(database: Database.Database) {
   database.exec(`
     CREATE TABLE IF NOT EXISTS areas (
       id TEXT PRIMARY KEY,

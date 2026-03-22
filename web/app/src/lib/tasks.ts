@@ -113,10 +113,6 @@ function toBoardFilterTask(task: Task) {
   };
 }
 
-export function taskMatchesAreaFilter(task: Task, filter: AreaFilter): boolean {
-  return taskMatchesAreaFilterRow(toBoardFilterTask(task), filter);
-}
-
 export function filterTasks(
   tasks: Task[],
   section: SectionId,

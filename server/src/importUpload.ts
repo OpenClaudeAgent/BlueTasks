@@ -3,7 +3,7 @@ import {randomUUID} from 'node:crypto';
 import type {NextFunction, Request, Response} from 'express';
 import multer from 'multer';
 
-export const uploadImport = multer({
+const uploadImport = multer({
   storage: multer.diskStorage({
     destination: (_req, _file, cb) => {
       cb(null, os.tmpdir());

@@ -1,6 +1,7 @@
 import js from '@eslint/js';
 import vitest from '@vitest/eslint-plugin';
 import eslintConfigPrettier from 'eslint-config-prettier';
+import {complexityPlugins, complexityRules} from '../eslint.complexity.mjs';
 import globals from 'globals';
 import security from 'eslint-plugin-security';
 import tseslint from 'typescript-eslint';
@@ -19,7 +20,7 @@ export default defineConfig([
     files: typeCheckedSourceFiles,
     ignores: typeCheckedIgnores,
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    plugins: {security},
+    plugins: {security, ...complexityPlugins},
     languageOptions: {
       ecmaVersion: 2022,
       globals: globals.node,
@@ -30,11 +31,18 @@ export default defineConfig([
     },
     rules: {
       ...security.configs.recommended.rules,
+      ...complexityRules,
       'security/detect-non-literal-fs-filename': 'off',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': [
         'error',
         {checksVoidReturn: {attributes: false, arguments: false}},
+      ],
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
+      '@typescript-eslint/no-unnecessary-boolean-literal-compare': 'error',
+      '@typescript-eslint/no-confusing-void-expression': [
+        'error',
+        {ignoreArrowShorthand: true, ignoreVoidOperator: true},
       ],
     },
   },
