@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.5] - 2026-03-22
+
+- Task delete: Radix alert dialog (replaces native confirm); a11y contrast + tests (e2e, Vitest, axe); e2e resetBoard dedupe; delete button aria-label.
+
 ## [0.2.4] - 2026-03-22
 
 - Axe a11y e2e and UI fixes; Playwright helpers for jscpd; Settings import strict-mode locator; CI tooling (Knip, Prettier).
@@ -68,7 +72,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial published image tag `v0.1.0` (multi-arch GHCR workflow).
 
-[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.4...HEAD
+[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.5...HEAD
+[0.2.5]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.4...v0.2.5
 [0.2.4]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.1...v0.2.2
