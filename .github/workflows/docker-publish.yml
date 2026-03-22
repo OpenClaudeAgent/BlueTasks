@@ -1,4 +1,5 @@
 # Build JS on the runner, then copy artifacts into `.dockerctx/` (no npm in the final image layer).
+# Image build uses BuildKit cache (type=gha) per arch so layer reuse speeds up repeat tag builds.
 # Trigger: tag push `v*` or manual `workflow_dispatch` (pushes to GHCR with the given tag).
 name: Docker image
 run-name: Docker image ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}

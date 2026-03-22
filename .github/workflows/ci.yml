@@ -1,6 +1,7 @@
 # Quality gates mirror `npm run ci` pieces, each as its own job for clear Actions output.
 # Any failing step exits non-zero → that job fails → the workflow run is red (unless a step sets continue-on-error).
-# Desktop (Tauri) bundles are built only on release — see desktop-publish.yml (not in this workflow).
+# Desktop (Tauri) bundles are built only on release — see desktop-publish.yml. PR CI does not run Clippy:
+# the desktop crate is thin glue around bundled Node; Rust is compiled on tag / desktop-publish instead.
 name: CI
 
 on:
@@ -75,30 +76,6 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run audit:prod
-
-  clippy:
-    name: Clippy (desktop Tauri)
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: desktop/src-tauri
-    steps:
-      - uses: actions/checkout@v6
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: Swatinem/rust-cache@v2
-        with:
-          workspaces: desktop/src-tauri
-      - name: Install system dependencies (Linux / Tauri)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev pkg-config
-      - name: Stub Tauri resources (real tree comes from desktop:prep; glob must match in CI)
-        run: |
-          mkdir -p resources/bluetasks-runtime resources/node
-          printf 'ci-stub\n' > resources/bluetasks-runtime/.ci-stub
-          printf 'ci-stub\n' > resources/node/.ci-stub
-      - run: cargo clippy --all-targets -- -D warnings
 
   eslint-web:
     name: ESLint (web)
