@@ -14,7 +14,7 @@ if [[ ! -f server/dist/index.js || ! -d web/app/dist ]]; then
 fi
 
 rm -rf .dockerctx
-mkdir -p .dockerctx/server/dist .dockerctx/web/app .dockerctx/contract
+mkdir -p .dockerctx/server/dist .dockerctx/server/data .dockerctx/web/app .dockerctx/contract
 
 cp Dockerfile .dockerctx/Dockerfile
 cp package.json package-lock.json .dockerctx/
