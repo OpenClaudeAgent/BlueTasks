@@ -1,28 +1,14 @@
-import {useRef} from 'react';
+import {memo, useCallback, useRef} from 'react';
 import {useTranslation} from 'react-i18next';
-import type {Area, Task, TaskDraftUpdate} from '../types';
 import {TaskCardExpandedBody} from './taskCard/TaskCardExpandedBody';
 import {TaskCardHeaderRow} from './taskCard/TaskCardHeaderRow';
 import {useAutoFocusTaskTitle} from './taskCard/useAutoFocusTaskTitle';
-import type {TaskCardBoardChrome} from './taskCard/useTaskCardChrome';
+import {taskCardPropsAreEqual, type TaskCardProps} from './taskCard/taskCardProps';
 import {useTaskCardChrome} from './taskCard/useTaskCardChrome';
 
-type TaskCardProps = {
-  task: Task;
-  areas: Area[];
-  boardChrome: TaskCardBoardChrome;
-  expanded: boolean;
-  /** First expanded render: focus the title field (e.g. after Add). */
-  autoFocusTitle?: boolean;
-  onAutoFocusTitleConsumed?: () => void;
-  isSaving: boolean;
-  onToggleExpand: () => void;
-  onChange: (taskId: string, update: TaskDraftUpdate) => void;
-  onDelete: (taskId: string) => void;
-  onToggleStatus: (taskId: string) => void;
-};
+export type {TaskCardProps};
 
-export function TaskCard({
+function TaskCardComponent({
   task,
   areas,
   boardChrome,
@@ -30,7 +16,7 @@ export function TaskCard({
   autoFocusTitle = false,
   onAutoFocusTitleConsumed,
   isSaving,
-  onToggleExpand,
+  onToggleExpandTask,
   onChange,
   onDelete,
   onToggleStatus,
@@ -38,6 +24,10 @@ export function TaskCard({
   const {i18n} = useTranslation();
   const titleInputRef = useRef<HTMLInputElement>(null);
   const chrome = useTaskCardChrome(task, areas, i18n.language, isSaving, onChange, onDelete, boardChrome);
+
+  const handleToggleExpand = useCallback(() => {
+    onToggleExpandTask(task.id);
+  }, [onToggleExpandTask, task.id]);
 
   useAutoFocusTaskTitle({
     autoFocusTitle,
@@ -60,7 +50,7 @@ export function TaskCard({
         onChange={onChange}
         onDateOpenChange={chrome.setDateOpen}
         onSelectDate={chrome.updateDate}
-        onToggleExpand={onToggleExpand}
+        onToggleExpand={handleToggleExpand}
         onToggleStatus={onToggleStatus}
         pinned={chrome.pinned}
         recurrence={chrome.recurrence}
@@ -73,3 +63,5 @@ export function TaskCard({
     </article>
   );
 }
+
+export const TaskCard = memo(TaskCardComponent, taskCardPropsAreEqual);

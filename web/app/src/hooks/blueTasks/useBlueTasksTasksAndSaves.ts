@@ -249,22 +249,32 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
     }
   }
 
-  function handleTaskDraftChange(taskId: string, update: TaskDraftUpdate) {
-    handleTaskMutation(taskId, (current) => ({
+  const handleTaskMutationRef = useRef(handleTaskMutation);
+  handleTaskMutationRef.current = handleTaskMutation;
+
+  const handleTaskDraftChange = useCallback((taskId: string, update: TaskDraftUpdate) => {
+    handleTaskMutationRef.current(taskId, (current) => ({
       ...current,
       ...update,
     }));
-  }
+  }, []);
 
-  async function handleAddTask(areaFilter: AreaFilter) {
-    const captureAreaId =
-      areaFilter !== AREA_FILTER_ALL && areaFilter !== AREA_FILTER_UNCATEGORIZED ? areaFilter : null;
-    const optimisticTask = createTask('', captureAreaId);
-    await persistOptimisticNewTask(optimisticTask, {
-      titleFocusTaskId: optimisticTask.id,
-      clearTitleFocusOnError: true,
-    });
-  }
+  const handleToggleRecurringStatus = useCallback((taskId: string) => {
+    handleTaskMutationRef.current(taskId, applyRecurringStatusToggle);
+  }, []);
+
+  const handleAddTask = useCallback(
+    async (areaFilter: AreaFilter) => {
+      const captureAreaId =
+        areaFilter !== AREA_FILTER_ALL && areaFilter !== AREA_FILTER_UNCATEGORIZED ? areaFilter : null;
+      const optimisticTask = createTask('', captureAreaId);
+      await persistOptimisticNewTask(optimisticTask, {
+        titleFocusTaskId: optimisticTask.id,
+        clearTitleFocusOnError: true,
+      });
+    },
+    [persistOptimisticNewTask],
+  );
 
   /** Header quick capture: title preset, optional default date from active section (Today / Upcoming). */
   const handleQuickCapture = useCallback(
@@ -298,8 +308,8 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
     [persistOptimisticNewTask],
   );
 
-  async function handleDelete(taskId: string) {
-    const previousTasks = tasks;
+  const handleDelete = useCallback(async (taskId: string) => {
+    const previousTasks = tasksRef.current;
     const existingTimeout = saveTimersRef.current.get(taskId);
     if (existingTimeout) {
       window.clearTimeout(existingTimeout);
@@ -319,11 +329,7 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
       bridgeRef.current.setErrorMessage(error instanceof Error ? error.message : tr('errors.deleteTask'));
       setTasks(previousTasks);
     }
-  }
-
-  function handleToggleRecurringStatus(taskId: string) {
-    handleTaskMutation(taskId, applyRecurringStatusToggle);
-  }
+  }, []);
 
   return {
     tasks,

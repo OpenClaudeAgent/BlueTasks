@@ -1,11 +1,15 @@
-import {useMemo, useState} from 'react';
+import {lazy, Suspense, useMemo, useState} from 'react';
 import {LoaderCircle, Plus} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
-import {SettingsDialog} from './components/SettingsDialog';
 import {Sidebar} from './components/Sidebar';
 import {TaskCard} from './components/TaskCard';
 import {useBlueTasksBoard} from './hooks/useBlueTasksBoard';
 import {useResizableSidebarWidth} from './hooks/useResizableSidebarWidth';
+
+const LazySettingsDialog = lazy(async () => {
+  const m = await import('./components/SettingsDialog');
+  return {default: m.SettingsDialog};
+});
 
 function App() {
   const {t} = useTranslation();
@@ -52,13 +56,24 @@ function App() {
           role="separator"
         />
       </div>
-      <SettingsDialog
-        areas={board.areas}
-        onAreasUpdated={board.refreshTasksAndAreas}
-        onOpenChange={setSettingsOpen}
-        open={settingsOpen}
-        taskCountByAreaId={board.taskCountByAreaId}
-      />
+      {settingsOpen ? (
+        <Suspense
+          fallback={
+            <div aria-live="polite" className="emptyState emptyState--loading">
+              <LoaderCircle className="is-spinning" size={18} />
+              {t('loading')}
+            </div>
+          }
+        >
+          <LazySettingsDialog
+            areas={board.areas}
+            onAreasUpdated={board.refreshTasksAndAreas}
+            onOpenChange={setSettingsOpen}
+            open
+            taskCountByAreaId={board.taskCountByAreaId}
+          />
+        </Suspense>
+      ) : null}
 
       <main className="mainPanel">
         <header className="mainHeader">
@@ -94,7 +109,7 @@ function App() {
                 aria-label={t('addTaskAria')}
                 className="mainHeader__addBtn"
                 disabled={board.loading}
-                onClick={() => void board.handleAddTask()}
+                onClick={board.handleAddTask}
                 type="button"
               >
                 <Plus aria-hidden size={18} strokeWidth={2.25} />
@@ -130,12 +145,10 @@ function App() {
                   autoFocusTitle={board.titleFocusTaskId === task.id}
                   expanded={board.selectedTaskId === task.id}
                   isSaving={Boolean(board.savingIds[task.id])}
-                  onAutoFocusTitleConsumed={() => board.setTitleFocusTaskId(null)}
+                  onAutoFocusTitleConsumed={board.clearTitleFocusTaskId}
                   onChange={board.handleTaskDraftChange}
-                  onDelete={(taskId) => void board.handleDelete(taskId)}
-                  onToggleExpand={() =>
-                    board.setSelectedTaskId((current) => (current === task.id ? null : task.id))
-                  }
+                  onDelete={board.handleDelete}
+                  onToggleExpandTask={board.toggleTaskExpanded}
                   onToggleStatus={board.handleToggleRecurringStatus}
                   task={task}
                 />

@@ -11,6 +11,7 @@ import {formatTaskDatePill} from '../lib/dateFormat';
 import {createTask} from '../lib/tasks';
 import type {Area} from '../types';
 import {TaskCard} from './TaskCard';
+import {taskCardPropsAreEqual, type TaskCardProps} from './taskCard/taskCardProps';
 
 vi.mock('./LexicalTaskEditor', () => ({
   LexicalTaskEditor: ({
@@ -97,7 +98,7 @@ describe('Feature: Task card (collapsed)', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -112,9 +113,9 @@ describe('Feature: Task card (collapsed)', () => {
   });
 
   describe('Scenario: User expands the card', () => {
-    it('given a collapsed card, when they click the chevron, then onToggleExpand is called', async () => {
+    it('given a collapsed card, when they click the chevron, then onToggleExpandTask is called with task id', async () => {
       const user = userEvent.setup();
-      const onToggleExpand = vi.fn();
+      const onToggleExpandTask = vi.fn();
       const task = createTask('Review');
 
       render(
@@ -125,7 +126,7 @@ describe('Feature: Task card (collapsed)', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={vi.fn()}
-            onToggleExpand={onToggleExpand}
+            onToggleExpandTask={onToggleExpandTask}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -135,7 +136,8 @@ describe('Feature: Task card (collapsed)', () => {
       const card = screen.getByRole('article');
       expect(card).toHaveClass('taskCard');
       await user.click(within(card).getByRole('button', {name: /expand task/i}));
-      expect(onToggleExpand).toHaveBeenCalledTimes(1);
+      expect(onToggleExpandTask).toHaveBeenCalledTimes(1);
+      expect(onToggleExpandTask).toHaveBeenCalledWith(task.id);
     });
   });
 
@@ -153,7 +155,7 @@ describe('Feature: Task card (collapsed)', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={onToggleStatus}
             task={task}
           />
@@ -182,7 +184,7 @@ describe('Feature: Task card (collapsed)', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={onToggleStatus}
             task={task}
           />
@@ -210,7 +212,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -236,7 +238,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChangeSpy={onChangeSpy}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
           />
         </I18nextProvider>,
@@ -261,7 +263,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChange={onChange}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -285,7 +287,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChange={onChange}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -312,7 +314,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChange={onChange}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -340,7 +342,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChange={onChange}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -365,7 +367,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChange={onChange}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -396,7 +398,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChange={onChange}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -421,7 +423,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChange={onChange}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -446,7 +448,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChangeSpy={onChangeSpy}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
           />
         </I18nextProvider>,
@@ -475,7 +477,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChangeSpy={onChangeSpy}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
           />
         </I18nextProvider>,
@@ -506,7 +508,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={onDelete}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -530,7 +532,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChange={onChange}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -554,7 +556,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChange={onChange}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -580,7 +582,7 @@ describe('Feature: Task card (expanded)', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -589,5 +591,51 @@ describe('Feature: Task card (expanded)', () => {
       const card = screen.getByRole('article');
       expect(within(card).getByRole('button', {name: /complete occurrence/i})).toBeInTheDocument();
     });
+  });
+});
+
+describe('Feature: TaskCard memo comparator', () => {
+  const noop = () => {};
+  const baseTask = createTask('T');
+
+  function baseProps(): TaskCardProps {
+    return {
+      task: baseTask,
+      areas: [],
+      boardChrome: {
+        datePopoverTaskId: null,
+        setDatePopoverTaskId: noop,
+        liveTimerNowMs: 0,
+      },
+      expanded: false,
+      isSaving: false,
+      onToggleExpandTask: noop,
+      onChange: noop,
+      onDelete: noop,
+      onToggleStatus: noop,
+    };
+  }
+
+  it('given no active timer, when only liveTimerNowMs changes, then props are equal (skip re-render)', () => {
+    const prev = baseProps();
+    const next: TaskCardProps = {
+      ...prev,
+      boardChrome: {...prev.boardChrome, liveTimerNowMs: 99_999},
+    };
+    expect(taskCardPropsAreEqual(prev, next)).toBe(true);
+  });
+
+  it('given active timer, when liveTimerNowMs changes, then props are not equal', () => {
+    const taskWithTimer = {...baseTask, timerStartedAt: new Date('2025-01-01T12:00:00.000Z').toISOString()};
+    const prev: TaskCardProps = {
+      ...baseProps(),
+      task: taskWithTimer,
+      boardChrome: {...baseProps().boardChrome, liveTimerNowMs: 1},
+    };
+    const next: TaskCardProps = {
+      ...prev,
+      boardChrome: {...prev.boardChrome, liveTimerNowMs: 2},
+    };
+    expect(taskCardPropsAreEqual(prev, next)).toBe(false);
   });
 });

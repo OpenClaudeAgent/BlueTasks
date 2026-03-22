@@ -1,6 +1,6 @@
-import {useEffect, useMemo, useState} from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {filterTasks, getTaskCounts} from '../lib/tasks';
+import {filterTasks, getAreaSidebarCounts, getTaskCounts} from '../lib/tasks';
 import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from '../types';
 import {useBlueTasksTasksAndSaves} from './blueTasks/useBlueTasksTasksAndSaves';
 import {useBlueTasksUiState} from './blueTasks/useBlueTasksUiState';
@@ -71,17 +71,27 @@ export function useBlueTasksBoard() {
     return map;
   }, [tasks]);
 
-  const areaSidebarCounts = useMemo(() => {
-    const byId: Record<string, number> = {};
-    for (const area of areas) {
-      byId[area.id] = filterTasks(tasks, selectedSection, area.id).length;
-    }
-    return {
-      all: filterTasks(tasks, selectedSection, AREA_FILTER_ALL).length,
-      uncategorized: filterTasks(tasks, selectedSection, AREA_FILTER_UNCATEGORIZED).length,
-      byId,
-    };
-  }, [tasks, selectedSection, areas]);
+  const areaSidebarCounts = useMemo(
+    () => getAreaSidebarCounts(tasks, selectedSection, areas),
+    [tasks, selectedSection, areas],
+  );
+
+  const handleAddTaskForCurrentArea = useCallback(() => {
+    void handleAddTask(areaFilter);
+  }, [handleAddTask, areaFilter]);
+
+  const handleQuickCaptureInContext = useCallback(
+    (title: string) => handleQuickCapture(title, areaFilter, selectedSection),
+    [handleQuickCapture, areaFilter, selectedSection],
+  );
+
+  const toggleTaskExpanded = useCallback((taskId: string) => {
+    setSelectedTaskId((current) => (current === taskId ? null : taskId));
+  }, [setSelectedTaskId]);
+
+  const clearTitleFocusTaskId = useCallback(() => {
+    setTitleFocusTaskId(null);
+  }, [setTitleFocusTaskId]);
 
   useEffect(() => {
     if (areaFilter === AREA_FILTER_ALL || areaFilter === AREA_FILTER_UNCATEGORIZED) {
@@ -124,13 +134,13 @@ export function useBlueTasksBoard() {
     taskCountByAreaId,
     areaSidebarCounts,
     refreshTasksAndAreas,
-    handleAddTask: () => {
-      void handleAddTask(areaFilter);
-    },
-    handleQuickCapture: (title: string) => handleQuickCapture(title, areaFilter, selectedSection),
+    handleAddTask: handleAddTaskForCurrentArea,
+    handleQuickCapture: handleQuickCaptureInContext,
     handleTaskDraftChange,
     handleToggleRecurringStatus,
     handleDelete,
+    toggleTaskExpanded,
+    clearTitleFocusTaskId,
     datePopoverTaskId,
     setDatePopoverTaskId,
     liveTimerNowMs,

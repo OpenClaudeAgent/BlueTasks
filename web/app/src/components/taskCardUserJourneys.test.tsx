@@ -101,7 +101,7 @@ describe('Feature: Task importance in the list', () => {
               isSaving={false}
               onChange={vi.fn()}
               onDelete={vi.fn()}
-              onToggleExpand={vi.fn()}
+              onToggleExpandTask={vi.fn()}
               onToggleStatus={vi.fn()}
               task={high}
             />
@@ -111,7 +111,7 @@ describe('Feature: Task importance in the list', () => {
               isSaving={false}
               onChange={vi.fn()}
               onDelete={vi.fn()}
-              onToggleExpand={vi.fn()}
+              onToggleExpandTask={vi.fn()}
               onToggleStatus={vi.fn()}
               task={normal}
             />
@@ -121,7 +121,7 @@ describe('Feature: Task importance in the list', () => {
               isSaving={false}
               onChange={vi.fn()}
               onDelete={vi.fn()}
-              onToggleExpand={vi.fn()}
+              onToggleExpandTask={vi.fn()}
               onToggleStatus={vi.fn()}
               task={low}
             />
@@ -151,7 +151,7 @@ describe('Feature: Task importance in the list', () => {
             isSaving={false}
             onChangeSpy={onChangeSpy}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
           />
         </I18nextProvider>,
@@ -179,7 +179,7 @@ describe('Feature: Checklist progress when the task is open', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -204,7 +204,7 @@ describe('Feature: Checklist progress when the task is open', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -231,7 +231,7 @@ describe('Feature: Task context on the row (collapsed)', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -255,7 +255,7 @@ describe('Feature: Task context on the row (collapsed)', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -283,7 +283,7 @@ describe('Feature: Task context on the row (collapsed)', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />
@@ -311,7 +311,7 @@ describe('Feature: Task context on the row (collapsed)', () => {
             isSaving={false}
             onChange={vi.fn()}
             onDelete={vi.fn()}
-            onToggleExpand={vi.fn()}
+            onToggleExpandTask={vi.fn()}
             onToggleStatus={vi.fn()}
             task={task}
           />

@@ -39,6 +39,11 @@ function baseBoard() {
     handleTaskDraftChange: vi.fn(),
     handleToggleRecurringStatus: vi.fn(),
     handleDelete: vi.fn(),
+    toggleTaskExpanded: vi.fn(),
+    clearTitleFocusTaskId: vi.fn(),
+    datePopoverTaskId: null as string | null,
+    setDatePopoverTaskId: vi.fn(),
+    liveTimerNowMs: 0,
   };
 }
 
@@ -145,7 +150,9 @@ describe('Feature: App shell', () => {
       </I18nextProvider>,
     );
     await user.click(within(screen.getByRole('complementary')).getByRole('button', {name: /settings/i}));
-    expect(screen.getByRole('dialog')).toBeVisible();
+    await waitFor(() => {
+      expect(screen.getByRole('dialog')).toBeVisible();
+    });
   });
 
   it('Scenario: Task title autofocus — clears titleFocusTaskId after consume', async () => {
@@ -157,6 +164,9 @@ describe('Feature: App shell', () => {
       selectedTaskId: task.id,
       titleFocusTaskId: task.id,
       setTitleFocusTaskId,
+      clearTitleFocusTaskId: vi.fn(() => {
+        setTitleFocusTaskId(null);
+      }),
     });
     render(
       <I18nextProvider i18n={i18n}>
@@ -177,6 +187,9 @@ describe('Feature: App shell', () => {
       visibleTasks: [task],
       selectedTaskId: null,
       setSelectedTaskId,
+      toggleTaskExpanded: (taskId: string) => {
+        setSelectedTaskId((current: string | null) => (current === taskId ? null : taskId));
+      },
     });
     render(
       <I18nextProvider i18n={i18n}>

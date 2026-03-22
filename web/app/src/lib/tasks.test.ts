@@ -1,13 +1,14 @@
 import {describe, expect, it} from 'vitest';
 import {addDaysToKey, todayKey} from './dateKeys';
 import {createEmptyEditorState} from './editorState';
-import type {Task} from '../types';
+import type {Area, Task} from '../types';
 import {
   applySavedTaskPreservingLexicalShape,
   coercePinned,
   coerceRecurrence,
   createTask,
   filterTasks,
+  getAreaSidebarCounts,
   getPreferredTaskId,
   getTaskCounts,
   getTaskSection,
@@ -274,6 +275,25 @@ describe('filterTasks', () => {
     ];
     const ids = filterTasks(tasks, 'all', z).map((t) => t.id);
     expect(ids).toEqual(['o', 'c']);
+  });
+});
+
+describe('getAreaSidebarCounts', () => {
+  it('matches filterTasks lengths for all, uncategorized, and each area row', () => {
+    const today = todayKey();
+    const z1 = 'zone-1';
+    const areas: Area[] = [
+      {id: z1, name: 'Work', icon: 'folder', sortIndex: 0, createdAt: '2025-01-01T00:00:00.000Z'},
+    ];
+    const tasks = [
+      {...createTask('In zone'), id: 'a', taskDate: today, areaId: z1},
+      {...createTask('No zone'), id: 'b', taskDate: today, areaId: null},
+    ];
+    const section = 'today' as const;
+    const got = getAreaSidebarCounts(tasks, section, areas);
+    expect(got.all).toBe(filterTasks(tasks, section, AREA_FILTER_ALL).length);
+    expect(got.uncategorized).toBe(filterTasks(tasks, section, AREA_FILTER_UNCATEGORIZED).length);
+    expect(got.byId[z1]).toBe(filterTasks(tasks, section, z1).length);
   });
 });
 

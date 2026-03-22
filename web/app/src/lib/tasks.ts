@@ -8,6 +8,8 @@ import {todayKey} from './dateKeys';
 import {createEmptyEditorState, lexicalDocsContentEqual} from './editorState';
 import {
   AREA_FILTER_ALL,
+  AREA_FILTER_UNCATEGORIZED,
+  type Area,
   type AreaFilter,
   type SectionId,
   type Task,
@@ -130,6 +132,42 @@ export function filterTasks(
       return taskMatchesBoardSectionRow(toBoardFilterTask(task), section as BoardSectionId, today);
     }),
   );
+}
+
+/** One pass over tasks: counts per area row for the sidebar (same rules as `filterTasks`, without sorting). */
+export function getAreaSidebarCounts(tasks: Task[], selectedSection: SectionId, areas: Area[]): {
+  all: number;
+  uncategorized: number;
+  byId: Record<string, number>;
+} {
+  const today = todayKey();
+  const section = selectedSection as BoardSectionId;
+  const byId: Record<string, number> = {};
+  for (const area of areas) {
+    byId[area.id] = 0;
+  }
+  let all = 0;
+  let uncategorized = 0;
+
+  for (const task of tasks) {
+    const row = toBoardFilterTask(task);
+    if (!taskMatchesBoardSectionRow(row, section, today)) {
+      continue;
+    }
+    if (taskMatchesAreaFilterRow(row, AREA_FILTER_ALL)) {
+      all++;
+    }
+    if (taskMatchesAreaFilterRow(row, AREA_FILTER_UNCATEGORIZED)) {
+      uncategorized++;
+    }
+    for (const area of areas) {
+      if (taskMatchesAreaFilterRow(row, area.id)) {
+        byId[area.id]++;
+      }
+    }
+  }
+
+  return {all, uncategorized, byId};
 }
 
 export function getTaskCounts(tasks: Task[], areaFilter: AreaFilter = AREA_FILTER_ALL): TaskCounts {
