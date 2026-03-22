@@ -1,17 +1,13 @@
 import {expect, test} from '@playwright/test';
-import {deleteAllAreas, deleteAllTasks} from './api-helpers';
 import {expectApiTaskRow} from './contract-expectations';
-import {addTaskWithTitle} from './task-flow-helpers';
+import {addTaskWithTitle, resetBoard} from './task-flow-helpers';
 import {gotoWithEnglish} from './helpers';
 
 test.describe('End-to-end: task lifecycle', () => {
   test.describe.configure({mode: 'serial'});
 
   test.beforeEach(async ({page, request}) => {
-    await deleteAllAreas(request);
-    await deleteAllTasks(request);
-    await gotoWithEnglish(page, '/');
-    await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
+    await resetBoard(page, request);
   });
 
   test('user adds a task, title is saved, survives reload', async ({page}) => {

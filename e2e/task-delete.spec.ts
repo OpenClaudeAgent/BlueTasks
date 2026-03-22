@@ -1,7 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {deleteAllAreas, deleteAllTasks} from './api-helpers';
-import {addTaskWithTitle, taskCardByTitle} from './task-flow-helpers';
-import {gotoWithEnglish} from './helpers';
+import {addTaskWithTitle, resetBoard, taskCardByTitle} from './task-flow-helpers';
 
 /**
  * Delete is only available on the expanded card footer. These tests cover paths
@@ -11,10 +9,7 @@ test.describe('Task delete', () => {
   test.describe.configure({mode: 'serial'});
 
   test.beforeEach(async ({page, request}) => {
-    await deleteAllAreas(request);
-    await deleteAllTasks(request);
-    await gotoWithEnglish(page, '/');
-    await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
+    await resetBoard(page, request);
   });
 
   test('user deletes after collapsing and re-expanding the card', async ({page}) => {
