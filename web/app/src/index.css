@@ -1879,7 +1879,10 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
 
 .datePopover {
   padding: 14px;
-  width: 288px;
+  /* Definite width so table % / fixed layout resolve; inner ≈ 308px for 7 × ~44px cells */
+  width: min(336px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
+  box-sizing: border-box;
   border-radius: var(--radius);
   border: 1px solid var(--border);
   background: #2f2c3a;
@@ -1922,7 +1925,33 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
 .datePopover .rdp-root {
   --rdp-accent-color: var(--accent);
   --rdp-accent-background-color: rgba(126, 184, 255, 0.22);
+  --rdp-day-height: 36px;
+  --rdp-day-width: 36px;
+  --rdp-day_button-height: 34px;
+  --rdp-day_button-width: 34px;
   margin: 0;
+  width: 100%;
+}
+
+/* Equal columns: default auto table layout grows with .rdp-selected { font-size: large } → 7th column spills */
+.datePopover .rdp-month_grid {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.datePopover .rdp-weekday {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.datePopover .rdp-day_button {
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+.datePopover .rdp-selected {
+  font-size: inherit;
+  font-weight: 700;
 }
 
 .datePopover .rdp-caption_label,
