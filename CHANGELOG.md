@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.3.4] - 2026-03-22
+
+- A11y: sidebar resize lane in its own named region (axe complementary + region rules). README: badges at top (release, Node 22, GHCR, Tauri, Playwright, SQLite).
+
 ## [0.3.3] - 2026-03-22
 
 - Web: resizable sidebar (compact mode, persisted width, optional ?sidebarWidthPx=); sidebarLayout module, Vitest/e2e tests; Knip ignores tauri binary for desktop workflow.
@@ -88,7 +92,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial published image tag `v0.1.0` (multi-arch GHCR workflow).
 
-[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.3...HEAD
+[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.4...HEAD
+[0.3.4]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.0...v0.3.1
