@@ -28,6 +28,15 @@ What it does:
 
 That pipeline is the **source of truth** for a release—not a local bump by hand or by tooling unless you are in the escape hatch below.
 
+## README version badge vs GitHub “Latest release”
+
+The README uses Shields **`github/v/tag`** (semver sort), labeled **version**, not **`github/v/release`**.
+
+- **`github/v/release`** reflects the latest **published** GitHub Release. That object is created when [**Desktop release**](../.github/workflows/desktop-publish.yml) finishes (`softprops/action-gh-release`). If only a **git tag** exists (e.g. escape-hatch push) and Desktop did not complete, the badge for “release” can stay on an **older** version while tags and `package.json` already moved forward.
+- **`github/v/tag`** matches the **newest `v*` tag** and stays consistent with the monorepo semver. The badge still links to the [Releases](https://github.com/OpenClaudeAgent/BlueTasks/releases) list for downloads.
+
+After a normal **Actions → Release** run, Docker and Desktop are dispatched explicitly; when Desktop succeeds, you get both an up-to-date tag **and** a proper GitHub Release.
+
 ## Manual release (local, escape hatch only)
 
 Use this **only** if the **Release** workflow cannot run (e.g. bot blocked by branch rules, Actions outage). For normal shipping, use **Actions → Release** above.

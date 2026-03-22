@@ -4,7 +4,7 @@
 [![Docker image](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml)
 [![Desktop app](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/desktop-publish.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/desktop-publish.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/OpenClaudeAgent/BlueTasks?sort=semver&label=release)](https://github.com/OpenClaudeAgent/BlueTasks/releases/latest)
+[![Version (tag)](https://img.shields.io/github/v/tag/OpenClaudeAgent/BlueTasks?sort=semver&label=version)](https://github.com/OpenClaudeAgent/BlueTasks/releases)
 [![Node.js 22](https://img.shields.io/badge/node.js-22-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
 [![Docker GHCR](https://img.shields.io/badge/ghcr.io-bluetasks-2496ED?logo=docker&logoColor=white)](https://github.com/OpenClaudeAgent/BlueTasks/pkgs/container/bluetasks)
 [![Tauri](https://img.shields.io/badge/desktop-Tauri-24C8D8?logo=tauri&logoColor=white)](desktop/README.md)
