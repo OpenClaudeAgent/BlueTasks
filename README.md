@@ -1,8 +1,19 @@
 # BlueTasks
 
+[![CI](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml)
+[![Docker image](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml)
+[![Desktop app](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/desktop-publish.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/desktop-publish.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/OpenClaudeAgent/BlueTasks?sort=semver&label=release)](https://github.com/OpenClaudeAgent/BlueTasks/releases/latest)
+[![Node.js 22](https://img.shields.io/badge/node.js-22-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Docker GHCR](https://img.shields.io/badge/ghcr.io-bluetasks-2496ED?logo=docker&logoColor=white)](https://github.com/OpenClaudeAgent/BlueTasks/pkgs/container/bluetasks)
+[![Tauri](https://img.shields.io/badge/desktop-Tauri-24C8D8?logo=tauri&logoColor=white)](desktop/README.md)
+[![Playwright](https://img.shields.io/badge/e2e-Playwright-2EAD33?logo=playwright&logoColor=white)](e2e/)
+[![SQLite](https://img.shields.io/badge/storage-SQLite-003B57?logo=sqlite&logoColor=white)](docs/architecture.md)
+
 **BlueTasks** is a calm, **local-first** task board: your data stays in **SQLite** on your machine, the UI stays fast, and each task can grow from a single line into a full note when you need it.
 
-License [MIT](LICENSE) · [Changelog](CHANGELOG.md)
+[Changelog](CHANGELOG.md)
 
 ## What you get
 
@@ -111,7 +122,3 @@ Same checks as CI: `npm run ci` — details in [docs/quality.md](docs/quality.md
 Optional: `web/app/.env` with `VITE_API_ORIGIN=https://your-api` (no trailing slash) if the API is not on `localhost:8787`.
 
 **Shipping releases:** maintainers use the GitHub **Actions → Release** workflow (see [docs/releasing.md](docs/releasing.md)). Forks: replace `OpenClaudeAgent/BlueTasks` and `openclaudeagent` in URLs / image names with your org.
-
----
-
-[![CI](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml) [![Docker image](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml) [![Desktop app](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/desktop-publish.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/desktop-publish.yml)
