@@ -35,11 +35,11 @@
   --priority-high: #e8a54a;
   --editor-bg: #2f2c3a;
   --editor-checkbox: rgba(255, 255, 255, 0.45);
-  /* Cases à cocher (carte + listes éditeur) — même gabarit */
+  /* Checkboxes: task card + editor lists — same size */
   --checkbox-size: 16px;
   --checkbox-radius: 4px;
   --checkbox-border-width: 1px;
-  /* Puces / menus compacts (pilule date vide, raccourcis calendrier, footer) */
+  /* Compact chips/menus (empty date pill, calendar shortcuts, footer) */
   --chip-pad-y: 6px;
   --chip-pad-x: 12px;
   --chip-radius-pill: 999px;
@@ -49,8 +49,11 @@
   --chip-border: 1px solid var(--border);
   --chip-bg: rgba(255, 255, 255, 0.06);
   --chip-bg-hover: rgba(255, 255, 255, 0.1);
-  /* Ligne tâche : chips + pilule date (même hauteur, wrap ensemble) */
-  --task-card-pill-height: 28px;
+  /* Task row: chips + date pill (aligned to 30px editor toolbar controls) */
+  --task-card-pill-height: 30px;
+  /* Same size as `.editor__toolbarButton` */
+  --editor-toolbar-btn-size: 30px;
+  --editor-toolbar-btn-radius: 7px;
   --radius: 14px;
   --radius-sm: 10px;
   --space-1: 4px;
@@ -565,7 +568,7 @@ button,
   opacity: 0.55;
 }
 
-/* Tâches terminées : tout le rang visuel en vert (plus de pilule date « en retard » rouge). */
+/* Completed tasks: whole row reads green (no red overdue date pill). */
 .taskCard.is-completed .taskCard__status.is-checked {
   background: var(--success);
   border-color: color-mix(in srgb, var(--success) 82%, #000);
@@ -630,7 +633,7 @@ button,
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-2) 10px;
+  padding: var(--space-2) var(--space-4);
   min-height: 44px;
   min-width: 0;
 }
@@ -680,10 +683,10 @@ button,
   gap: 5px;
   flex: 0 1 auto;
   min-width: 0;
-  /* Pas de max-width : sinon zone + chrono + date dépassent et la date passe à la ligne */
+  /* No max-width: otherwise area + timer + date overflow and the date wraps */
 }
 
-/* Chips + date : hauteur fixe identique (évite le bouton date plus haut que les spans). */
+/* Chips + date: same fixed height (keeps the date control from towering over spans). */
 .taskCard__chip,
 .taskCard__datePill {
   display: inline-flex;
@@ -867,7 +870,7 @@ button,
 
 .taskCard__body {
   min-width: 0;
-  padding: var(--space-3) 10px 12px;
+  padding: var(--space-3) var(--space-4) 12px;
   border-top: 1px solid var(--border);
 }
 
@@ -889,11 +892,12 @@ button,
 
 .taskCard__footerBar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-2);
   margin-top: var(--space-2);
-  padding: var(--space-2);
+  padding: var(--space-4);
   border-radius: var(--radius-sm);
   background: rgba(0, 0, 0, 0.18);
   border: 1px solid var(--border);
@@ -904,6 +908,9 @@ button,
   flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2) var(--space-3);
+  flex: 1 1 auto;
+  /* Do not shrink this cluster or “0% of subtasks” gets clipped beside the icon rail. */
+  flex-shrink: 0;
   min-width: 0;
 }
 
@@ -926,6 +933,7 @@ button,
   text-transform: uppercase;
   color: var(--text-secondary);
   line-height: 1.2;
+  flex-shrink: 0;
 }
 
 .taskCard__footerMeta--priority-normal {
@@ -950,7 +958,7 @@ button,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: calc(var(--chip-pad-y) * 2 + var(--chip-font-size) * 1.35);
+  min-height: var(--editor-toolbar-btn-size);
   padding: var(--chip-pad-y) var(--chip-pad-x);
   border-radius: var(--chip-radius-pill);
   border: var(--chip-border);
@@ -977,7 +985,7 @@ button,
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: calc(var(--chip-pad-y) * 2 + var(--chip-font-size) * 1.35);
+  min-height: var(--editor-toolbar-btn-size);
   padding: var(--chip-pad-y) var(--chip-pad-x);
   border-radius: var(--chip-radius-pill);
   border: var(--chip-border);
@@ -1024,7 +1032,7 @@ button,
 
 .taskCard__footerEstimateInput {
   width: 4.25rem;
-  min-height: calc(var(--chip-pad-y) * 2 + var(--chip-font-size) * 1.35);
+  min-height: var(--editor-toolbar-btn-size);
   padding: var(--chip-pad-y) var(--chip-pad-x);
   border-radius: var(--chip-radius-pill);
   border: var(--chip-border);
@@ -1053,7 +1061,7 @@ button,
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  min-height: calc(var(--chip-pad-y) * 2 + var(--chip-font-size) * 1.35);
+  min-height: var(--editor-toolbar-btn-size);
   padding: var(--chip-pad-y) var(--chip-pad-x);
   margin: 0;
   border-radius: var(--chip-radius-pill);
@@ -1102,9 +1110,9 @@ button,
 }
 
 .taskCard__iconBtn {
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: var(--editor-toolbar-btn-size);
+  height: var(--editor-toolbar-btn-size);
+  border-radius: var(--editor-toolbar-btn-radius);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1130,7 +1138,7 @@ button,
 .taskCard__timerControl {
   display: inline-flex;
   align-items: center;
-  gap: 0;
+  gap: 1px;
   flex-shrink: 0;
 }
 
@@ -1138,8 +1146,8 @@ button,
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 32px;
-  min-width: 36px;
+  min-height: var(--editor-toolbar-btn-size);
+  min-width: 34px;
   margin: 0;
   padding: 4px 6px;
   border: none;
@@ -1188,16 +1196,15 @@ button,
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
-  /* Same inset on all sides (was 6px vertical vs 10px horizontal). */
   padding: var(--space-4);
   border-bottom: 1px solid var(--border);
   background: rgba(0, 0, 0, 0.12);
 }
 
 .editor__toolbarButton {
-  width: 30px;
-  height: 30px;
-  border-radius: 7px;
+  width: var(--editor-toolbar-btn-size);
+  height: var(--editor-toolbar-btn-size);
+  border-radius: var(--editor-toolbar-btn-radius);
   border: 1px solid transparent;
   background: rgba(255, 255, 255, 0.04);
   display: inline-flex;
@@ -1224,7 +1231,7 @@ button,
   min-height: 180px;
   max-width: 100%;
   box-sizing: border-box;
-  padding: var(--space-3) 10px 12px;
+  padding: var(--space-3) var(--space-4) 12px;
   color: var(--text);
   line-height: 1.5;
   font-size: 14px;
@@ -1238,7 +1245,7 @@ button,
 .editor__placeholder {
   position: absolute;
   top: var(--space-3);
-  left: 10px;
+  left: var(--space-4);
   color: var(--text-muted);
   pointer-events: none;
   font-size: 14px;
@@ -1285,7 +1292,7 @@ button,
   padding-left: 1.1rem;
 }
 
-/* Checklist : pas de retrait ul en double (Lexical ajoute déjà ul + checklist) */
+/* Checklist: no double ul indent (Lexical already nests ul + checklist) */
 .editor__list--check {
   list-style: none;
   padding: 0;
@@ -1293,9 +1300,9 @@ button,
 }
 
 /*
- * Sous-listes checklist : retrait visible par niveau (Tab / setIndent), sinon la structure
- * change dans le document mais l’UI reste identique — on garde un pas modéré pour limiter
- * le débordement horizontal sur petits écrans.
+ * Nested checklist: visible indent per level (Tab / setIndent); otherwise the document
+ * structure changes but the UI looks flat — keep a moderate step to limit horizontal
+ * overflow on small screens.
  */
 .editor__list--check.editor__list--nestedSublist {
   display: block;
@@ -1341,7 +1348,7 @@ button,
   display: none;
 }
 
-/* Pas d’anneau « bordure » : on avait un box-shadow focus-visible + le navigateur peut entourer li[role=checkbox] */
+/* No double focus ring: avoid box-shadow focus-visible stacking with native li[role=checkbox] outline */
 .editor__list--check .editor__listItem--checked:focus,
 .editor__list--check .editor__listItem--unchecked:focus,
 .editor__list--check .editor__listItem--checked:focus-visible,
@@ -1350,7 +1357,7 @@ button,
   box-shadow: none;
 }
 
-/* Zone ::before = cible de clic Lexical (largeur lue par registerCheckList) — une seule case, pas de doublon */
+/* ::before = Lexical click target (width read by registerCheckList) — single checkbox, no duplicate */
 .editor__list--check .editor__listItem--checked::before,
 .editor__list--check .editor__listItem--unchecked::before {
   content: '';

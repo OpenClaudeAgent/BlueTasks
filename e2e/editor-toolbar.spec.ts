@@ -69,6 +69,45 @@ test.describe('End-to-end: Lexical toolbar', () => {
     await expect(card.locator('.editor__tableCell, .editor__tableCellHeader')).toHaveCount(4);
   });
 
+  test('Toolbar: Bold then Italic without clicking the editor in between still formats text', async ({
+    page,
+  }) => {
+    const title = `E2E toolbar chain ${Date.now()}`;
+    await addTaskWithTitle(page, title);
+
+    const card = firstCard(page);
+    const editor = card.locator('.editor__input');
+
+    await editor.click();
+    await card.getByRole('button', {name: 'Bold'}).click();
+    await editor.pressSequentially('Wide');
+    await card.getByRole('button', {name: 'Italic'}).click();
+    await editor.pressSequentially('Lean');
+
+    await expect(card.getByText('Wide', {exact: true})).toBeVisible();
+    await expect(card.locator('.editor__text--bold.editor__text--italic')).toHaveText('Lean');
+  });
+
+  test('Checklist: [] then Tab then space starts a line (literal tab for markdown shortcut)', async ({
+    page,
+  }) => {
+    const title = `E2E editor md tab check ${Date.now()}`;
+    await addTaskWithTitle(page, title);
+
+    const card = firstCard(page);
+    const editor = card.locator('.editor__input');
+
+    await editor.click();
+    await editor.pressSequentially('[]');
+    await editor.press('Tab');
+    await editor.press(' ');
+    await editor.pressSequentially('Tab then space');
+
+    const list = card.locator('.editor__list--check');
+    await expect(list).toBeVisible();
+    await expect(list.locator('.editor__listItem').first()).toContainText('Tab then space');
+  });
+
   test('Typing [] then space starts a checklist line (markdown shortcut)', async ({page}) => {
     const title = `E2E editor md check ${Date.now()}`;
     await addTaskWithTitle(page, title);

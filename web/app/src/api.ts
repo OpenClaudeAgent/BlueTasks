@@ -2,8 +2,8 @@ import type {Area, CreateTaskPayload, Task, TaskDraftPayload} from './types';
 
 /**
  * Express API base URL. Empty string = same-origin relative paths (e.g. production on :8787).
- * En `vite dev`, les requêtes vont sur `/api` et le proxy (`vite.config.ts`) les envoie vers :8787 :
- * même origine = pas de souci CORS, et l’app reste utilisable si le navigateur bloque le cross-origin.
+ * In `vite dev`, requests hit `/api` and the Vite proxy forwards to :8787 — same origin, no CORS,
+ * and the app still works when the browser would block cross-origin calls.
  */
 function apiOrigin(): string {
   const fromEnv = import.meta.env.VITE_API_ORIGIN?.trim();

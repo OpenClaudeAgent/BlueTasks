@@ -16,15 +16,16 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    /* Use 127.0.0.1 so the proxy matches IPv4 listen; `localhost` → ::1 can cause 502. */
     proxy: {
-      '/api': 'http://localhost:8787',
+      '/api': 'http://127.0.0.1:8787',
     },
   },
-  /** Sans ce proxy, `vite preview` renvoie « Cannot GET /api/… » au lieu du backend. */
+  /** Without this proxy, `vite preview` serves "Cannot GET /api/…" instead of the API. */
   preview: {
     port: 4173,
     proxy: {
-      '/api': 'http://localhost:8787',
+      '/api': 'http://127.0.0.1:8787',
     },
   },
 });
