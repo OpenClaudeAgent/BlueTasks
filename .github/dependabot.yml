@@ -12,7 +12,7 @@ updates:
     groups:
       npm-monorepo:
         patterns:
-          - "*"
+          - '*'
 
   - package-ecosystem: npm
     directory: /desktop
@@ -22,7 +22,7 @@ updates:
     groups:
       npm-desktop:
         patterns:
-          - "*"
+          - '*'
 
   - package-ecosystem: cargo
     directory: /desktop/src-tauri
@@ -32,7 +32,7 @@ updates:
     groups:
       cargo-tauri:
         patterns:
-          - "*"
+          - '*'
 
   - package-ecosystem: github-actions
     directory: /
@@ -42,7 +42,7 @@ updates:
     groups:
       github-actions:
         patterns:
-          - "*"
+          - '*'
 
   - package-ecosystem: docker
     directory: /
@@ -52,7 +52,7 @@ updates:
     groups:
       docker:
         patterns:
-          - "*"
+          - '*'
     ignore:
       - dependency-name: node
         update-types: [version-update:semver-major]

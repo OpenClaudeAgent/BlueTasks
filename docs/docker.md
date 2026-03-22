@@ -2,7 +2,7 @@
 
 ## Local image
 
-The **JS build** (Vite + `tsc`) runs **on the host** (or on GitHub Actions), not in the final image layer. The Docker context is only ~1 MB of artifacts plus `package-lock.json`; **`npm ci --omit=dev`** for the server runs in an intermediate **Linux** stage so `better-sqlite3` matches the target OS (avoids *Exec format error* when building on macOS).
+The **JS build** (Vite + `tsc`) runs **on the host** (or on GitHub Actions), not in the final image layer. The Docker context is only ~1 MB of artifacts plus `package-lock.json`; **`npm ci --omit=dev`** for the server runs in an intermediate **Linux** stage so `better-sqlite3` matches the target OS (avoids _Exec format error_ when building on macOS).
 
 ```bash
 npm run docker:release    # npm ci + build + .dockerctx/ (ready for the image)
@@ -47,7 +47,7 @@ For a single entry point that bumps **semver in all workspaces**, updates **CHAN
 
 ### Publishing
 
-**Option A — version tag (recommended for releases)**
+#### Option A — version tag (recommended for releases)
 
 1. Tag and push: `git tag v0.2.0 && git push origin v0.2.0`.
 2. Workflow [`.github/workflows/docker-publish.yml`](../.github/workflows/docker-publish.yml) builds and pushes:
@@ -63,7 +63,7 @@ For a single entry point that bumps **semver in all workspaces**, updates **CHAN
    docker run -p 8787:8787 -v bluetasks-data:/app/.data ghcr.io/your-org/bluetasks:v0.2.0
    ```
 
-**Option B — manual workflow dispatch**
+#### Option B — manual workflow dispatch
 
 In **Actions → Docker image → Run workflow**, enter a tag (e.g. `v0.2.0-rc1`). The workflow pushes the same multi-arch tags and updates `:latest` to that build (use with care on shared repos).
 
@@ -84,7 +84,7 @@ services:
   bluetasks:
     image: ghcr.io/your-org/bluetasks:v0.2.0
     ports:
-      - "8787:8787"
+      - '8787:8787'
     volumes:
       - ./.data:/app/.data
 ```

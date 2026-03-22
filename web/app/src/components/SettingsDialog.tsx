@@ -191,7 +191,9 @@ export function SettingsDialog({
                 <>
                   <Dialog.Description asChild>
                     <div className="settingsDialog__panelIntro settingsDialog__panelIntro--solo">
-                      <h3 className="settingsDialog__panelHeading">{t('settingsGeneralHeading')}</h3>
+                      <h3 className="settingsDialog__panelHeading">
+                        {t('settingsGeneralHeading')}
+                      </h3>
                       <p>{t('settingsGeneralIntro')}</p>
                       <p className="settingsDialog__panelHint">{t('settingsSidebarHint')}</p>
                     </div>
@@ -292,7 +294,10 @@ export function SettingsDialog({
                           <li className="settingsDialog__row" key={area.id}>
                             {editingId === area.id ? (
                               <div className="settingsDialog__rowEdit">
-                                <div className="settingsDialog__fieldLabel" id={`edit-area-icon-${area.id}`}>
+                                <div
+                                  className="settingsDialog__fieldLabel"
+                                  id={`edit-area-icon-${area.id}`}
+                                >
                                   {t('settingsAreaIconLabel')}
                                 </div>
                                 <AreaIconPicker
@@ -334,7 +339,9 @@ export function SettingsDialog({
                                 </span>
                                 <span className="settingsDialog__areaName">{area.name}</span>
                                 <span className="settingsDialog__areaMeta">
-                                  {t('settingsAreaTaskCount', {count: taskCountByAreaId[area.id] ?? 0})}
+                                  {t('settingsAreaTaskCount', {
+                                    count: taskCountByAreaId[area.id] ?? 0,
+                                  })}
                                 </span>
                                 <button
                                   aria-label={t('settingsRenameArea')}

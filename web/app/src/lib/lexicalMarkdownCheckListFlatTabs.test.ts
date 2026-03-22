@@ -13,13 +13,7 @@ import {
 } from 'lexical';
 import {CHECK_LIST, registerMarkdownShortcuts} from '@lexical/markdown';
 import {extractChecklistStats} from './editorState';
-import {
-  $isListNode,
-  ListItemNode,
-  ListNode,
-  registerCheckList,
-  registerList,
-} from '@lexical/list';
+import {$isListNode, ListItemNode, ListNode, registerCheckList, registerList} from '@lexical/list';
 import {CHECK_LIST_FLAT_TABS} from './lexicalMarkdownCheckListFlatTabs';
 
 describe('CHECK_LIST_FLAT_TABS', () => {

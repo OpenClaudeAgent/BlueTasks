@@ -3,9 +3,7 @@
   "identifier": "default",
   "description": "Main window loads the local Express server over HTTP.",
   "windows": ["main"],
-  "permissions": [
-    "core:default"
-  ],
+  "permissions": ["core:default"],
   "remote": {
     "urls": [
       "http://127.0.0.1:8787",

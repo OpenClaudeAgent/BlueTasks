@@ -6,10 +6,7 @@ import {createTask} from '../../lib/tasks';
 import type {TaskCardBoardChrome} from './useTaskCardChrome';
 import {useTaskCardChrome} from './useTaskCardChrome';
 
-function renderTaskCardChromeHook(
-  task: ReturnType<typeof createTask>,
-  language = 'en-US',
-) {
+function renderTaskCardChromeHook(task: ReturnType<typeof createTask>, language = 'en-US') {
   const onChange = vi.fn();
   const onDelete = vi.fn();
   const {result} = renderHook(() => {

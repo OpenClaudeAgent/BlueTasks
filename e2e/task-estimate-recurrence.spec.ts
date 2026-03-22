@@ -1,5 +1,11 @@
 import {expect, test} from '@playwright/test';
-import {addTaskWithTitle, expandTaskCardIfCollapsed, firstCard, resetBoard, taskCardByTitle} from './task-flow-helpers';
+import {
+  addTaskWithTitle,
+  expandTaskCardIfCollapsed,
+  firstCard,
+  resetBoard,
+  taskCardByTitle,
+} from './task-flow-helpers';
 
 test.describe('Time estimate', () => {
   test.describe.configure({mode: 'serial'});
@@ -53,7 +59,10 @@ test.describe('Recurrence', () => {
     await putRec;
 
     // Weekly sets implicit due date → task moves to Today while the section may still be Anytime.
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Today\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Today\b/})
+      .click();
     const onToday = taskCardByTitle(page, title);
     await expect(onToday.locator('.taskCard__datePill--recurring')).toBeVisible();
   });
@@ -70,7 +79,10 @@ test.describe('Recurrence', () => {
     await page.locator('.footerPopover').getByRole('button', {name: 'Weekly'}).click();
     await putRec;
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Today\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Today\b/})
+      .click();
     const onToday = taskCardByTitle(page, title);
     await expandTaskCardIfCollapsed(page, title);
     await onToday.locator('button[title="Repeat"]').click();
@@ -91,7 +103,9 @@ test.describe('Recurring task completion', () => {
     await resetBoard(page, request);
   });
 
-  test('user completes a recurring task and sees next due date (not plain “done”)', async ({page}) => {
+  test('user completes a recurring task and sees next due date (not plain “done”)', async ({
+    page,
+  }) => {
     const title = `E2E recur done ${Date.now()}`;
     await addTaskWithTitle(page, title);
 
@@ -101,10 +115,16 @@ test.describe('Recurring task completion', () => {
     const putDate = page.waitForResponse(
       (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
     );
-    await page.locator('.datePopover__quickActions').getByRole('button', {name: 'Today', exact: true}).click();
+    await page
+      .locator('.datePopover__quickActions')
+      .getByRole('button', {name: 'Today', exact: true})
+      .click();
     await putDate;
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Today\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Today\b/})
+      .click();
     const todayCard = taskCardByTitle(page, title);
     await expandTaskCardIfCollapsed(page, title);
 
@@ -125,7 +145,11 @@ test.describe('Recurring task completion', () => {
           if (!res.ok()) {
             return false;
           }
-          const tasks = (await res.json()) as {title: string; taskDate: string | null; status: string}[];
+          const tasks = (await res.json()) as {
+            title: string;
+            taskDate: string | null;
+            status: string;
+          }[];
           const row = tasks.find((t) => t.title === title);
           return Boolean(row && row.status === 'pending' && row.taskDate);
         },
@@ -133,7 +157,10 @@ test.describe('Recurring task completion', () => {
       )
       .toBe(true);
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Upcoming\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Upcoming\b/})
+      .click();
     await expect(page.getByRole('button', {name: title})).toBeVisible();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
   });

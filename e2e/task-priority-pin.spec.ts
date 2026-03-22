@@ -60,6 +60,8 @@ test.describe('Task pin', () => {
     const unpin = firstCard(page).locator('button[title="Unpin"]');
     await expect(unpin).toHaveClass(/is-active/);
     await unpin.click();
-    await expect(firstCard(page).locator('button[title="Pin to top"]')).not.toHaveClass(/is-active/);
+    await expect(firstCard(page).locator('button[title="Pin to top"]')).not.toHaveClass(
+      /is-active/,
+    );
   });
 });

@@ -15,6 +15,83 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  format-check:
+    name: Prettier
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+
+  markdownlint:
+    name: Markdownlint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run lint:markdown
+
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - run: sudo apt-get update && sudo apt-get install -y shellcheck
+      - run: npm run lint:shell
+
+  knip:
+    name: Knip
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run knip
+
+  audit:
+    name: npm audit (production, high+)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run audit:prod
+
+  clippy:
+    name: Clippy (desktop Tauri)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: desktop/src-tauri
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install system dependencies (Linux / Tauri)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev pkg-config
+      - run: cargo clippy --all-targets -- -D warnings
+
   eslint-web:
     name: ESLint (web)
     runs-on: ubuntu-latest
@@ -23,7 +100,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
       - run: npm ci
       - run: npm run lint:eslint-web
@@ -36,7 +113,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
       - run: npm ci
       - run: npm run lint:stylelint
@@ -49,7 +126,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
       - run: npm ci
       - run: npm run lint:eslint-server
@@ -62,7 +139,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
       - run: npm ci
       - run: npm run lint:eslint-e2e
@@ -75,7 +152,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
       - run: npm ci
       - run: npm run lint:eslint-tooling
@@ -88,7 +165,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
       - run: npm ci
       - run: npm run duplicates
@@ -103,7 +180,8 @@ jobs:
         run: |
           docker run --rm -v "${{ github.workspace }}:/src" -w /src semgrep/semgrep sh -c \
             'semgrep scan --config p/typescript --config p/react --error web/app && \
-             semgrep scan --config p/typescript --error server contract e2e scripts playwright.config.ts eslint.tooling.config.mjs eslint.e2e.config.mjs'
+             semgrep scan --config p/typescript --config p/security-audit --error server && \
+             semgrep scan --config p/typescript --error contract e2e scripts playwright.config.ts eslint.tooling.config.mjs eslint.e2e.config.mjs'
 
   test:
     name: Tests & coverage
@@ -113,7 +191,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
       - run: npm ci
       - name: Tests with coverage gate (≥80% lines/statements/funcs, ≥75% branches web)
@@ -141,7 +219,7 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
       - run: npm ci
       - run: npm run build
@@ -158,12 +236,12 @@ jobs:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
       - run: npm ci
       - name: Install Playwright Chromium
         run: npx playwright install chromium --with-deps
       - name: Run Playwright (e2e shard)
         env:
-          CI: "true"
+          CI: 'true'
         run: npx playwright test --shard=${{ matrix.shard }}/2

@@ -10,7 +10,16 @@
  * then deleting that dir can leave broken absolute symlinks on Linux. We extract
  * straight into `resources/` and rename the versioned folder to `node` instead.
  */
-import {createWriteStream, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, renameSync, rmSync} from 'node:fs';
+import {
+  createWriteStream,
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  renameSync,
+  rmSync,
+} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {dirname, join} from 'node:path';
 import {pipeline} from 'node:stream/promises';

@@ -2,7 +2,7 @@
 
 We describe behaviour with **Feature → Scenario → Given / When / Then** (Gherkin-style thinking) and map each scenario to the **lowest layer** that gives enough confidence without duplication.
 
-### Behaviour first (not “tests for tests”)
+## Behaviour first (not “tests for tests”)
 
 Every test should defend a **behaviour someone cares about** (user journey, API contract, or invariant), and the title should make that obvious.
 
@@ -12,11 +12,11 @@ Every test should defend a **behaviour someone cares about** (user journey, API 
 
 ---
 
-| Layer | Scope | Tools | When to use |
-|--------|--------|--------|-------------|
-| **Unit** | Pure logic, small helpers, domain rules | Vitest (`node` or `jsdom`) | Fast feedback; no I/O; stable contracts |
-| **Integration** | HTTP API + DB (or React + mocked boundaries) | Vitest + `supertest`; RTL + `vi.mock` for `fetch`/modules | Verify wiring, serializers, persistence, critical UI flows |
-| **End-to-end (E2E)** | Full stack: built SPA + real server | Playwright | Main user paths, regressions across static serving + API |
+| Layer                | Scope                                        | Tools                                                     | When to use                                                |
+| -------------------- | -------------------------------------------- | --------------------------------------------------------- | ---------------------------------------------------------- |
+| **Unit**             | Pure logic, small helpers, domain rules      | Vitest (`node` or `jsdom`)                                | Fast feedback; no I/O; stable contracts                    |
+| **Integration**      | HTTP API + DB (or React + mocked boundaries) | Vitest + `supertest`; RTL + `vi.mock` for `fetch`/modules | Verify wiring, serializers, persistence, critical UI flows |
+| **End-to-end (E2E)** | Full stack: built SPA + real server          | Playwright                                                | Main user paths, regressions across static serving + API   |
 
 Avoid repeating the same assertion at every layer: e.g. task sorting rules stay in **unit** tests; **E2E** checks that the app loads and core endpoints respond.
 
@@ -93,13 +93,13 @@ Coverage is a **guardrail**, not the goal: prefer scenarios that document behavi
 
 ## Commands
 
-| Command | Purpose |
-|---------|---------|
-| `npm run test` | All Vitest unit/integration (web + server) |
-| `npm run test:coverage` | Vitest + coverage (broader web scope, softer thresholds) |
+| Command                      | Purpose                                                                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `npm run test`               | All Vitest unit/integration (web + server)                                                                                |
+| `npm run test:coverage`      | Vitest + coverage (broader web scope, softer thresholds)                                                                  |
 | `npm run test:coverage:gate` | Web gate (almost full `web/app/src/`, see config exclusions) + server `src/**` (except `index.ts`); see § Coverage policy |
-| `npm run test:scenario` | Playwright E2E suite under `e2e/` (starts `npm run build` + `npm run start` unless reusing a server) |
-| `npm run ci` | Lint, jscpd, **coverage gate**, production build, Playwright E2E tests |
+| `npm run test:scenario`      | Playwright E2E suite under `e2e/` (starts `npm run build` + `npm run start` unless reusing a server)                      |
+| `npm run ci`                 | Lint, jscpd, **coverage gate**, production build, Playwright E2E tests                                                    |
 
 ---
 

@@ -23,20 +23,28 @@ export const apiTaskRowSchema = z
     checklistTotal: z.number().int().min(0),
     checklistCompleted: z.number().int().min(0),
     priority: z.enum(['low', 'normal', 'high']),
-    estimateMinutes: z.union([z.null(), z.number().int().positive().max(24 * 60)]),
+    estimateMinutes: z.union([
+      z.null(),
+      z
+        .number()
+        .int()
+        .positive()
+        .max(24 * 60),
+    ]),
     pinned: z.boolean(),
     timeSpentSeconds: z.number().int().min(0),
     timerStartedAt: z.union([
       z.null(),
       z.string().refine((s) => !Number.isNaN(Date.parse(s)), 'expected parseable ISO string'),
     ]),
-    recurrence: z.union([
-      z.null(),
-      z.enum(['daily', 'weekly', 'biweekly', 'monthly', 'yearly']),
-    ]),
+    recurrence: z.union([z.null(), z.enum(['daily', 'weekly', 'biweekly', 'monthly', 'yearly'])]),
     areaId: z.union([z.null(), z.string().uuid()]),
-    createdAt: z.string().refine((s) => !Number.isNaN(Date.parse(s)), 'expected parseable ISO string'),
-    updatedAt: z.string().refine((s) => !Number.isNaN(Date.parse(s)), 'expected parseable ISO string'),
+    createdAt: z
+      .string()
+      .refine((s) => !Number.isNaN(Date.parse(s)), 'expected parseable ISO string'),
+    updatedAt: z
+      .string()
+      .refine((s) => !Number.isNaN(Date.parse(s)), 'expected parseable ISO string'),
   })
   .strict()
   .superRefine((row, ctx) => {

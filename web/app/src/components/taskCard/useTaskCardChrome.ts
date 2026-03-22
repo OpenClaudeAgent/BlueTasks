@@ -72,10 +72,11 @@ export function useTaskCardChrome(
   const recurrence = coerceRecurrence(task.recurrence);
 
   const areaNameById = useMemo(() => areaNameByIdMap(areas), [areas]);
-  const areaDisplayName = task.areaId ? areaNameById[task.areaId] ?? null : null;
+  const areaDisplayName = task.areaId ? (areaNameById[task.areaId] ?? null) : null;
 
   const AreaGlyph = useMemo(
-    () => getAreaIconComponent(task.areaId ? areas.find((a) => a.id === task.areaId)?.icon : undefined),
+    () =>
+      getAreaIconComponent(task.areaId ? areas.find((a) => a.id === task.areaId)?.icon : undefined),
     [areas, task.areaId],
   );
 

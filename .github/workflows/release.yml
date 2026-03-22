@@ -7,14 +7,14 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: "Semver only, no leading v (e.g. 0.2.0)"
+        description: 'Semver only, no leading v (e.g. 0.2.0)'
         required: true
         type: string
       release_notes:
-        description: "One-line changelog bullet (shown under the new version)"
+        description: 'One-line changelog bullet (shown under the new version)'
         required: false
         type: string
-        default: ""
+        default: ''
 
 permissions:
   contents: write
@@ -35,7 +35,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
 
       - name: Validate semver

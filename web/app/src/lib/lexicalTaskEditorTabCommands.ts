@@ -114,7 +114,10 @@ export function registerTaskEditorTabCommands(editor: LexicalEditor): () => void
           return false;
         }
 
-        const textBlock = $findMatchingParent(anchorNode, (n) => $isElementNode(n) && !n.isInline());
+        const textBlock = $findMatchingParent(
+          anchorNode,
+          (n) => $isElementNode(n) && !n.isInline(),
+        );
         if (textBlock !== null && $isCodeNode(textBlock)) {
           return false;
         }

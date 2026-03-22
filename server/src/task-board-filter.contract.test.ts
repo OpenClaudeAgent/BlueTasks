@@ -19,7 +19,9 @@ describe('contract task-board-filter', () => {
     it('matches uncategorized', () => {
       const task = {areaId: null, status: 'pending' as const, taskDate: null};
       expect(taskMatchesAreaFilterRow(task, FILTER_AREA_UNCATEGORIZED)).toBe(true);
-      expect(taskMatchesAreaFilterRow({...task, areaId: 'z'}, FILTER_AREA_UNCATEGORIZED)).toBe(false);
+      expect(taskMatchesAreaFilterRow({...task, areaId: 'z'}, FILTER_AREA_UNCATEGORIZED)).toBe(
+        false,
+      );
     });
 
     it('matches specific area id', () => {
@@ -40,7 +42,9 @@ describe('contract task-board-filter', () => {
     it('done excludes pending', () => {
       const pending = {status: 'pending' as const, taskDate: today, areaId: null};
       expect(taskMatchesBoardSectionRow(pending, 'done', today)).toBe(false);
-      expect(taskMatchesBoardSectionRow({...pending, status: 'completed'}, 'done', today)).toBe(true);
+      expect(taskMatchesBoardSectionRow({...pending, status: 'completed'}, 'done', today)).toBe(
+        true,
+      );
     });
 
     it('today uses calendar key vs today string', () => {
@@ -53,10 +57,18 @@ describe('contract task-board-filter', () => {
 
   describe('getTaskSectionBucket', () => {
     it('classifies buckets', () => {
-      expect(getTaskSectionBucket({status: 'completed', taskDate: today, areaId: null}, today)).toBe('done');
-      expect(getTaskSectionBucket({status: 'pending', taskDate: null, areaId: null}, today)).toBe('anytime');
-      expect(getTaskSectionBucket({status: 'pending', taskDate: today, areaId: null}, today)).toBe('today');
-      expect(getTaskSectionBucket({status: 'pending', taskDate: '2099-01-01', areaId: null}, today)).toBe('upcoming');
+      expect(
+        getTaskSectionBucket({status: 'completed', taskDate: today, areaId: null}, today),
+      ).toBe('done');
+      expect(getTaskSectionBucket({status: 'pending', taskDate: null, areaId: null}, today)).toBe(
+        'anytime',
+      );
+      expect(getTaskSectionBucket({status: 'pending', taskDate: today, areaId: null}, today)).toBe(
+        'today',
+      );
+      expect(
+        getTaskSectionBucket({status: 'pending', taskDate: '2099-01-01', areaId: null}, today),
+      ).toBe('upcoming');
     });
   });
 });

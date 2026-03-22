@@ -9,11 +9,19 @@ export type TaskCardFooterPriorityButtonProps = {
   onChange: (taskId: string, update: TaskDraftUpdate) => void;
 };
 
-export function TaskCardFooterPriorityButton({taskId, priority, onChange}: TaskCardFooterPriorityButtonProps) {
+export function TaskCardFooterPriorityButton({
+  taskId,
+  priority,
+  onChange,
+}: TaskCardFooterPriorityButtonProps) {
   const {t} = useTranslation();
 
   const priorityLabel =
-    priority === 'low' ? t('priorityShort.low') : priority === 'high' ? t('priorityShort.high') : t('priorityShort.normal');
+    priority === 'low'
+      ? t('priorityShort.low')
+      : priority === 'high'
+        ? t('priorityShort.high')
+        : t('priorityShort.normal');
 
   return (
     <button
@@ -24,7 +32,9 @@ export function TaskCardFooterPriorityButton({taskId, priority, onChange}: TaskC
     >
       <TaskCardPriorityIcon priority={priority} />
       <span className="taskCard__footerMeta">{t('footerPriority')}</span>
-      <span className={`taskCard__footerMeta taskCard__footerMeta--priority-${priority}`}>{priorityLabel}</span>
+      <span className={`taskCard__footerMeta taskCard__footerMeta--priority-${priority}`}>
+        {priorityLabel}
+      </span>
     </button>
   );
 }

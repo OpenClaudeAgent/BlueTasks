@@ -135,7 +135,11 @@ export function filterTasks(
 }
 
 /** One pass over tasks: counts per area row for the sidebar (same rules as `filterTasks`, without sorting). */
-export function getAreaSidebarCounts(tasks: Task[], selectedSection: SectionId, areas: Area[]): {
+export function getAreaSidebarCounts(
+  tasks: Task[],
+  selectedSection: SectionId,
+  areas: Area[],
+): {
   all: number;
   uncategorized: number;
   byId: Record<string, number>;

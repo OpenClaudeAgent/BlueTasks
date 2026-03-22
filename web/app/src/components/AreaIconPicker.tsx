@@ -9,11 +9,7 @@ type AreaIconPickerProps = {
 
 export function AreaIconPicker({value, onChange, disabled, labelledBy}: AreaIconPickerProps) {
   return (
-    <div
-      aria-labelledby={labelledBy}
-      className="areaIconPicker"
-      role="group"
-    >
+    <div aria-labelledby={labelledBy} className="areaIconPicker" role="group">
       {AREA_ICON_IDS.map((id) => {
         const Icon = getAreaIconComponent(id);
         const selected = value === id;

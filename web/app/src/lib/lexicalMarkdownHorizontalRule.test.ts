@@ -1,7 +1,17 @@
 /** @vitest-environment jsdom */
 import {describe, expect, it} from 'vitest';
-import {$createParagraphNode, $createTextNode, $getRoot, createEditor, ParagraphNode, TextNode} from 'lexical';
-import {$createHorizontalRuleNode, HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  createEditor,
+  ParagraphNode,
+  TextNode,
+} from 'lexical';
+import {
+  $createHorizontalRuleNode,
+  HorizontalRuleNode,
+} from '@lexical/react/LexicalHorizontalRuleNode';
 import {MARKDOWN_HORIZONTAL_RULE} from './lexicalMarkdownHorizontalRule';
 
 describe('MARKDOWN_HORIZONTAL_RULE', () => {
@@ -51,7 +61,11 @@ describe('MARKDOWN_HORIZONTAL_RULE', () => {
       p.append(t);
       root.append(p);
       MARKDOWN_HORIZONTAL_RULE.replace(p, [t], ['---'], true);
-      expect($getRoot().getChildren().some((n) => n.getType() === 'horizontalrule')).toBe(true);
+      expect(
+        $getRoot()
+          .getChildren()
+          .some((n) => n.getType() === 'horizontalrule'),
+      ).toBe(true);
     });
   });
 });

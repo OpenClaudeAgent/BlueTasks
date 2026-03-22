@@ -4,7 +4,7 @@
 
 npm **workspaces** at the root: `web/app` (`@bluetasks/app`) and `server` (`@bluetasks/server`). Other top-level folders are not separate npm packages but belong to the same repo.
 
-```
+```text
 BlueTasks/
 ├── contract/      Zod + shared API contract checks (Vitest + Playwright import these)
 ├── desktop/       Tauri shell (embedded Node + same server bundle as Docker)

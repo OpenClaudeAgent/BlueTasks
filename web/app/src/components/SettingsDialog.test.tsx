@@ -77,12 +77,8 @@ describe('SettingsDialog', () => {
 
     await user.click(screen.getByRole('button', {name: /general/i}));
 
-    expect(
-      screen.getByRole('button', {name: /export sqlite database/i}),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', {name: /import sqlite database/i}),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /export sqlite database/i})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: /import sqlite database/i})).toBeInTheDocument();
   });
 
   it('Scenario: Areas tab — user adds an area and areasApi.create is called', async () => {

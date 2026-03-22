@@ -1,7 +1,4 @@
-import {
-  UI_LANGUAGE_OPTIONS,
-  type UiLanguageCode,
-} from '../locales/uiLanguages';
+import {UI_LANGUAGE_OPTIONS, type UiLanguageCode} from '../locales/uiLanguages';
 
 type LanguageSwitcherProps = {
   language: UiLanguageCode;

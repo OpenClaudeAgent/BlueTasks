@@ -1,6 +1,12 @@
 import type {RecurrenceKind} from '../types';
 
-const RECURRENCE_KINDS = new Set<RecurrenceKind>(['daily', 'weekly', 'biweekly', 'monthly', 'yearly']);
+const RECURRENCE_KINDS = new Set<RecurrenceKind>([
+  'daily',
+  'weekly',
+  'biweekly',
+  'monthly',
+  'yearly',
+]);
 
 /** SQLite / JSON may expose pinned as 0/1; avoid Boolean("0") === true. */
 export function coercePinned(value: unknown): boolean {

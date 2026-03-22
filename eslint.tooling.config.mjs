@@ -1,7 +1,8 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import tseslint from 'typescript-eslint'
-import { defineConfig } from 'eslint/config'
+import js from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
+import {defineConfig} from 'eslint/config';
 
 /** Root-level TS/JS not covered by web, server, or e2e workspaces. */
 export default defineConfig([
@@ -41,4 +42,5 @@ export default defineConfig([
       globals: {...globals.node},
     },
   },
-])
+  eslintConfigPrettier,
+]);

@@ -14,7 +14,11 @@ const HTTP_URL_BODY = /https?:\/\/[^\s<>"'`[\]{}|\\^]+/i;
 
 const WWW_BODY = /www\.[^\s<>"'`[\]{}|\\^]+/i;
 
-function matchFromRegExp(text: string, re: RegExp, toUrl: (matched: string) => string): ReturnType<LinkMatcher> {
+function matchFromRegExp(
+  text: string,
+  re: RegExp,
+  toUrl: (matched: string) => string,
+): ReturnType<LinkMatcher> {
   const match = re.exec(text);
   if (match === null) {
     return null;
@@ -38,7 +42,6 @@ function matchFromRegExp(text: string, re: RegExp, toUrl: (matched: string) => s
 
 const matchHttpUrl: LinkMatcher = (text) => matchFromRegExp(text, HTTP_URL_BODY, (u) => u);
 
-const matchWwwUrl: LinkMatcher = (text) =>
-  matchFromRegExp(text, WWW_BODY, (t) => `https://${t}`);
+const matchWwwUrl: LinkMatcher = (text) => matchFromRegExp(text, WWW_BODY, (t) => `https://${t}`);
 
 export const LEXICAL_AUTO_LINK_MATCHERS: LinkMatcher[] = [matchHttpUrl, matchWwwUrl];

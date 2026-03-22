@@ -1,0 +1,18 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignore": [
+    "contract/**",
+    "desktop/src/main.js",
+    "scripts/bundle-server-docker.mjs",
+    "scripts/docker-appPaths-stub.cjs",
+    "scripts/docker-prune-native-deps.mjs"
+  ],
+  "ignoreDependencies": ["esbuild"],
+  "ignoreBinaries": ["shellcheck"],
+  "rules": {
+    "exports": "off",
+    "types": "off",
+    "nsExports": "off",
+    "nsTypes": "off"
+  }
+}

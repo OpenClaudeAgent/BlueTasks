@@ -1,6 +1,11 @@
 import {expect, test} from '@playwright/test';
 import {expectApiTaskRow} from './contract-expectations';
-import {quickCaptureTextbox, resetBoard, taskCardByTitle, waitForTaskCreateResponse} from './task-flow-helpers';
+import {
+  quickCaptureTextbox,
+  resetBoard,
+  taskCardByTitle,
+  waitForTaskCreateResponse,
+} from './task-flow-helpers';
 
 test.describe('Feature: Quick capture (E2E)', () => {
   test.describe.configure({mode: 'serial'});
@@ -9,8 +14,13 @@ test.describe('Feature: Quick capture (E2E)', () => {
     await resetBoard(page, request);
   });
 
-  test('Scenario: Anytime — user submits quick capture; task appears with valid API row', async ({page}) => {
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+  test('Scenario: Anytime — user submits quick capture; task appears with valid API row', async ({
+    page,
+  }) => {
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
     await expect(page.getByRole('heading', {level: 1, name: 'Anytime'})).toBeVisible();
 
     const title = `QC ${Date.now()}`;
@@ -30,8 +40,13 @@ test.describe('Feature: Quick capture (E2E)', () => {
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
   });
 
-  test('Scenario: Upcoming — user quick-captures; API returns dated row and pill is set', async ({page}) => {
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Upcoming\b/}).click();
+  test('Scenario: Upcoming — user quick-captures; API returns dated row and pill is set', async ({
+    page,
+  }) => {
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Upcoming\b/})
+      .click();
     await expect(page.getByRole('heading', {level: 1, name: 'Upcoming'})).toBeVisible();
 
     const title = `QC up ${Date.now()}`;
@@ -47,8 +62,8 @@ test.describe('Feature: Quick capture (E2E)', () => {
 
     await expect(taskCardByTitle(page, title)).toBeVisible();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
-    await expect(
-      taskCardByTitle(page, title).locator('.taskCard__datePill'),
-    ).not.toHaveClass(/taskCard__datePill--empty/);
+    await expect(taskCardByTitle(page, title).locator('.taskCard__datePill')).not.toHaveClass(
+      /taskCard__datePill--empty/,
+    );
   });
 });

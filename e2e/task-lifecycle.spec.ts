@@ -47,7 +47,10 @@ test.describe('End-to-end: task lifecycle', () => {
     await page.reload();
     await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
     await expect(page.getByRole('button', {name: title})).toBeVisible();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
   });
@@ -94,7 +97,10 @@ test.describe('End-to-end: task lifecycle', () => {
     expectApiTaskRow(withDate);
     expect(withDate.taskDate).toMatch(/^\d{4}-\d{2}-\d{2}$/);
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Today\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Today\b/})
+      .click();
     await expect(page.getByRole('button', {name: title})).toBeVisible();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
   });
@@ -106,7 +112,8 @@ test.describe('End-to-end: task lifecycle', () => {
     await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
 
     const post = page.waitForResponse(
-      (r) => r.url().includes('/api/tasks') && r.request().method() === 'POST' && r.status() === 201,
+      (r) =>
+        r.url().includes('/api/tasks') && r.request().method() === 'POST' && r.status() === 201,
     );
     await page.getByRole('button', {name: 'Add task'}).click();
     await post;
@@ -114,7 +121,8 @@ test.describe('End-to-end: task lifecycle', () => {
     const titleInput = page.getByRole('textbox', {name: 'Task title'});
     await titleInput.fill(title);
     const put = page.waitForResponse(
-      (r) => r.request().method() === 'PUT' && r.url().includes('/api/tasks/') && r.status() === 200,
+      (r) =>
+        r.request().method() === 'PUT' && r.url().includes('/api/tasks/') && r.status() === 200,
     );
     await titleInput.blur();
     await put;
@@ -137,7 +145,10 @@ test.describe('End-to-end: task lifecycle', () => {
       )
       .toBe(true);
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Done\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Done\b/})
+      .click();
 
     await expect(page.getByRole('heading', {level: 1, name: 'Done'})).toBeVisible();
     await expect(page.getByRole('heading', {level: 2, name: 'Done'})).toBeVisible();
@@ -146,7 +157,10 @@ test.describe('End-to-end: task lifecycle', () => {
 
     await page.reload();
     await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Done\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Done\b/})
+      .click();
     await expect(page.getByRole('button', {name: title})).toBeVisible();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
   });
@@ -160,10 +174,17 @@ test.describe('End-to-end: task lifecycle', () => {
     const putDone = page.waitForResponse(
       (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
     );
-    await page.locator('article.taskCard').first().getByRole('button', {name: 'Mark as done'}).click();
+    await page
+      .locator('article.taskCard')
+      .first()
+      .getByRole('button', {name: 'Mark as done'})
+      .click();
     await putDone;
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Done\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Done\b/})
+      .click();
     await expect(page.getByRole('button', {name: title})).toBeVisible();
 
     const reopenPut = page.waitForResponse(
@@ -173,7 +194,10 @@ test.describe('End-to-end: task lifecycle', () => {
     const reopenRes = await reopenPut;
     expect((await reopenRes.json()).status).toBe('pending');
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
     await expect(page.getByRole('button', {name: title})).toBeVisible();
   });
 
@@ -191,10 +215,16 @@ test.describe('End-to-end: task lifecycle', () => {
     const del = page.waitForResponse(
       (r) => r.request().method() === 'DELETE' && r.url().includes('/api/tasks/') && r.ok(),
     );
-    await page.locator('article.taskCard').getByRole('button', {name: 'Delete', exact: true}).click();
+    await page
+      .locator('article.taskCard')
+      .getByRole('button', {name: 'Delete', exact: true})
+      .click();
     await del;
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
     await expect(page.getByRole('button', {name: title})).toHaveCount(0);
     await expect(page.locator('.taskBoard__count')).toHaveText('0');
   });

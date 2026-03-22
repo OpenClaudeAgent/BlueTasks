@@ -112,12 +112,19 @@ describe('Feature: After save, preserve local Lexical JSON shape', () => {
     });
 
     it('given different semantic editor content, when applySavedTaskPreservingLexicalShape runs, then server copy wins', () => {
-      const local = {...createTask('L2'), id: 'l2', contentJson: createEmptyEditorState(), contentText: ''};
+      const local = {
+        ...createTask('L2'),
+        id: 'l2',
+        contentJson: createEmptyEditorState(),
+        contentText: '',
+      };
       const remoteJson = JSON.stringify({
         root: {
           type: 'root',
           version: 1,
-          children: [{type: 'paragraph', version: 1, children: [{type: 'text', text: 'Remote', version: 1}]}],
+          children: [
+            {type: 'paragraph', version: 1, children: [{type: 'text', text: 'Remote', version: 1}]},
+          ],
           direction: null,
           format: '',
           indent: 0,
@@ -271,7 +278,13 @@ describe('filterTasks', () => {
     const tasks = [
       {...createTask('Open'), id: 'o', taskDate: today, areaId: z, status: 'pending' as const},
       {...createTask('Closed'), id: 'c', taskDate: today, areaId: z, status: 'completed' as const},
-      {...createTask('Other zone'), id: 'x', taskDate: today, areaId: 'other', status: 'pending' as const},
+      {
+        ...createTask('Other zone'),
+        id: 'x',
+        taskDate: today,
+        areaId: 'other',
+        status: 'pending' as const,
+      },
     ];
     const ids = filterTasks(tasks, 'all', z).map((t) => t.id);
     expect(ids).toEqual(['o', 'c']);

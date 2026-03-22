@@ -8,7 +8,10 @@ test.describe('End-to-end: navigation and settings', () => {
     await gotoWithEnglish(page, '/');
     await expect(page.getByRole('heading', {level: 1, name: 'Today'})).toBeVisible();
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
 
     await expect(page.getByRole('heading', {level: 1, name: 'Anytime'})).toBeVisible();
     await expect(page.getByRole('heading', {level: 2, name: 'Anytime'})).toBeVisible();
@@ -43,7 +46,8 @@ test.describe('End-to-end: navigation and settings', () => {
     await expect(dialog.getByText(/Create areas/i)).toBeVisible();
 
     const postArea = page.waitForResponse(
-      (r) => r.url().includes('/api/areas') && r.request().method() === 'POST' && r.status() === 201,
+      (r) =>
+        r.url().includes('/api/areas') && r.request().method() === 'POST' && r.status() === 201,
     );
     await dialog.getByPlaceholder('New area name').fill(areaName);
     await dialog.getByRole('button', {name: 'Add'}).click();

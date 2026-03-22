@@ -166,7 +166,9 @@ test.describe('End-to-end: Lexical toolbar', () => {
     await expect(editor.getByText('Sous la liste', {exact: true})).toBeVisible();
   });
 
-  test('Checklist: Tab after new line inserts a tab in the row (no nested sub-list)', async ({page}) => {
+  test('Checklist: Tab after new line inserts a tab in the row (no nested sub-list)', async ({
+    page,
+  }) => {
     const title = `E2E editor check tab ${Date.now()}`;
     await addTaskWithTitle(page, title);
 

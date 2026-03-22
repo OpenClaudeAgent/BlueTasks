@@ -65,10 +65,12 @@ describe('API HTTP', () => {
     const id = created.body.id as string;
     const createdAt = created.body.createdAt as string;
 
-    const updated = await request(app).put(`/api/tasks/${id}`).send({
-      ...created.body,
-      title: 'B',
-    });
+    const updated = await request(app)
+      .put(`/api/tasks/${id}`)
+      .send({
+        ...created.body,
+        title: 'B',
+      });
     expect(updated.status).toBe(200);
     expectApiTaskRow(updated.body);
     expect(updated.body.title).toBe('B');
@@ -174,7 +176,10 @@ describe('API HTTP', () => {
       const noiseTitles = before.body.map((t: {title: string}) => t.title);
       expect(noiseTitles).toContain('Noise');
 
-      await request(fileApp).post('/api/import/database').attach('database', buf, 'dump.sqlite').expect(204);
+      await request(fileApp)
+        .post('/api/import/database')
+        .attach('database', buf, 'dump.sqlite')
+        .expect(204);
 
       const after = await request(fileApp).get('/api/tasks');
       const afterTitles = after.body.map((t: {title: string}) => t.title);
@@ -284,9 +289,7 @@ describe('API HTTP', () => {
 
     const tasks = await request(app).get('/api/tasks');
     const row = tasks.body.find((t: {id: string}) => t.id === task.body.id);
-    expect(row).toEqual(
-      expect.objectContaining({id: task.body.id, areaId: null, title: 'Linked'}),
-    );
+    expect(row).toEqual(expect.objectContaining({id: task.body.id, areaId: null, title: 'Linked'}));
     expectApiTaskRow(row);
   });
 

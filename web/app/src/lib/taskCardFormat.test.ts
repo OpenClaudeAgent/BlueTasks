@@ -1,6 +1,11 @@
 import {describe, expect, it} from 'vitest';
 import {createTask} from './tasks';
-import {formatDurationLabel, formatEstimateMinutesLabel, formatTrackedSeconds, nextPriority} from './taskCardFormat';
+import {
+  formatDurationLabel,
+  formatEstimateMinutesLabel,
+  formatTrackedSeconds,
+  nextPriority,
+} from './taskCardFormat';
 
 const t = (key: string, opts?: {count: number}) => {
   switch (key) {

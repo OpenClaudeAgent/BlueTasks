@@ -65,7 +65,7 @@ export default {
     all: 'Aucune tâche ne correspond à cette vue pour le moment.',
     today: "Aucune tâche urgente pour l'instant.",
     upcoming: "Aucune échéance n'arrive ensuite.",
-    anytime: "Aucune tâche capturée pour plus tard.",
+    anytime: 'Aucune tâche capturée pour plus tard.',
     done: 'Aucune tâche terminée pour le moment.',
   },
   quickCapturePlaceholder: 'Capturer une tâche sans casser le flux',
@@ -150,7 +150,8 @@ export default {
   emptyNoteHint: 'Ajoutez une note, une checklist ou quelques lignes de contexte.',
   inspectorEmptyBadge: 'Panneau de détail',
   inspectorEmptyTitle: 'Sélectionnez une tâche',
-  inspectorEmptyBody: "Choisissez une tâche dans la liste ou créez-en une nouvelle pour ouvrir l'éditeur riche.",
+  inspectorEmptyBody:
+    "Choisissez une tâche dans la liste ou créez-en une nouvelle pour ouvrir l'éditeur riche.",
   inspectorActive: 'Tâche active',
   inspectorDone: 'Tâche terminée',
   markAsDone: 'Marquer comme terminée',

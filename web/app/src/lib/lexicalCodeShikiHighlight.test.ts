@@ -16,9 +16,7 @@ import {
 import {registerTaskEditorCodeHighlighting} from './lexicalCodeShiki';
 
 describe('registerTaskEditorCodeHighlighting', () => {
-  it(
-    'Given CodeNode with javascript When Shiki finishes Then children include CodeHighlightNode',
-    async () => {
+  it('Given CodeNode with javascript When Shiki finishes Then children include CodeHighlightNode', async () => {
     const onError = vi.fn();
     const editor = createEditor({
       namespace: 'code-shiki-tdd',
@@ -60,7 +58,5 @@ describe('registerTaskEditorCodeHighlighting', () => {
 
     unregister();
     expect(onError).not.toHaveBeenCalled();
-    },
-    25_000,
-  );
+  }, 25_000);
 });

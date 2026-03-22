@@ -55,7 +55,9 @@ describe('registerTaskImagePaste', () => {
       () => {
         let hasImage = false;
         editor.getEditorState().read(() => {
-          hasImage = $getRoot().getChildren().some((c) => $isTaskImageNode(c));
+          hasImage = $getRoot()
+            .getChildren()
+            .some((c) => $isTaskImageNode(c));
         });
         return hasImage;
       },
@@ -127,7 +129,9 @@ describe('registerTaskImagePaste', () => {
       () => {
         let hasImage = false;
         editor.getEditorState().read(() => {
-          hasImage = $getRoot().getChildren().some((c) => $isTaskImageNode(c));
+          hasImage = $getRoot()
+            .getChildren()
+            .some((c) => $isTaskImageNode(c));
         });
         return hasImage;
       },
@@ -172,7 +176,9 @@ describe('registerTaskImagePaste', () => {
       onerror: ((this: FileReader, ev: ProgressEvent<FileReader>) => void) | null = null;
       onload: ((this: FileReader, ev: ProgressEvent<FileReader>) => void) | null = null;
       readAsDataURL() {
-        queueMicrotask(() => this.onerror?.call(this as unknown as FileReader, {} as ProgressEvent<FileReader>));
+        queueMicrotask(() =>
+          this.onerror?.call(this as unknown as FileReader, {} as ProgressEvent<FileReader>),
+        );
       }
     }
     // @ts-expect-error test double

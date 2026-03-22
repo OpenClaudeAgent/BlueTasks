@@ -300,13 +300,17 @@ function ToolbarPlugin({labels}: Pick<Props, 'labels'>) {
     <div className="editor__toolbar">
       <ToolbarButton
         label={labels.bold}
-        onClick={() => runToolbarAction(editor, () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold'))}
+        onClick={() =>
+          runToolbarAction(editor, () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold'))
+        }
       >
         <Bold size={14} />
       </ToolbarButton>
       <ToolbarButton
         label={labels.italic}
-        onClick={() => runToolbarAction(editor, () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic'))}
+        onClick={() =>
+          runToolbarAction(editor, () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic'))
+        }
       >
         <Italic size={14} />
       </ToolbarButton>
@@ -327,13 +331,21 @@ function ToolbarPlugin({labels}: Pick<Props, 'labels'>) {
       </ToolbarButton>
       <ToolbarButton
         label={labels.checklist}
-        onClick={() => runToolbarAction(editor, () => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined))}
+        onClick={() =>
+          runToolbarAction(editor, () =>
+            editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined),
+          )
+        }
       >
         <ListChecks size={14} />
       </ToolbarButton>
       <ToolbarButton
         label={labels.bulletList}
-        onClick={() => runToolbarAction(editor, () => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined))}
+        onClick={() =>
+          runToolbarAction(editor, () =>
+            editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined),
+          )
+        }
       >
         <List size={14} />
       </ToolbarButton>
@@ -398,7 +410,11 @@ function ToolbarPlugin({labels}: Pick<Props, 'labels'>) {
       ) : null}
       <ToolbarButton
         label={labels.horizontalRule}
-        onClick={() => runToolbarAction(editor, () => editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined))}
+        onClick={() =>
+          runToolbarAction(editor, () =>
+            editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined),
+          )
+        }
       >
         <Minus size={14} />
       </ToolbarButton>
@@ -505,7 +521,8 @@ function EditorSyncPlugin({
 
     if (
       editorValueRef.current !== null &&
-      (editorValueRef.current === safeValue || lexicalDocsContentEqual(editorValueRef.current, safeValue))
+      (editorValueRef.current === safeValue ||
+        lexicalDocsContentEqual(editorValueRef.current, safeValue))
     ) {
       editorValueRef.current = safeValue;
       return;
@@ -520,11 +537,8 @@ function EditorSyncPlugin({
 
     const refVal = editorValueRef.current;
     const localMatchesLastEmit =
-      refVal !== null &&
-      currentSerialized &&
-      lexicalDocsContentEqual(currentSerialized, refVal);
-    const propBehindLocal =
-      localMatchesLastEmit && !lexicalDocsContentEqual(safeValue, refVal);
+      refVal !== null && currentSerialized && lexicalDocsContentEqual(currentSerialized, refVal);
+    const propBehindLocal = localMatchesLastEmit && !lexicalDocsContentEqual(safeValue, refVal);
 
     if (propBehindLocal) {
       return;

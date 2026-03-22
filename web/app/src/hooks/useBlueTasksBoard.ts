@@ -85,9 +85,12 @@ export function useBlueTasksBoard() {
     [handleQuickCapture, areaFilter, selectedSection],
   );
 
-  const toggleTaskExpanded = useCallback((taskId: string) => {
-    setSelectedTaskId((current) => (current === taskId ? null : taskId));
-  }, [setSelectedTaskId]);
+  const toggleTaskExpanded = useCallback(
+    (taskId: string) => {
+      setSelectedTaskId((current) => (current === taskId ? null : taskId));
+    },
+    [setSelectedTaskId],
+  );
 
   const clearTitleFocusTaskId = useCallback(() => {
     setTitleFocusTaskId(null);

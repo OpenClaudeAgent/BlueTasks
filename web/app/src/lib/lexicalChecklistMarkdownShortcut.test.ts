@@ -50,7 +50,7 @@ describe('Checklist markdown shortcut `[] `', () => {
             selection.insertText(character);
           }
         },
-        { discrete: true },
+        {discrete: true},
       );
       await setImmediatePromise();
     }

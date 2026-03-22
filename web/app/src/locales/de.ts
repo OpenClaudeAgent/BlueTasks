@@ -27,7 +27,8 @@ export default {
   settingsSectionGeneral: 'Allgemein',
   settingsSectionAreas: 'Bereiche',
   settingsGeneralHeading: 'Sprache',
-  settingsGeneralIntro: 'Wähle die Oberflächensprache. Die Auswahl wird in diesem Browser gespeichert.',
+  settingsGeneralIntro:
+    'Wähle die Oberflächensprache. Die Auswahl wird in diesem Browser gespeichert.',
   settingsSidebarHint:
     'Bereiche bleiben in der linken Seitenleiste — Tab „Bereiche“ in diesem Dialog zum Bearbeiten.',
   settingsDataHeading: 'Deine Daten',

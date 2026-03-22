@@ -27,7 +27,13 @@ export type TaskRow = {
 
 export type TaskPayload = Omit<TaskRow, 'createdAt' | 'updatedAt'>;
 
-const RECURRENCE_VALUES = new Set<RecurrenceKind>(['daily', 'weekly', 'biweekly', 'monthly', 'yearly']);
+const RECURRENCE_VALUES = new Set<RecurrenceKind>([
+  'daily',
+  'weekly',
+  'biweekly',
+  'monthly',
+  'yearly',
+]);
 
 export function normalizePriority(value: unknown): TaskPriority {
   if (value === 'low' || value === 'high' || value === 'normal') {
@@ -87,8 +93,13 @@ export function isDateKey(value: string): boolean {
   return /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
-export function sanitizePayload(input: Partial<TaskPayload>, database: Database.Database): TaskPayload {
-  const checklistTotal = Number.isFinite(input.checklistTotal) ? Math.max(0, Number(input.checklistTotal)) : 0;
+export function sanitizePayload(
+  input: Partial<TaskPayload>,
+  database: Database.Database,
+): TaskPayload {
+  const checklistTotal = Number.isFinite(input.checklistTotal)
+    ? Math.max(0, Number(input.checklistTotal))
+    : 0;
   const checklistCompleted = Number.isFinite(input.checklistCompleted)
     ? Math.max(0, Math.min(Number(input.checklistCompleted), checklistTotal))
     : 0;
@@ -121,8 +132,12 @@ export function sanitizePayload(input: Partial<TaskPayload>, database: Database.
     id: typeof input.id === 'string' && input.id ? input.id : randomUUID(),
     title: typeof input.title === 'string' ? input.title.trim() : '',
     status: input.status === 'completed' ? 'completed' : 'pending',
-    taskDate: typeof input.taskDate === 'string' && isDateKey(input.taskDate) ? input.taskDate : null,
-    contentJson: typeof input.contentJson === 'string' && input.contentJson ? input.contentJson : emptyEditorState(),
+    taskDate:
+      typeof input.taskDate === 'string' && isDateKey(input.taskDate) ? input.taskDate : null,
+    contentJson:
+      typeof input.contentJson === 'string' && input.contentJson
+        ? input.contentJson
+        : emptyEditorState(),
     contentText: typeof input.contentText === 'string' ? input.contentText : '',
     checklistTotal,
     checklistCompleted,

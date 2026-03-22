@@ -11,7 +11,8 @@ export default {
   areaMissing: 'Unknown area',
   settingsTitle: 'Settings',
   settingsOpen: 'Settings',
-  settingsAreasIntro: 'Create areas (projects, life domains, etc.) and assign tasks to them. Use the sidebar to filter by area.',
+  settingsAreasIntro:
+    'Create areas (projects, life domains, etc.) and assign tasks to them. Use the sidebar to filter by area.',
   settingsAreaIconLabel: 'Icon',
   settingsAreaIconHint: 'Pick an icon for this area. You can change it when editing the zone.',
   settingsNewAreaPlaceholder: 'New area name',
@@ -19,15 +20,15 @@ export default {
   settingsNoAreasYet: 'No areas yet — add one above.',
   settingsAreaTaskCount: '{{count}} tasks',
   settingsDeleteAreaConfirm: 'Delete area "{{name}}"?',
-  settingsDeleteAreaWithTasks:
-    'Delete area "{{name}}"? {{count}} task(s) will become unassigned.',
+  settingsDeleteAreaWithTasks: 'Delete area "{{name}}"? {{count}} task(s) will become unassigned.',
   settingsRenameArea: 'Rename area',
   settingsNavLabel: 'Settings sections',
   settingsSectionGeneral: 'General',
   settingsSectionAreas: 'Areas',
   settingsGeneralHeading: 'Language',
   settingsGeneralIntro: 'Choose the interface language. Your choice is saved in this browser.',
-  settingsSidebarHint: 'Areas (projects / life zones) stay in the left sidebar — open this dialog’s « Areas » tab to edit them.',
+  settingsSidebarHint:
+    'Areas (projects / life zones) stay in the left sidebar — open this dialog’s « Areas » tab to edit them.',
   settingsDataHeading: 'Your data',
   settingsExportDb: 'Export SQLite database',
   settingsExportDbHelp:

@@ -6,11 +6,11 @@ run-name: Desktop release ${{ github.event_name == 'workflow_dispatch' && github
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
   workflow_dispatch:
     inputs:
       tag:
-        description: "Existing tag (e.g. v0.2.0)"
+        description: 'Existing tag (e.g. v0.2.0)'
         required: true
         type: string
 
@@ -36,7 +36,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
           cache-dependency-path: |
             package-lock.json
@@ -91,7 +91,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
           cache-dependency-path: |
             package-lock.json
@@ -151,7 +151,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
           cache-dependency-path: |
             package-lock.json

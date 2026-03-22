@@ -60,7 +60,13 @@ describe('Feature: Sidebar', () => {
     const user = userEvent.setup();
     const onAreaFilterChange = vi.fn();
     const areas = [
-      {id: 'z1', name: 'Work', icon: 'folder' as const, sortIndex: 0, createdAt: '2025-01-01T00:00:00.000Z'},
+      {
+        id: 'z1',
+        name: 'Work',
+        icon: 'folder' as const,
+        sortIndex: 0,
+        createdAt: '2025-01-01T00:00:00.000Z',
+      },
     ];
     render(
       <I18nextProvider i18n={i18n}>

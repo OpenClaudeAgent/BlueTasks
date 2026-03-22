@@ -1,7 +1,8 @@
-import js from '@eslint/js'
-import playwright from 'eslint-plugin-playwright'
-import tseslint from 'typescript-eslint'
-import { defineConfig } from 'eslint/config'
+import js from '@eslint/js';
+import playwright from 'eslint-plugin-playwright';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import tseslint from 'typescript-eslint';
+import {defineConfig} from 'eslint/config';
 
 export default defineConfig([
   {
@@ -16,4 +17,5 @@ export default defineConfig([
       sourceType: 'module',
     },
   },
-])
+  eslintConfigPrettier,
+]);

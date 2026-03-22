@@ -23,7 +23,10 @@ test.describe('All section', () => {
     await doneCard.getByRole('button', {name: 'Mark as done'}).click();
     await markDonePut;
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^All\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^All\b/})
+      .click();
 
     await expect(page.getByRole('heading', {level: 1, name: 'All'})).toBeVisible();
     await expect(page.locator('.taskBoard__count')).toHaveText('2');

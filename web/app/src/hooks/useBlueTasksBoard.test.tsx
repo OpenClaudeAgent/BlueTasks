@@ -72,7 +72,9 @@ describe('Feature: useBlueTasksBoard composition', () => {
 
   it('Scenario: Unknown area filter — effect resets to ALL when area missing', async () => {
     mockUi.areaFilter = 'missing-area-id';
-    mockCore.areas = [{id: 'real', name: 'R', icon: 'folder', sortIndex: 0, createdAt: '2025-01-01T00:00:00.000Z'}];
+    mockCore.areas = [
+      {id: 'real', name: 'R', icon: 'folder', sortIndex: 0, createdAt: '2025-01-01T00:00:00.000Z'},
+    ];
     renderBoard();
     await waitFor(() => {
       expect(mockUi.setAreaFilter).toHaveBeenCalledWith(AREA_FILTER_ALL);
@@ -162,6 +164,10 @@ describe('Feature: useBlueTasksBoard composition', () => {
       expect(result.current.visibleTasks.length).toBeGreaterThan(0);
     });
     result.current.handleQuickCapture('Inbox note');
-    expect(mockCore.handleQuickCapture).toHaveBeenCalledWith('Inbox note', AREA_FILTER_ALL, 'today');
+    expect(mockCore.handleQuickCapture).toHaveBeenCalledWith(
+      'Inbox note',
+      AREA_FILTER_ALL,
+      'today',
+    );
   });
 });

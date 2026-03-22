@@ -3,11 +3,7 @@ import {useRef, useState, type MouseEvent} from 'react';
 import {Timer} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {formatDurationLabel} from '../../lib/taskCardFormat';
-import {
-  breakDownSeconds,
-  composeSeconds,
-  parseTimerField,
-} from '../../lib/taskTimerEdit';
+import {breakDownSeconds, composeSeconds, parseTimerField} from '../../lib/taskTimerEdit';
 import type {TaskDraftUpdate} from '../../types';
 
 export type TaskCardFooterTimerButtonProps = {

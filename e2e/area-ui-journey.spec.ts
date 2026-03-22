@@ -19,7 +19,9 @@ test.describe('Areas: UI journey', () => {
     await resetBoard(page, request);
   });
 
-  test('user creates a zone in Settings, assigns one task from the card, and sidebar filters behave', async ({page}) => {
+  test('user creates a zone in Settings, assigns one task from the card, and sidebar filters behave', async ({
+    page,
+  }) => {
     const zoneName = 'UI Journey Zone';
     await createAreaViaSettingsUi(page, zoneName);
 
@@ -28,20 +30,31 @@ test.describe('Areas: UI journey', () => {
 
     await assignTaskToAreaFromFooter(page, 'In zone', zoneName);
 
-    await page.locator('.sidebar__areasNav').getByRole('button', {name: /Unassigned/}).click();
+    await page
+      .locator('.sidebar__areasNav')
+      .getByRole('button', {name: /Unassigned/})
+      .click();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
     await expect(taskCardByTitle(page, 'No zone')).toBeVisible();
     await expect(taskCardByTitle(page, 'In zone')).toHaveCount(0);
 
-    await page.locator('.sidebar__areasNav').getByRole('button', {name: new RegExp(zoneName)}).click();
+    await page
+      .locator('.sidebar__areasNav')
+      .getByRole('button', {name: new RegExp(zoneName)})
+      .click();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
     await expect(taskCardByTitle(page, 'In zone')).toBeVisible();
 
-    await page.locator('.sidebar__areasNav').getByRole('button', {name: /All areas/}).click();
+    await page
+      .locator('.sidebar__areasNav')
+      .getByRole('button', {name: /All areas/})
+      .click();
     await expect(page.locator('.taskBoard__count')).toHaveText('2');
   });
 
-  test('user creates a zone in Settings then clears assignment with “No area” on the card', async ({page}) => {
+  test('user creates a zone in Settings then clears assignment with “No area” on the card', async ({
+    page,
+  }) => {
     await createAreaViaSettingsUi(page, 'UI Detach Zone');
 
     await addTaskWithTitle(page, 'Detach UI');
