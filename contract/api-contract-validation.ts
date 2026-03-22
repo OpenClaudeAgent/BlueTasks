@@ -1,4 +1,4 @@
-import {apiAreaRowSchema} from './schemas/api-area-row.schema.js';
+import {apiCategoryRowSchema} from './schemas/api-category-row.schema.js';
 import {apiTaskRowSchema} from './schemas/api-task-row.schema.js';
 
 /**
@@ -9,6 +9,6 @@ export function assertApiTaskRowContract(t: unknown): void {
   apiTaskRowSchema.parse(t);
 }
 
-export function assertApiAreaRowContract(t: unknown): void {
-  apiAreaRowSchema.parse(t);
+export function assertApiCategoryRowContract(t: unknown): void {
+  apiCategoryRowSchema.parse(t);
 }

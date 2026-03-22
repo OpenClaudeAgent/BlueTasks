@@ -1,12 +1,12 @@
 /**
- * Pure board / area filtering rules (shared with the web client).
+ * Pure board / category filtering rules (shared with the web client).
  * API returns the full task list; sections are a client concern.
  */
 
-/** Area sidebar: every area */
-export const FILTER_AREA_ALL = 'all';
-/** Area sidebar: tasks with no area */
-export const FILTER_AREA_UNCATEGORIZED = 'uncategorized';
+/** Category sidebar: every category */
+export const FILTER_CATEGORY_ALL = 'all';
+/** Category sidebar: tasks with no category */
+export const FILTER_CATEGORY_UNCATEGORIZED = 'uncategorized';
 
 export type TaskSectionBucket = 'today' | 'upcoming' | 'anytime' | 'done';
 
@@ -15,17 +15,17 @@ export type BoardSectionId = TaskSectionBucket | 'all';
 export type BoardFilterTask = {
   status: 'pending' | 'completed';
   taskDate: string | null;
-  areaId: string | null;
+  categoryId: string | null;
 };
 
-export function taskMatchesAreaFilterRow(task: BoardFilterTask, areaFilter: string): boolean {
-  if (areaFilter === FILTER_AREA_ALL) {
+export function taskMatchesCategoryFilterRow(task: BoardFilterTask, categoryFilter: string): boolean {
+  if (categoryFilter === FILTER_CATEGORY_ALL) {
     return true;
   }
-  if (areaFilter === FILTER_AREA_UNCATEGORIZED) {
-    return !task.areaId;
+  if (categoryFilter === FILTER_CATEGORY_UNCATEGORIZED) {
+    return !task.categoryId;
   }
-  return task.areaId === areaFilter;
+  return task.categoryId === categoryFilter;
 }
 
 export function taskMatchesBoardSectionRow(

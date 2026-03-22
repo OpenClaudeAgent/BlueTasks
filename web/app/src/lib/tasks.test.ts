@@ -1,14 +1,14 @@
 import {describe, expect, it} from 'vitest';
 import {addDaysToKey, todayKey} from './dateKeys';
 import {createEmptyEditorState} from './editorState';
-import type {Area, Task} from '../types';
+import type {Category, Task} from '../types';
 import {
   applySavedTaskPreservingLexicalShape,
   coercePinned,
   coerceRecurrence,
   createTask,
   filterTasks,
-  getAreaSidebarCounts,
+  getCategorySidebarCounts,
   getPreferredTaskId,
   getTaskCounts,
   getTaskSection,
@@ -17,7 +17,7 @@ import {
   sortTasks,
   toTaskDraftPayload,
 } from './tasks';
-import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from '../types';
+import {CATEGORY_FILTER_ALL, CATEGORY_FILTER_UNCATEGORIZED} from '../types';
 
 describe('createTask', () => {
   it('creates a task with valid non-empty contentJson', () => {
@@ -39,12 +39,12 @@ describe('createTask', () => {
     });
   });
 
-  it('does not set taskDate or areaId by default', () => {
+  it('does not set taskDate or categoryId by default', () => {
     const task = createTask('Sans date');
     expect(task.taskDate).toBeNull();
-    expect(task.areaId).toBeNull();
-    const zoned = createTask('Avec zone', 'area-uuid');
-    expect(zoned.areaId).toBe('area-uuid');
+    expect(task.categoryId).toBeNull();
+    const zoned = createTask('Avec catégorie', 'category-uuid');
+    expect(zoned.categoryId).toBe('category-uuid');
   });
 });
 
@@ -64,9 +64,9 @@ describe('Feature: Task draft payload for API', () => {
       expect(toTaskDraftPayload(task).pinned).toBe(true);
     });
 
-    it('given empty string areaId, when toTaskDraftPayload runs, then areaId is null', () => {
-      const task = {...createTask('Z'), id: 'area-empty', areaId: ''};
-      expect(toTaskDraftPayload(task).areaId).toBeNull();
+    it('given empty string categoryId, when toTaskDraftPayload runs, then categoryId is null', () => {
+      const task = {...createTask('Z'), id: 'category-empty', categoryId: ''};
+      expect(toTaskDraftPayload(task).categoryId).toBeNull();
     });
   });
 });
@@ -82,14 +82,14 @@ describe('Feature: Normalize task from API', () => {
         pinned: 1 as unknown as boolean,
         timeSpentSeconds: null as unknown as number,
         recurrence: 'bogus' as unknown as Task['recurrence'],
-        areaId: '' as unknown as string | null,
+        categoryId: '' as unknown as string | null,
       };
       const merged = mergeTaskFromApi(raw as Task);
       expect(merged.priority).toBe('normal');
       expect(merged.pinned).toBe(true);
       expect(merged.timeSpentSeconds).toBe(0);
       expect(merged.recurrence).toBeNull();
-      expect(merged.areaId).toBeNull();
+      expect(merged.categoryId).toBeNull();
     });
   });
 });
@@ -261,28 +261,28 @@ describe('filterTasks', () => {
     expect(anytimeTasks.map((t) => t.id)).toContain('3');
   });
 
-  it('filters by area and uncategorized', () => {
+  it('filters by category and uncategorized', () => {
     const today = todayKey();
     const z1 = 'zone-1';
     const tasks = [
-      {...createTask('Dans Z1'), id: 'a', taskDate: today, areaId: z1},
-      {...createTask('Sans zone'), id: 'b', taskDate: today, areaId: null},
+      {...createTask('Dans Z1'), id: 'a', taskDate: today, categoryId: z1},
+      {...createTask('Sans zone'), id: 'b', taskDate: today, categoryId: null},
     ];
     expect(filterTasks(tasks, 'today', z1).map((t) => t.id)).toEqual(['a']);
-    expect(filterTasks(tasks, 'today', AREA_FILTER_UNCATEGORIZED).map((t) => t.id)).toEqual(['b']);
+    expect(filterTasks(tasks, 'today', CATEGORY_FILTER_UNCATEGORIZED).map((t) => t.id)).toEqual(['b']);
   });
 
-  it('all section lists every task in area including completed, sorted', () => {
+  it('all section lists every task in category including completed, sorted', () => {
     const today = todayKey();
     const z = 'zone-all';
     const tasks = [
-      {...createTask('Open'), id: 'o', taskDate: today, areaId: z, status: 'pending' as const},
-      {...createTask('Closed'), id: 'c', taskDate: today, areaId: z, status: 'completed' as const},
+      {...createTask('Open'), id: 'o', taskDate: today, categoryId: z, status: 'pending' as const},
+      {...createTask('Closed'), id: 'c', taskDate: today, categoryId: z, status: 'completed' as const},
       {
         ...createTask('Other zone'),
         id: 'x',
         taskDate: today,
-        areaId: 'other',
+        categoryId: 'other',
         status: 'pending' as const,
       },
     ];
@@ -291,21 +291,21 @@ describe('filterTasks', () => {
   });
 });
 
-describe('getAreaSidebarCounts', () => {
-  it('matches filterTasks lengths for all, uncategorized, and each area row', () => {
+describe('getCategorySidebarCounts', () => {
+  it('matches filterTasks lengths for all, uncategorized, and each category row', () => {
     const today = todayKey();
     const z1 = 'zone-1';
-    const areas: Area[] = [
+    const categories: Category[] = [
       {id: z1, name: 'Work', icon: 'folder', sortIndex: 0, createdAt: '2025-01-01T00:00:00.000Z'},
     ];
     const tasks = [
-      {...createTask('In zone'), id: 'a', taskDate: today, areaId: z1},
-      {...createTask('No zone'), id: 'b', taskDate: today, areaId: null},
+      {...createTask('In zone'), id: 'a', taskDate: today, categoryId: z1},
+      {...createTask('No zone'), id: 'b', taskDate: today, categoryId: null},
     ];
     const section = 'today' as const;
-    const got = getAreaSidebarCounts(tasks, section, areas);
-    expect(got.all).toBe(filterTasks(tasks, section, AREA_FILTER_ALL).length);
-    expect(got.uncategorized).toBe(filterTasks(tasks, section, AREA_FILTER_UNCATEGORIZED).length);
+    const got = getCategorySidebarCounts(tasks, section, categories);
+    expect(got.all).toBe(filterTasks(tasks, section, CATEGORY_FILTER_ALL).length);
+    expect(got.uncategorized).toBe(filterTasks(tasks, section, CATEGORY_FILTER_UNCATEGORIZED).length);
     expect(got.byId[z1]).toBe(filterTasks(tasks, section, z1).length);
   });
 });
@@ -319,15 +319,15 @@ describe('coerceRecurrence', () => {
 });
 
 describe('getTaskCounts', () => {
-  it('counts tasks per section with area filter', () => {
+  it('counts tasks per section with category filter', () => {
     const today = todayKey();
     const z = 'z99';
     const tasks = [
-      {...createTask('T1'), id: '1', taskDate: today, areaId: z},
-      {...createTask('T2'), id: '2', taskDate: null, areaId: z},
-      {...createTask('T3'), id: '3', taskDate: today, areaId: null},
+      {...createTask('T1'), id: '1', taskDate: today, categoryId: z},
+      {...createTask('T2'), id: '2', taskDate: null, categoryId: z},
+      {...createTask('T3'), id: '3', taskDate: today, categoryId: null},
     ];
-    const all = getTaskCounts(tasks, AREA_FILTER_ALL);
+    const all = getTaskCounts(tasks, CATEGORY_FILTER_ALL);
     expect(all.all).toBe(3);
     expect(all.today).toBe(2);
     expect(all.anytime).toBe(1);
@@ -356,8 +356,8 @@ describe('getPreferredTaskId', () => {
       {...createTask('A'), id: 'x', taskDate: today},
       {...createTask('B'), id: 'y', taskDate: today},
     ];
-    expect(getPreferredTaskId(tasks, 'today', 'y', AREA_FILTER_ALL)).toBe('y');
-    expect(getPreferredTaskId(tasks, 'today', 'absent', AREA_FILTER_ALL)).toBe('x');
-    expect(getPreferredTaskId([], 'today', 'x', AREA_FILTER_ALL)).toBeNull();
+    expect(getPreferredTaskId(tasks, 'today', 'y', CATEGORY_FILTER_ALL)).toBe('y');
+    expect(getPreferredTaskId(tasks, 'today', 'absent', CATEGORY_FILTER_ALL)).toBe('x');
+    expect(getPreferredTaskId([], 'today', 'x', CATEGORY_FILTER_ALL)).toBeNull();
   });
 });

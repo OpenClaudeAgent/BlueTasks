@@ -1,7 +1,7 @@
 import {expect, test} from '@playwright/test';
 import type {APIRequestContext, APIResponse} from '@playwright/test';
 import {expectJsonContentType} from './api-production-helpers';
-import {expectApiAreaRow, expectApiTaskRow} from './contract-expectations';
+import {expectApiCategoryRow, expectApiTaskRow} from './contract-expectations';
 
 const GET_LIST_CASES = [
   {
@@ -10,9 +10,9 @@ const GET_LIST_CASES = [
     validateRow: expectApiTaskRow,
   },
   {
-    title: 'GET /api/areas returns JSON array of area rows',
-    path: '/api/areas',
-    validateRow: expectApiAreaRow,
+    title: 'GET /api/categories returns JSON array of category rows',
+    path: '/api/categories',
+    validateRow: expectApiCategoryRow,
   },
 ] as const;
 
@@ -32,17 +32,17 @@ const API_NOT_FOUND_CASES: NotFoundCase[] = [
     expectedJson: {message: 'Task not found'},
   },
   {
-    title: 'PUT /api/areas/:id with unknown id returns 404',
+    title: 'PUT /api/categories/:id with unknown id returns 404',
     act: (request) =>
-      request.put('/api/areas/00000000-0000-4000-8000-000000000002', {
+      request.put('/api/categories/00000000-0000-4000-8000-000000000002', {
         data: {name: 'x'},
       }),
-    expectedJson: {message: 'Area not found'},
+    expectedJson: {message: 'Category not found'},
   },
   {
-    title: 'DELETE /api/areas/:id with unknown id returns 404',
-    act: (request) => request.delete('/api/areas/00000000-0000-4000-8000-000000000003'),
-    expectedJson: {message: 'Area not found'},
+    title: 'DELETE /api/categories/:id with unknown id returns 404',
+    act: (request) => request.delete('/api/categories/00000000-0000-4000-8000-000000000003'),
+    expectedJson: {message: 'Category not found'},
   },
 ];
 
@@ -126,72 +126,72 @@ test.describe('API (production server)', () => {
     });
   }
 
-  test('POST /api/areas returns 201; row appears on GET; DELETE returns 204', async ({request}) => {
-    const post = await request.post('/api/areas', {
-      data: {name: '  API area  ', icon: 'folder'},
+  test('POST /api/categories returns 201; row appears on GET; DELETE returns 204', async ({request}) => {
+    const post = await request.post('/api/categories', {
+      data: {name: '  API category  ', icon: 'folder'},
     });
     expect(post.status()).toBe(201);
     expectJsonContentType(post);
     const created = (await post.json()) as Record<string, unknown>;
-    expectApiAreaRow(created);
-    expect(created.name).toBe('API area');
+    expectApiCategoryRow(created);
+    expect(created.name).toBe('API category');
 
-    const list = await request.get('/api/areas');
+    const list = await request.get('/api/categories');
     expect(list.status()).toBe(200);
-    const areas = (await list.json()) as Record<string, unknown>[];
-    const found = areas.find((a) => a.id === created.id);
-    expect(found).toEqual(expect.objectContaining({id: created.id, name: 'API area'}));
-    expectApiAreaRow(found);
+    const categories = (await list.json()) as Record<string, unknown>[];
+    const found = categories.find((c) => c.id === created.id);
+    expect(found).toEqual(expect.objectContaining({id: created.id, name: 'API category'}));
+    expectApiCategoryRow(found);
 
-    const del = await request.delete(`/api/areas/${created.id as string}`);
+    const del = await request.delete(`/api/categories/${created.id as string}`);
     expect(del.status()).toBe(204);
 
-    const after = await request.get('/api/areas');
+    const after = await request.get('/api/categories');
     const ids = ((await after.json()) as {id: string}[]).map((a) => a.id);
     expect(ids).not.toContain(created.id as string);
   });
 
-  test('POST /api/areas with empty name returns 400', async ({request}) => {
-    const res = await request.post('/api/areas', {data: {name: '   '}});
+  test('POST /api/categories with empty name returns 400', async ({request}) => {
+    const res = await request.post('/api/categories', {data: {name: '   '}});
     expect(res.status()).toBe(400);
     expect(await res.json()).toEqual({message: 'Name required'});
   });
 
-  test('PUT /api/areas/:id updates name and returns full row', async ({request}) => {
-    const post = await request.post('/api/areas', {data: {name: 'Rename me'}});
+  test('PUT /api/categories/:id updates name and returns full row', async ({request}) => {
+    const post = await request.post('/api/categories', {data: {name: 'Rename me'}});
     expect(post.status()).toBe(201);
     const {id} = (await post.json()) as {id: string};
 
-    const put = await request.put(`/api/areas/${id}`, {data: {name: 'Renamed'}});
+    const put = await request.put(`/api/categories/${id}`, {data: {name: 'Renamed'}});
     expect(put.status()).toBe(200);
     const row = (await put.json()) as Record<string, unknown>;
-    expectApiAreaRow(row);
+    expectApiCategoryRow(row);
     expect(row.id).toBe(id);
     expect(row.name).toBe('Renamed');
 
-    await request.delete(`/api/areas/${id}`);
+    await request.delete(`/api/categories/${id}`);
   });
 
-  test('POST /api/tasks with areaId persists link when area exists', async ({request}) => {
-    const areaRes = await request.post('/api/areas', {data: {name: 'Task area'}});
-    expect(areaRes.status()).toBe(201);
-    const area = (await areaRes.json()) as {id: string};
+  test('POST /api/tasks with categoryId persists link when category exists', async ({request}) => {
+    const categoryRes = await request.post('/api/categories', {data: {name: 'Task category'}});
+    expect(categoryRes.status()).toBe(201);
+    const category = (await categoryRes.json()) as {id: string};
 
     const taskRes = await request.post('/api/tasks', {
-      data: {title: 'Linked task', areaId: area.id},
+      data: {title: 'Linked task', categoryId: category.id},
     });
     expect(taskRes.status()).toBe(201);
     const task = (await taskRes.json()) as Record<string, unknown>;
     expectApiTaskRow(task);
-    expect(task.areaId).toBe(area.id);
+    expect(task.categoryId).toBe(category.id);
 
     const again = await request.get('/api/tasks');
     const rows = (await again.json()) as Record<string, unknown>[];
     const persisted = rows.find((r) => r.id === task.id);
-    expect(persisted?.areaId).toBe(area.id);
+    expect(persisted?.categoryId).toBe(category.id);
 
     await request.delete(`/api/tasks/${task.id as string}`);
-    await request.delete(`/api/areas/${area.id}`);
+    await request.delete(`/api/categories/${category.id}`);
   });
 
   test('DELETE /api/tasks/:id returns 204 even when id is unknown (idempotent)', async ({

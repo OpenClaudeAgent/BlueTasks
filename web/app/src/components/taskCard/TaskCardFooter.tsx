@@ -1,7 +1,7 @@
 import {LoaderCircle, type LucideIcon} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
-import type {Area, RecurrenceKind, TaskDraftUpdate, TaskPriority} from '../../types';
-import {TaskCardFooterAreaPicker} from './TaskCardFooterAreaPicker';
+import type {Category, RecurrenceKind, TaskDraftUpdate, TaskPriority} from '../../types';
+import {TaskCardFooterCategoryPicker} from './TaskCardFooterCategoryPicker';
 import {TaskCardFooterEstimatePicker} from './TaskCardFooterEstimatePicker';
 import {TaskCardFooterPriorityButton} from './TaskCardFooterPriorityButton';
 import {TaskCardFooterRight} from './TaskCardFooterRight';
@@ -11,15 +11,15 @@ export type TaskCardFooterProps = {
   taskTitle: string;
   taskDate: string | null;
   estimateMinutes: number | null;
-  areaId: string | null;
+  categoryId: string | null;
   priority: TaskPriority;
   pinned: boolean;
   recurrence: RecurrenceKind | null;
   timerStartedAt: string | null;
   timeSpentSeconds: number;
   checklistTotal: number;
-  areaGlyph: LucideIcon;
-  areas: Area[];
+  categoryGlyph: LucideIcon;
+  categories: Category[];
   isSaving: boolean;
   trackedSeconds: number;
   checklistRatio: number;
@@ -33,15 +33,15 @@ export function TaskCardFooter({
   taskTitle,
   taskDate,
   estimateMinutes,
-  areaId,
+  categoryId,
   priority,
   pinned,
   recurrence,
   timerStartedAt,
   timeSpentSeconds,
   checklistTotal,
-  areaGlyph,
-  areas,
+  categoryGlyph,
+  categories,
   isSaving,
   trackedSeconds,
   checklistRatio,
@@ -60,10 +60,10 @@ export function TaskCardFooter({
           taskId={taskId}
         />
 
-        <TaskCardFooterAreaPicker
-          areaGlyph={areaGlyph}
-          areaId={areaId}
-          areas={areas}
+        <TaskCardFooterCategoryPicker
+          categories={categories}
+          categoryGlyph={categoryGlyph}
+          categoryId={categoryId}
           onChange={onChange}
           taskId={taskId}
         />

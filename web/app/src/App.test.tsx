@@ -6,7 +6,7 @@ import {I18nextProvider} from 'react-i18next';
 import i18n from './i18n';
 import App from './App';
 import {useBlueTasksBoard} from './hooks/useBlueTasksBoard';
-import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from './types';
+import {CATEGORY_FILTER_ALL, CATEGORY_FILTER_UNCATEGORIZED} from './types';
 import type {Task} from './types';
 import {createTask} from './lib/tasks';
 
@@ -17,9 +17,9 @@ vi.mock('./components/LexicalTaskEditor', () => ({
 
 function baseBoard() {
   return {
-    areas: [],
-    areaFilter: AREA_FILTER_ALL,
-    setAreaFilter: vi.fn(),
+    categories: [],
+    categoryFilter: CATEGORY_FILTER_ALL,
+    setCategoryFilter: vi.fn(),
     selectedSection: 'today' as const,
     setSelectedSection: vi.fn(),
     selectedTaskId: null as string | null,
@@ -31,9 +31,9 @@ function baseBoard() {
     savingIds: {} as Record<string, boolean>,
     visibleTasks: [] as Task[],
     counts: {all: 0, today: 0, upcoming: 0, anytime: 0, done: 0},
-    taskCountByAreaId: {} as Record<string, number>,
-    areaSidebarCounts: {all: 0, uncategorized: 0, byId: {} as Record<string, number>},
-    refreshTasksAndAreas: vi.fn(),
+    taskCountByCategoryId: {} as Record<string, number>,
+    categorySidebarCounts: {all: 0, uncategorized: 0, byId: {} as Record<string, number>},
+    refreshTasksAndCategories: vi.fn(),
     handleAddTask: vi.fn(),
     handleQuickCapture: vi.fn().mockResolvedValue(undefined),
     handleTaskDraftChange: vi.fn(),
@@ -220,11 +220,11 @@ describe('Feature: App shell', () => {
     expect(screen.getByText('Nothing urgent is waiting right now.')).toBeVisible();
   });
 
-  it('Scenario: User focuses a single project area — sidebar asks the board to filter by that area', async () => {
+  it('Scenario: User focuses a single project category — sidebar asks the board to filter by that category', async () => {
     const user = userEvent.setup();
-    const setAreaFilter = vi.fn();
-    const workArea = {
-      id: 'area-work',
+    const setCategoryFilter = vi.fn();
+    const workCategory = {
+      id: 'category-work',
       name: 'Work',
       icon: 'folder' as const,
       sortIndex: 0,
@@ -232,38 +232,38 @@ describe('Feature: App shell', () => {
     };
     vi.mocked(useBlueTasksBoard).mockReturnValue({
       ...baseBoard(),
-      areas: [workArea],
-      areaFilter: AREA_FILTER_ALL,
-      setAreaFilter,
-      areaSidebarCounts: {all: 3, uncategorized: 0, byId: {'area-work': 2}},
+      categories: [workCategory],
+      categoryFilter: CATEGORY_FILTER_ALL,
+      setCategoryFilter,
+      categorySidebarCounts: {all: 3, uncategorized: 0, byId: {'category-work': 2}},
     });
     render(
       <I18nextProvider i18n={i18n}>
         <App />
       </I18nextProvider>,
     );
-    const areasGroup = screen.getByRole('group', {name: /^areas$/i});
-    await user.click(within(areasGroup).getByRole('button', {name: /^work/i}));
-    expect(setAreaFilter).toHaveBeenCalledWith('area-work');
+    const categoriesGroup = screen.getByRole('group', {name: /^categories$/i});
+    await user.click(within(categoriesGroup).getByRole('button', {name: /^work/i}));
+    expect(setCategoryFilter).toHaveBeenCalledWith('category-work');
   });
 
-  it('Scenario: User isolates tasks without a project — sidebar filters to Unassigned', async () => {
+  it('Scenario: User isolates tasks without a category — sidebar filters to Unassigned', async () => {
     const user = userEvent.setup();
-    const setAreaFilter = vi.fn();
+    const setCategoryFilter = vi.fn();
     vi.mocked(useBlueTasksBoard).mockReturnValue({
       ...baseBoard(),
-      areaFilter: AREA_FILTER_ALL,
-      setAreaFilter,
-      areaSidebarCounts: {all: 10, uncategorized: 3, byId: {}},
+      categoryFilter: CATEGORY_FILTER_ALL,
+      setCategoryFilter,
+      categorySidebarCounts: {all: 10, uncategorized: 3, byId: {}},
     });
     render(
       <I18nextProvider i18n={i18n}>
         <App />
       </I18nextProvider>,
     );
-    const areasGroup = screen.getByRole('group', {name: /^areas$/i});
-    await user.click(within(areasGroup).getByRole('button', {name: /unassigned/i}));
-    expect(setAreaFilter).toHaveBeenCalledWith(AREA_FILTER_UNCATEGORIZED);
+    const categoriesGroup = screen.getByRole('group', {name: /^categories$/i});
+    await user.click(within(categoriesGroup).getByRole('button', {name: /unassigned/i}));
+    expect(setCategoryFilter).toHaveBeenCalledWith(CATEGORY_FILTER_UNCATEGORIZED);
   });
 
   it('Scenario: User reviews future due dates — primary nav switches to Upcoming', async () => {
@@ -285,24 +285,24 @@ describe('Feature: App shell', () => {
     expect(setSelectedSection).toHaveBeenCalledWith('upcoming');
   });
 
-  it('Scenario: User returns to all areas — sidebar selects the combined view', async () => {
+  it('Scenario: User returns to all categories — sidebar selects the combined view', async () => {
     const user = userEvent.setup();
-    const setAreaFilter = vi.fn();
+    const setCategoryFilter = vi.fn();
     vi.mocked(useBlueTasksBoard).mockReturnValue({
       ...baseBoard(),
-      areas: [],
-      areaFilter: AREA_FILTER_UNCATEGORIZED,
-      setAreaFilter,
-      areaSidebarCounts: {all: 5, uncategorized: 1, byId: {}},
+      categories: [],
+      categoryFilter: CATEGORY_FILTER_UNCATEGORIZED,
+      setCategoryFilter,
+      categorySidebarCounts: {all: 5, uncategorized: 1, byId: {}},
     });
     render(
       <I18nextProvider i18n={i18n}>
         <App />
       </I18nextProvider>,
     );
-    const areasGroup = screen.getByRole('group', {name: /^areas$/i});
-    await user.click(within(areasGroup).getByRole('button', {name: /all areas/i}));
-    expect(setAreaFilter).toHaveBeenCalledWith(AREA_FILTER_ALL);
+    const categoriesGroup = screen.getByRole('group', {name: /^categories$/i});
+    await user.click(within(categoriesGroup).getByRole('button', {name: /all categories/i}));
+    expect(setCategoryFilter).toHaveBeenCalledWith(CATEGORY_FILTER_ALL);
   });
 
   it('Scenario: One visible task — renders TaskCard', () => {

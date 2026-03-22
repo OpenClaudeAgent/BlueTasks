@@ -42,7 +42,7 @@ describe('dbSetup', () => {
       const cols = db.prepare('PRAGMA table_info(tasks)').all() as {name: string}[];
       const colNames = cols.map((c) => c.name);
       expect(colNames).toContain('priority');
-      expect(colNames).toContain('area_id');
+      expect(colNames).toContain('category_id');
       expect(getUserVersion(db)).toBe(CURRENT_SCHEMA_VERSION);
     } finally {
       db.close();

@@ -1,19 +1,19 @@
 import {randomUUID} from 'node:crypto';
 import type Database from 'better-sqlite3';
 import {Router} from 'express';
-import {normalizeAreaIcon} from '../areaIconIds.js';
+import {normalizeCategoryIcon} from '../categoryIconIds.js';
 
-function areaRowToJson(row: Record<string, unknown>) {
+function categoryRowToJson(row: Record<string, unknown>) {
   return {
     id: row.id,
     name: row.name,
-    icon: normalizeAreaIcon(row.icon),
+    icon: normalizeCategoryIcon(row.icon),
     sortIndex: Number(row.sortIndex) || 0,
     createdAt: row.createdAt,
   };
 }
 
-export function createAreasRouter(getDb: () => Database.Database): Router {
+export function createCategoriesRouter(getDb: () => Database.Database): Router {
   const r = Router();
 
   r.get('/', (_req, res) => {
@@ -21,13 +21,13 @@ export function createAreasRouter(getDb: () => Database.Database): Router {
       .prepare(
         `
       SELECT id, name, icon, sort_index as sortIndex, created_at as createdAt
-      FROM areas
+      FROM categories
       ORDER BY sort_index ASC, created_at ASC
       `,
       )
       .all() as Record<string, unknown>[];
 
-    res.json(rows.map((row) => areaRowToJson(row)));
+    res.json(rows.map((row) => categoryRowToJson(row)));
   });
 
   r.post('/', (req, res) => {
@@ -37,18 +37,18 @@ export function createAreasRouter(getDb: () => Database.Database): Router {
       return;
     }
 
-    const icon = normalizeAreaIcon(req.body?.icon);
+    const icon = normalizeCategoryIcon(req.body?.icon);
     const id = randomUUID();
     const now = new Date().toISOString();
     const maxRow = getDb()
-      .prepare('SELECT COALESCE(MAX(sort_index), -1) as m FROM areas')
+      .prepare('SELECT COALESCE(MAX(sort_index), -1) as m FROM categories')
       .get() as {m: number};
     const sortIndex = maxRow.m + 1;
 
     getDb()
       .prepare(
         `
-    INSERT INTO areas (id, name, icon, sort_index, created_at)
+    INSERT INTO categories (id, name, icon, sort_index, created_at)
     VALUES (?, ?, ?, ?, ?)
     `,
       )
@@ -59,10 +59,10 @@ export function createAreasRouter(getDb: () => Database.Database): Router {
 
   r.put('/:id', (req, res) => {
     const existing = getDb()
-      .prepare('SELECT id, name, icon FROM areas WHERE id = ?')
+      .prepare('SELECT id, name, icon FROM categories WHERE id = ?')
       .get(req.params.id) as {id: string; name: string; icon: string} | undefined;
     if (!existing) {
-      res.status(404).json({message: 'Area not found'});
+      res.status(404).json({message: 'Category not found'});
       return;
     }
 
@@ -75,30 +75,30 @@ export function createAreasRouter(getDb: () => Database.Database): Router {
     const name = nameRaw.trim();
     const icon =
       req.body != null && Object.prototype.hasOwnProperty.call(req.body, 'icon')
-        ? normalizeAreaIcon(req.body.icon)
-        : normalizeAreaIcon(existing.icon);
+        ? normalizeCategoryIcon(req.body.icon)
+        : normalizeCategoryIcon(existing.icon);
 
     getDb()
-      .prepare('UPDATE areas SET name = ?, icon = ? WHERE id = ?')
+      .prepare('UPDATE categories SET name = ?, icon = ? WHERE id = ?')
       .run(name, icon, req.params.id);
     const row = getDb()
       .prepare(
-        'SELECT id, name, icon, sort_index as sortIndex, created_at as createdAt FROM areas WHERE id = ?',
+        'SELECT id, name, icon, sort_index as sortIndex, created_at as createdAt FROM categories WHERE id = ?',
       )
       .get(req.params.id) as Record<string, unknown>;
 
-    res.json(areaRowToJson(row));
+    res.json(categoryRowToJson(row));
   });
 
   r.delete('/:id', (req, res) => {
-    const existing = getDb().prepare('SELECT id FROM areas WHERE id = ?').get(req.params.id);
+    const existing = getDb().prepare('SELECT id FROM categories WHERE id = ?').get(req.params.id);
     if (!existing) {
-      res.status(404).json({message: 'Area not found'});
+      res.status(404).json({message: 'Category not found'});
       return;
     }
 
-    getDb().prepare('UPDATE tasks SET area_id = NULL WHERE area_id = ?').run(req.params.id);
-    getDb().prepare('DELETE FROM areas WHERE id = ?').run(req.params.id);
+    getDb().prepare('UPDATE tasks SET category_id = NULL WHERE category_id = ?').run(req.params.id);
+    getDb().prepare('DELETE FROM categories WHERE id = ?').run(req.params.id);
     res.status(204).send();
   });
 

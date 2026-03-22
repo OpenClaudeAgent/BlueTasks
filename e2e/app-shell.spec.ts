@@ -1,5 +1,5 @@
 import {expect, test} from '@playwright/test';
-import {deleteAllAreas, deleteAllTasks} from './api-helpers';
+import {deleteAllCategories, deleteAllTasks} from './api-helpers';
 import {gotoWithEnglish} from './helpers';
 import {resetBoard} from './task-flow-helpers';
 
@@ -20,7 +20,7 @@ test.describe('App shell', () => {
 
   test('SPA fallback: unknown path still serves app shell', async ({page, request}) => {
     await deleteAllTasks(request);
-    await deleteAllAreas(request);
+    await deleteAllCategories(request);
     await gotoWithEnglish(page, '/this-route-does-not-exist');
     await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
   });

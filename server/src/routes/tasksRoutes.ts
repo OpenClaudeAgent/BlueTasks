@@ -25,7 +25,7 @@ export function createTasksRouter(getDb: () => Database.Database): Router {
         time_spent_seconds as timeSpentSeconds,
         timer_started_at as timerStartedAt,
         recurrence,
-        area_id as areaId,
+        category_id as categoryId,
         created_at as createdAt,
         updated_at as updatedAt
       FROM tasks
@@ -47,7 +47,7 @@ export function createTasksRouter(getDb: () => Database.Database): Router {
       timerStartedAt:
         typeof row.timerStartedAt === 'string' && row.timerStartedAt ? row.timerStartedAt : null,
       recurrence: normalizeRecurrence(row.recurrence),
-      areaId: typeof row.areaId === 'string' && row.areaId ? row.areaId : null,
+      categoryId: typeof row.categoryId === 'string' && row.categoryId ? row.categoryId : null,
     }));
 
     res.json(tasks);
@@ -80,7 +80,7 @@ export function createTasksRouter(getDb: () => Database.Database): Router {
       time_spent_seconds,
       timer_started_at,
       recurrence,
-      area_id,
+      category_id,
       created_at,
       updated_at
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -101,7 +101,7 @@ export function createTasksRouter(getDb: () => Database.Database): Router {
         row.timeSpentSeconds,
         row.timerStartedAt,
         row.recurrence,
-        row.areaId,
+        row.categoryId,
         row.createdAt,
         row.updatedAt,
       );
@@ -147,7 +147,7 @@ export function createTasksRouter(getDb: () => Database.Database): Router {
       time_spent_seconds = ?,
       timer_started_at = ?,
       recurrence = ?,
-      area_id = ?,
+      category_id = ?,
       updated_at = ?
     WHERE id = ?
     `,
@@ -166,7 +166,7 @@ export function createTasksRouter(getDb: () => Database.Database): Router {
         payload.timeSpentSeconds,
         payload.timerStartedAt,
         payload.recurrence,
-        payload.areaId,
+        payload.categoryId,
         updatedAt,
         payload.id,
       );

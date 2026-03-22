@@ -1,11 +1,11 @@
 import {expect, test} from '@playwright/test';
 
-import {deleteAllAreas, deleteAllTasks} from './api-helpers';
+import {deleteAllCategories, deleteAllTasks} from './api-helpers';
 import {expectNoAxeViolations, goToPrimarySection} from './a11y-axe-helpers';
 import {gotoWithEnglish} from './helpers';
 import {
   addTaskWithTitle,
-  createAreaViaSettingsUi,
+  createCategoryViaSettingsUi,
   firstCard,
   markTaskDoneAfterCollapse,
   resetBoard,
@@ -48,7 +48,7 @@ test.describe('Accessibility (axe)', () => {
 
   test('unknown SPA route still serves shell without axe regressions', async ({page, request}) => {
     await deleteAllTasks(request);
-    await deleteAllAreas(request);
+    await deleteAllCategories(request);
     await gotoWithEnglish(page, '/this-route-does-not-exist');
     await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
     await expectNoAxeViolations(page);
@@ -63,32 +63,32 @@ test.describe('Accessibility (axe)', () => {
     await expectNoAxeViolations(page);
   });
 
-  test('Settings dialog (Areas, empty list) has no axe violations', async ({page, request}) => {
+  test('Settings dialog (Categories, empty list) has no axe violations', async ({page, request}) => {
     await resetBoard(page, request);
     await page.getByRole('button', {name: 'Settings'}).click();
     const dialog = page.getByRole('dialog', {name: 'Settings'});
-    await dialog.getByRole('button', {name: 'Areas'}).click();
-    await expect(dialog.getByText(/No areas yet/i)).toBeVisible();
+    await dialog.getByRole('button', {name: 'Categories'}).click();
+    await expect(dialog.getByText(/No categories yet/i)).toBeVisible();
     await expectNoAxeViolations(page);
   });
 
-  test('Settings dialog (Areas with one area row) has no axe violations', async ({
+  test('Settings dialog (Categories with one category row) has no axe violations', async ({
     page,
     request,
   }) => {
     await resetBoard(page, request);
     await page.getByRole('button', {name: 'Settings'}).click();
     const dialog = page.getByRole('dialog', {name: 'Settings'});
-    await dialog.getByRole('button', {name: 'Areas'}).click();
-    const areaName = `A11y area ${Date.now()}`;
-    const postArea = page.waitForResponse(
+    await dialog.getByRole('button', {name: 'Categories'}).click();
+    const categoryName = `A11y category ${Date.now()}`;
+    const postCategory = page.waitForResponse(
       (r) =>
-        r.url().includes('/api/areas') && r.request().method() === 'POST' && r.status() === 201,
+        r.url().includes('/api/categories') && r.request().method() === 'POST' && r.status() === 201,
     );
-    await dialog.getByPlaceholder('New area name').fill(areaName);
+    await dialog.getByPlaceholder('New category name').fill(categoryName);
     await dialog.getByRole('button', {name: 'Add'}).click();
-    await postArea;
-    await expect(dialog.getByText(areaName)).toBeVisible();
+    await postCategory;
+    await expect(dialog.getByText(categoryName)).toBeVisible();
     await expectNoAxeViolations(page);
   });
 
@@ -129,12 +129,12 @@ test.describe('Accessibility (axe)', () => {
     await expectNoAxeViolations(page);
   });
 
-  test('footer area popover open has no axe violations', async ({page, request}) => {
+  test('footer category popover open has no axe violations', async ({page, request}) => {
     await resetBoard(page, request);
-    await createAreaViaSettingsUi(page, `A11y zone ${Date.now()}`);
-    await addTaskWithTitle(page, `A11y area pop ${Date.now()}`);
+    await createCategoryViaSettingsUi(page, `A11y zone ${Date.now()}`);
+    await addTaskWithTitle(page, `A11y category pop ${Date.now()}`);
     const card = firstCard(page);
-    await card.locator('.taskCard__footerAreaTrigger').click();
+    await card.locator('.taskCard__footerCategoryTrigger').click();
     await expect(page.locator('.footerPopover')).toBeVisible();
     await expectNoAxeViolations(page);
   });

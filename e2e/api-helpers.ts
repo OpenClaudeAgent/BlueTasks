@@ -31,10 +31,10 @@ export async function deleteAllTasks(request: APIRequestContext): Promise<void> 
   await Promise.all(tasks.map((task) => request.delete(`/api/tasks/${task.id}`)));
 }
 
-/** Empty all areas via the running server (serial E2E cleanup). */
-export async function deleteAllAreas(request: APIRequestContext): Promise<void> {
-  const res = await request.get('/api/areas');
+/** Empty all categories via the running server (serial E2E cleanup). */
+export async function deleteAllCategories(request: APIRequestContext): Promise<void> {
+  const res = await request.get('/api/categories');
   expect(res.ok()).toBe(true);
-  const areas = (await res.json()) as {id: string}[];
-  await Promise.all(areas.map((a) => request.delete(`/api/areas/${a.id}`)));
+  const categories = (await res.json()) as {id: string}[];
+  await Promise.all(categories.map((c) => request.delete(`/api/categories/${c.id}`)));
 }

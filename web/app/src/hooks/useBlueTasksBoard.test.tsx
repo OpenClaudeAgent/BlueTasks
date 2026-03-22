@@ -6,11 +6,11 @@ import i18n from '../i18n';
 import {useBlueTasksBoard} from './useBlueTasksBoard';
 import {todayKey} from '../lib/dateKeys';
 import {createTask} from '../lib/tasks';
-import {AREA_FILTER_ALL} from '../types';
+import {CATEGORY_FILTER_ALL} from '../types';
 
 const mockUi = {
-  areaFilter: AREA_FILTER_ALL,
-  setAreaFilter: vi.fn(),
+  categoryFilter: CATEGORY_FILTER_ALL,
+  setCategoryFilter: vi.fn(),
   selectedSection: 'today' as const,
   setSelectedSection: vi.fn(),
   selectedTaskId: null as string | null,
@@ -27,9 +27,9 @@ const taskToday = {...createTask('T'), id: 't1', taskDate: todayKey()};
 
 const mockCore = {
   tasks: [taskToday],
-  areas: [] as {id: string; name: string; icon: 'folder'; sortIndex: number; createdAt: string}[],
+  categories: [] as {id: string; name: string; icon: 'folder'; sortIndex: number; createdAt: string}[],
   savingIds: {} as Record<string, boolean>,
-  refreshTasksAndAreas: vi.fn(),
+  refreshTasksAndCategories: vi.fn(),
   handleAddTask: vi.fn(),
   handleQuickCapture: vi.fn(),
   handleTaskDraftChange: vi.fn(),
@@ -48,13 +48,13 @@ vi.mock('./blueTasks/useBlueTasksTasksAndSaves', () => ({
 describe('Feature: useBlueTasksBoard composition', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUi.areaFilter = AREA_FILTER_ALL;
+    mockUi.categoryFilter = CATEGORY_FILTER_ALL;
     mockUi.selectedSection = 'today';
     mockUi.loading = false;
     mockUi.errorMessage = null;
     mockUi.selectedTaskId = null;
     mockCore.tasks = [taskToday];
-    mockCore.areas = [];
+    mockCore.categories = [];
   });
 
   function renderBoard() {
@@ -63,21 +63,21 @@ describe('Feature: useBlueTasksBoard composition', () => {
     });
   }
 
-  it('Scenario: Today section — visibleTasks filters by section and area', async () => {
+  it('Scenario: Today section — visibleTasks filters by section and category', async () => {
     const {result} = renderBoard();
     await waitFor(() => {
       expect(result.current.visibleTasks.some((t) => t.id === 't1')).toBe(true);
     });
   });
 
-  it('Scenario: Unknown area filter — effect resets to ALL when area missing', async () => {
-    mockUi.areaFilter = 'missing-area-id';
-    mockCore.areas = [
+  it('Scenario: Unknown category filter — effect resets to ALL when category missing', async () => {
+    mockUi.categoryFilter = 'missing-category-id';
+    mockCore.categories = [
       {id: 'real', name: 'R', icon: 'folder', sortIndex: 0, createdAt: '2025-01-01T00:00:00.000Z'},
     ];
     renderBoard();
     await waitFor(() => {
-      expect(mockUi.setAreaFilter).toHaveBeenCalledWith(AREA_FILTER_ALL);
+      expect(mockUi.setCategoryFilter).toHaveBeenCalledWith(CATEGORY_FILTER_ALL);
     });
   });
 
@@ -141,24 +141,24 @@ describe('Feature: useBlueTasksBoard composition', () => {
     expect(updater('ghost')).toBe('t1');
   });
 
-  it('Scenario: Add task — calls core handleAddTask with current area filter', async () => {
+  it('Scenario: Add task — calls core handleAddTask with current category filter', async () => {
     const {result} = renderBoard();
     await waitFor(() => {
       expect(result.current.visibleTasks.length).toBeGreaterThan(0);
     });
     result.current.handleAddTask();
-    expect(mockCore.handleAddTask).toHaveBeenCalledWith(AREA_FILTER_ALL);
+    expect(mockCore.handleAddTask).toHaveBeenCalledWith(CATEGORY_FILTER_ALL);
   });
 
-  it('Scenario: Task counts by area — includes tasks with areaId', async () => {
-    mockCore.tasks = [{...taskToday, areaId: 'a1'}];
+  it('Scenario: Task counts by category — includes tasks with categoryId', async () => {
+    mockCore.tasks = [{...taskToday, categoryId: 'a1'}];
     const {result} = renderBoard();
     await waitFor(() => {
-      expect(result.current.taskCountByAreaId.a1).toBe(1);
+      expect(result.current.taskCountByCategoryId.a1).toBe(1);
     });
   });
 
-  it('Scenario: Quick capture — forwards title, area filter and section to core', async () => {
+  it('Scenario: Quick capture — forwards title, category filter and section to core', async () => {
     const {result} = renderBoard();
     await waitFor(() => {
       expect(result.current.visibleTasks.length).toBeGreaterThan(0);
@@ -166,7 +166,7 @@ describe('Feature: useBlueTasksBoard composition', () => {
     result.current.handleQuickCapture('Inbox note');
     expect(mockCore.handleQuickCapture).toHaveBeenCalledWith(
       'Inbox note',
-      AREA_FILTER_ALL,
+      CATEGORY_FILTER_ALL,
       'today',
     );
   });

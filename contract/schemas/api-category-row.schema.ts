@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-export const apiAreaRowSchema = z
+export const apiCategoryRowSchema = z
   .object({
     id: z.string().uuid(),
     name: z.string().refine((n) => n.trim().length > 0, 'expected non-empty string'),
@@ -12,4 +12,4 @@ export const apiAreaRowSchema = z
   })
   .strict();
 
-export type ApiAreaRow = z.infer<typeof apiAreaRowSchema>;
+export type ApiCategoryRow = z.infer<typeof apiCategoryRowSchema>;

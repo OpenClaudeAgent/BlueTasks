@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import {I18nextProvider} from 'react-i18next';
 import i18n from '../i18n';
 import {Sidebar} from './Sidebar';
-import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from '../types';
+import {CATEGORY_FILTER_ALL, CATEGORY_FILTER_UNCATEGORIZED} from '../types';
 
 const baseCounts = {all: 3, today: 1, upcoming: 0, anytime: 2, done: 0};
 
@@ -24,11 +24,11 @@ describe('Feature: Sidebar', () => {
       <I18nextProvider i18n={i18n}>
         <Sidebar
           {...resizeProps}
-          areaFilter={AREA_FILTER_ALL}
-          areaRowCounts={{all: 3, uncategorized: 1, byId: {}}}
-          areas={[]}
+          categoryFilter={CATEGORY_FILTER_ALL}
+          categoryRowCounts={{all: 3, uncategorized: 1, byId: {}}}
+          categories={[]}
           counts={baseCounts}
-          onAreaFilterChange={vi.fn()}
+          onCategoryFilterChange={vi.fn()}
           onOpenSettings={vi.fn()}
           onSelect={onSelect}
           selectedSection="today"
@@ -48,11 +48,11 @@ describe('Feature: Sidebar', () => {
       <I18nextProvider i18n={i18n}>
         <Sidebar
           {...resizeProps}
-          areaFilter={AREA_FILTER_ALL}
-          areaRowCounts={{all: 3, uncategorized: 1, byId: {}}}
-          areas={[]}
+          categoryFilter={CATEGORY_FILTER_ALL}
+          categoryRowCounts={{all: 3, uncategorized: 1, byId: {}}}
+          categories={[]}
           counts={baseCounts}
-          onAreaFilterChange={vi.fn()}
+          onCategoryFilterChange={vi.fn()}
           onOpenSettings={vi.fn()}
           onSelect={onSelect}
           selectedSection="today"
@@ -65,10 +65,10 @@ describe('Feature: Sidebar', () => {
     expect(onSelect).toHaveBeenCalledWith('all');
   });
 
-  it('Scenario: User filters by named area — calls onAreaFilterChange', async () => {
+  it('Scenario: User filters by named category — calls onCategoryFilterChange', async () => {
     const user = userEvent.setup();
-    const onAreaFilterChange = vi.fn();
-    const areas = [
+    const onCategoryFilterChange = vi.fn();
+    const categories = [
       {
         id: 'z1',
         name: 'Work',
@@ -81,11 +81,11 @@ describe('Feature: Sidebar', () => {
       <I18nextProvider i18n={i18n}>
         <Sidebar
           {...resizeProps}
-          areaFilter={AREA_FILTER_ALL}
-          areaRowCounts={{all: 1, uncategorized: 0, byId: {z1: 1}}}
-          areas={areas}
+          categoryFilter={CATEGORY_FILTER_ALL}
+          categoryRowCounts={{all: 1, uncategorized: 0, byId: {z1: 1}}}
+          categories={categories}
           counts={baseCounts}
-          onAreaFilterChange={onAreaFilterChange}
+          onCategoryFilterChange={onCategoryFilterChange}
           onOpenSettings={vi.fn()}
           onSelect={vi.fn()}
           selectedSection="today"
@@ -93,55 +93,55 @@ describe('Feature: Sidebar', () => {
       </I18nextProvider>,
     );
 
-    const group = screen.getByRole('group', {name: /areas/i});
+    const group = screen.getByRole('group', {name: /categories/i});
     await user.click(within(group).getByRole('button', {name: (n) => n.startsWith('Work')}));
-    expect(onAreaFilterChange).toHaveBeenCalledWith('z1');
+    expect(onCategoryFilterChange).toHaveBeenCalledWith('z1');
   });
 
-  it('Scenario: User filters all areas — calls onAreaFilterChange with ALL', async () => {
+  it('Scenario: User filters all categories — calls onCategoryFilterChange with ALL', async () => {
     const user = userEvent.setup();
-    const onAreaFilterChange = vi.fn();
+    const onCategoryFilterChange = vi.fn();
     render(
       <I18nextProvider i18n={i18n}>
         <Sidebar
           {...resizeProps}
-          areaFilter={AREA_FILTER_UNCATEGORIZED}
-          areaRowCounts={{all: 2, uncategorized: 1, byId: {}}}
-          areas={[]}
+          categoryFilter={CATEGORY_FILTER_UNCATEGORIZED}
+          categoryRowCounts={{all: 2, uncategorized: 1, byId: {}}}
+          categories={[]}
           counts={baseCounts}
-          onAreaFilterChange={onAreaFilterChange}
+          onCategoryFilterChange={onCategoryFilterChange}
           onOpenSettings={vi.fn()}
           onSelect={vi.fn()}
           selectedSection="today"
         />
       </I18nextProvider>,
     );
-    const group = screen.getByRole('group', {name: /areas/i});
-    await user.click(within(group).getByRole('button', {name: (n) => n.startsWith('All areas')}));
-    expect(onAreaFilterChange).toHaveBeenCalledWith(AREA_FILTER_ALL);
+    const group = screen.getByRole('group', {name: /categories/i});
+    await user.click(within(group).getByRole('button', {name: (n) => n.startsWith('All categories')}));
+    expect(onCategoryFilterChange).toHaveBeenCalledWith(CATEGORY_FILTER_ALL);
   });
 
-  it('Scenario: User filters unassigned — calls onAreaFilterChange with UNCATEGORIZED', async () => {
+  it('Scenario: User filters unassigned — calls onCategoryFilterChange with UNCATEGORIZED', async () => {
     const user = userEvent.setup();
-    const onAreaFilterChange = vi.fn();
+    const onCategoryFilterChange = vi.fn();
     render(
       <I18nextProvider i18n={i18n}>
         <Sidebar
           {...resizeProps}
-          areaFilter={AREA_FILTER_ALL}
-          areaRowCounts={{all: 2, uncategorized: 1, byId: {}}}
-          areas={[]}
+          categoryFilter={CATEGORY_FILTER_ALL}
+          categoryRowCounts={{all: 2, uncategorized: 1, byId: {}}}
+          categories={[]}
           counts={baseCounts}
-          onAreaFilterChange={onAreaFilterChange}
+          onCategoryFilterChange={onCategoryFilterChange}
           onOpenSettings={vi.fn()}
           onSelect={vi.fn()}
           selectedSection="today"
         />
       </I18nextProvider>,
     );
-    const group = screen.getByRole('group', {name: /areas/i});
+    const group = screen.getByRole('group', {name: /categories/i});
     await user.click(within(group).getByRole('button', {name: (n) => n.startsWith('Unassigned')}));
-    expect(onAreaFilterChange).toHaveBeenCalledWith(AREA_FILTER_UNCATEGORIZED);
+    expect(onCategoryFilterChange).toHaveBeenCalledWith(CATEGORY_FILTER_UNCATEGORIZED);
   });
 
   it('Scenario: User opens settings — calls onOpenSettings', async () => {
@@ -151,11 +151,11 @@ describe('Feature: Sidebar', () => {
       <I18nextProvider i18n={i18n}>
         <Sidebar
           {...resizeProps}
-          areaFilter={AREA_FILTER_ALL}
-          areaRowCounts={{all: 0, uncategorized: 0, byId: {}}}
-          areas={[]}
+          categoryFilter={CATEGORY_FILTER_ALL}
+          categoryRowCounts={{all: 0, uncategorized: 0, byId: {}}}
+          categories={[]}
           counts={baseCounts}
-          onAreaFilterChange={vi.fn()}
+          onCategoryFilterChange={vi.fn()}
           onOpenSettings={onOpenSettings}
           onSelect={vi.fn()}
           selectedSection="today"

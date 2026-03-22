@@ -38,7 +38,7 @@ export const apiTaskRowSchema = z
       z.string().refine((s) => !Number.isNaN(Date.parse(s)), 'expected parseable ISO string'),
     ]),
     recurrence: z.union([z.null(), z.enum(['daily', 'weekly', 'biweekly', 'monthly', 'yearly'])]),
-    areaId: z.union([z.null(), z.string().uuid()]),
+    categoryId: z.union([z.null(), z.string().uuid()]),
     createdAt: z
       .string()
       .refine((s) => !Number.isNaN(Date.parse(s)), 'expected parseable ISO string'),

@@ -9,7 +9,7 @@ import i18n from '../i18n';
 import {addDaysToKey, todayKey} from '../lib/dateKeys';
 import {formatTaskDatePill} from '../lib/dateFormat';
 import {createTask} from '../lib/tasks';
-import type {Area} from '../types';
+import type {Category} from '../types';
 import {TaskCard} from './TaskCard';
 import {taskCardPropsAreEqual, type TaskCardProps} from './taskCard/taskCardProps';
 
@@ -42,7 +42,7 @@ vi.mock('./LexicalTaskEditor', () => ({
   ),
 }));
 
-const sampleAreas: Area[] = [
+const sampleCategories: Category[] = [
   {id: 'a1', name: 'Work', icon: 'folder', sortIndex: 0, createdAt: '2025-01-01T00:00:00.000Z'},
 ];
 
@@ -93,7 +93,7 @@ describe('Feature: Task card (collapsed)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={[]}
+            categories={[]}
             expanded={false}
             isSaving={false}
             onChange={vi.fn()}
@@ -121,7 +121,7 @@ describe('Feature: Task card (collapsed)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={[]}
+            categories={[]}
             expanded={false}
             isSaving={false}
             onChange={vi.fn()}
@@ -150,7 +150,7 @@ describe('Feature: Task card (collapsed)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={[]}
+            categories={[]}
             expanded={false}
             isSaving={false}
             onChange={vi.fn()}
@@ -179,7 +179,7 @@ describe('Feature: Task card (collapsed)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={[]}
+            categories={[]}
             expanded={false}
             isSaving={false}
             onChange={vi.fn()}
@@ -207,7 +207,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={[]}
+            categories={[]}
             expanded
             isSaving={false}
             onChange={vi.fn()}
@@ -233,7 +233,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <ExpandedTaskCardLive
-            areas={sampleAreas}
+            categories={sampleCategories}
             initial={initial}
             isSaving={false}
             onChangeSpy={onChangeSpy}
@@ -258,7 +258,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded
             isSaving={false}
             onChange={onChange}
@@ -282,7 +282,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded
             isSaving={false}
             onChange={onChange}
@@ -309,7 +309,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded
             isSaving={false}
             onChange={onChange}
@@ -337,7 +337,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded
             isSaving={false}
             onChange={onChange}
@@ -366,7 +366,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded
             isSaving={false}
             onChange={onChange}
@@ -397,7 +397,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded
             isSaving={false}
             onChange={onChange}
@@ -422,7 +422,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded
             isSaving={false}
             onChange={onChange}
@@ -447,7 +447,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <ExpandedTaskCardLive
-            areas={sampleAreas}
+            categories={sampleCategories}
             initial={initial}
             isSaving={false}
             onChangeSpy={onChangeSpy}
@@ -476,7 +476,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <ExpandedTaskCardLive
-            areas={sampleAreas}
+            categories={sampleCategories}
             initial={initial}
             isSaving={false}
             onChangeSpy={onChangeSpy}
@@ -506,7 +506,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded
             isSaving={false}
             onChange={vi.fn()}
@@ -532,7 +532,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded
             isSaving={false}
             onChange={vi.fn()}
@@ -559,7 +559,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded
             isSaving={false}
             onChange={onChange}
@@ -576,14 +576,14 @@ describe('Feature: Task card (expanded)', () => {
       expect(onChange).toHaveBeenCalledWith(task.id, {estimateMinutes: 30});
     });
 
-    it('given expanded card, when user assigns area Work, then onChange receives area id', async () => {
+    it('given expanded card, when user assigns category Work, then onChange receives category id', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
-      const task = {...createTask('Area'), areaId: null};
+      const task = {...createTask('CatPick'), categoryId: null};
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded
             isSaving={false}
             onChange={onChange}
@@ -595,9 +595,9 @@ describe('Feature: Task card (expanded)', () => {
         </I18nextProvider>,
       );
       const card = screen.getByRole('article');
-      await user.click(within(card).getByTitle('Area'));
+      await user.click(within(card).getByTitle('Category'));
       await user.click(await screen.findByRole('button', {name: /^work$/i}));
-      expect(onChange).toHaveBeenCalledWith(task.id, {areaId: 'a1'});
+      expect(onChange).toHaveBeenCalledWith(task.id, {categoryId: 'a1'});
     });
 
     it('given recurring pending task, status control exposes recurrence completion label', () => {
@@ -609,7 +609,7 @@ describe('Feature: Task card (expanded)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded={false}
             isSaving={false}
             onChange={vi.fn()}
@@ -633,7 +633,7 @@ describe('Feature: TaskCard memo comparator', () => {
   function baseProps(): TaskCardProps {
     return {
       task: baseTask,
-      areas: [],
+      categories: [],
       boardChrome: {
         datePopoverTaskId: null,
         setDatePopoverTaskId: noop,

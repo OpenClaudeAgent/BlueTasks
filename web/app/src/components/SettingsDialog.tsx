@@ -2,38 +2,38 @@ import {useEffect, useRef, useState, type ChangeEvent} from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import {Database, FolderOpen, Globe, Pencil, Plus, Settings, Trash2, X} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
-import {areasApi, downloadDatabaseExport, uploadDatabaseImport} from '../api';
-import {DEFAULT_AREA_ICON, type AreaIconId, getAreaIconComponent} from '../lib/areaIcons';
-import type {Area} from '../types';
-import {AreaIconPicker} from './AreaIconPicker';
+import {categoriesApi, downloadDatabaseExport, uploadDatabaseImport} from '../api';
+import {DEFAULT_CATEGORY_ICON, type CategoryIconId, getCategoryIconComponent} from '../lib/categoryIcons';
+import type {Category} from '../types';
+import {CategoryIconPicker} from './CategoryIconPicker';
 import {normalizeUiLanguageCode} from '../locales/uiLanguages';
 import {LanguageSwitcher} from './LanguageSwitcher';
 
-type SettingsSection = 'general' | 'areas';
+type SettingsSection = 'general' | 'categories';
 
 type SettingsDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  areas: Area[];
-  taskCountByAreaId: Record<string, number>;
-  onAreasUpdated: () => Promise<void>;
+  categories: Category[];
+  taskCountByCategoryId: Record<string, number>;
+  onCategoriesUpdated: () => Promise<void>;
 };
 
 export function SettingsDialog({
   open,
   onOpenChange,
-  areas,
-  taskCountByAreaId,
-  onAreasUpdated,
+  categories,
+  taskCountByCategoryId,
+  onCategoriesUpdated,
 }: SettingsDialogProps) {
   const {t, i18n} = useTranslation();
-  const [section, setSection] = useState<SettingsSection>('areas');
+  const [section, setSection] = useState<SettingsSection>('categories');
   const [newName, setNewName] = useState('');
-  const [newIcon, setNewIcon] = useState<AreaIconId>(DEFAULT_AREA_ICON);
+  const [newIcon, setNewIcon] = useState<CategoryIconId>(DEFAULT_CATEGORY_ICON);
   const [busy, setBusy] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editValue, setEditValue] = useState('');
-  const [editIcon, setEditIcon] = useState<AreaIconId>(DEFAULT_AREA_ICON);
+  const [editIcon, setEditIcon] = useState<CategoryIconId>(DEFAULT_CATEGORY_ICON);
   const [exportBusy, setExportBusy] = useState(false);
   const [importBusy, setImportBusy] = useState(false);
   const importInputRef = useRef<HTMLInputElement>(null);
@@ -43,7 +43,7 @@ export function SettingsDialog({
     if (!open) {
       setEditingId(null);
       setNewName('');
-      setNewIcon(DEFAULT_AREA_ICON);
+      setNewIcon(DEFAULT_CATEGORY_ICON);
       return;
     }
   }, [open]);
@@ -61,10 +61,10 @@ export function SettingsDialog({
     }
     setBusy(true);
     try {
-      await areasApi.create({name, icon: newIcon});
+      await categoriesApi.create({name, icon: newIcon});
       setNewName('');
-      setNewIcon(DEFAULT_AREA_ICON);
-      await onAreasUpdated();
+      setNewIcon(DEFAULT_CATEGORY_ICON);
+      await onCategoriesUpdated();
     } catch {
       /* parent shows errors */
     } finally {
@@ -79,9 +79,9 @@ export function SettingsDialog({
     }
     setBusy(true);
     try {
-      await areasApi.update(id, {name, icon: editIcon});
+      await categoriesApi.update(id, {name, icon: editIcon});
       setEditingId(null);
-      await onAreasUpdated();
+      await onCategoriesUpdated();
     } finally {
       setBusy(false);
     }
@@ -120,7 +120,7 @@ export function SettingsDialog({
     setImportBusy(true);
     try {
       await uploadDatabaseImport(file);
-      await onAreasUpdated();
+      await onCategoriesUpdated();
     } catch {
       window.alert(t('settingsImportDbError'));
     } finally {
@@ -129,18 +129,18 @@ export function SettingsDialog({
   }
 
   async function handleDelete(id: string, name: string) {
-    const n = taskCountByAreaId[id] ?? 0;
+    const n = taskCountByCategoryId[id] ?? 0;
     const msg =
       n > 0
-        ? t('settingsDeleteAreaWithTasks', {name, count: n})
-        : t('settingsDeleteAreaConfirm', {name});
+        ? t('settingsDeleteCategoryWithTasks', {name, count: n})
+        : t('settingsDeleteCategoryConfirm', {name});
     if (!window.confirm(msg)) {
       return;
     }
     setBusy(true);
     try {
-      await areasApi.remove(id);
-      await onAreasUpdated();
+      await categoriesApi.remove(id);
+      await onCategoriesUpdated();
     } finally {
       setBusy(false);
     }
@@ -177,12 +177,12 @@ export function SettingsDialog({
                 <span>{t('settingsSectionGeneral')}</span>
               </button>
               <button
-                className={`settingsDialog__navBtn ${section === 'areas' ? 'is-active' : ''}`}
-                onClick={() => setSection('areas')}
+                className={`settingsDialog__navBtn ${section === 'categories' ? 'is-active' : ''}`}
+                onClick={() => setSection('categories')}
                 type="button"
               >
                 <FolderOpen aria-hidden size={18} />
-                <span>{t('settingsSectionAreas')}</span>
+                <span>{t('settingsSectionCategories')}</span>
               </button>
             </nav>
 
@@ -246,20 +246,20 @@ export function SettingsDialog({
               ) : (
                 <>
                   <Dialog.Description asChild>
-                    <p className="settingsDialog__panelIntro">{t('settingsAreasIntro')}</p>
+                    <p className="settingsDialog__panelIntro">{t('settingsCategoriesIntro')}</p>
                   </Dialog.Description>
 
-                  <div className="settingsDialog__areaNew">
-                    <div className="settingsDialog__fieldLabel" id="settings-new-area-icon">
-                      {t('settingsAreaIconLabel')}
+                  <div className="settingsDialog__categoryNew">
+                    <div className="settingsDialog__fieldLabel" id="settings-new-category-icon">
+                      {t('settingsCategoryIconLabel')}
                     </div>
-                    <AreaIconPicker
+                    <CategoryIconPicker
                       disabled={busy}
-                      labelledBy="settings-new-area-icon"
+                      labelledBy="settings-new-category-icon"
                       onChange={setNewIcon}
                       value={newIcon}
                     />
-                    <p className="settingsDialog__fieldHint">{t('settingsAreaIconHint')}</p>
+                    <p className="settingsDialog__fieldHint">{t('settingsCategoryIconHint')}</p>
                     <div className="settingsDialog__addRow">
                       <input
                         className="settingsDialog__input"
@@ -270,7 +270,7 @@ export function SettingsDialog({
                             void handleAdd();
                           }
                         }}
-                        placeholder={t('settingsNewAreaPlaceholder')}
+                        placeholder={t('settingsNewCategoryPlaceholder')}
                         value={newName}
                       />
                       <button
@@ -280,30 +280,30 @@ export function SettingsDialog({
                         type="button"
                       >
                         <Plus aria-hidden size={16} strokeWidth={2.25} />
-                        <span>{t('settingsAddArea')}</span>
+                        <span>{t('settingsAddCategory')}</span>
                       </button>
                     </div>
                   </div>
 
                   <ul className="settingsDialog__list">
-                    {areas.length === 0 ? (
-                      <li className="settingsDialog__empty">{t('settingsNoAreasYet')}</li>
+                    {categories.length === 0 ? (
+                      <li className="settingsDialog__empty">{t('settingsNoCategoriesYet')}</li>
                     ) : (
-                      areas.map((area) => {
-                        const RowIcon = getAreaIconComponent(area.icon);
+                      categories.map((cat) => {
+                        const RowIcon = getCategoryIconComponent(cat.icon);
                         return (
-                          <li className="settingsDialog__row" key={area.id}>
-                            {editingId === area.id ? (
+                          <li className="settingsDialog__row" key={cat.id}>
+                            {editingId === cat.id ? (
                               <div className="settingsDialog__rowEdit">
                                 <div
                                   className="settingsDialog__fieldLabel"
-                                  id={`edit-area-icon-${area.id}`}
+                                  id={`edit-category-icon-${cat.id}`}
                                 >
-                                  {t('settingsAreaIconLabel')}
+                                  {t('settingsCategoryIconLabel')}
                                 </div>
-                                <AreaIconPicker
+                                <CategoryIconPicker
                                   disabled={busy}
-                                  labelledBy={`edit-area-icon-${area.id}`}
+                                  labelledBy={`edit-category-icon-${cat.id}`}
                                   onChange={setEditIcon}
                                   value={editIcon}
                                 />
@@ -315,7 +315,7 @@ export function SettingsDialog({
                                     onKeyDown={(e) => {
                                       if (e.key === 'Enter') {
                                         e.preventDefault();
-                                        void handleSaveEdit(area.id);
+                                        void handleSaveEdit(cat.id);
                                       }
                                       if (e.key === 'Escape') {
                                         setEditingId(null);
@@ -326,7 +326,7 @@ export function SettingsDialog({
                                   <button
                                     className="settingsDialog__iconBtn"
                                     disabled={busy}
-                                    onClick={() => void handleSaveEdit(area.id)}
+                                    onClick={() => void handleSaveEdit(cat.id)}
                                     type="button"
                                   >
                                     {t('save')}
@@ -335,23 +335,23 @@ export function SettingsDialog({
                               </div>
                             ) : (
                               <>
-                                <span className="settingsDialog__rowIcon" title={area.icon}>
+                                <span className="settingsDialog__rowIcon" title={cat.icon}>
                                   <RowIcon aria-hidden size={17} strokeWidth={2} />
                                 </span>
-                                <span className="settingsDialog__areaName">{area.name}</span>
-                                <span className="settingsDialog__areaMeta">
-                                  {t('settingsAreaTaskCount', {
-                                    count: taskCountByAreaId[area.id] ?? 0,
+                                <span className="settingsDialog__categoryName">{cat.name}</span>
+                                <span className="settingsDialog__categoryMeta">
+                                  {t('settingsCategoryTaskCount', {
+                                    count: taskCountByCategoryId[cat.id] ?? 0,
                                   })}
                                 </span>
                                 <button
-                                  aria-label={t('settingsRenameArea')}
+                                  aria-label={t('settingsRenameCategory')}
                                   className="settingsDialog__iconBtn"
                                   disabled={busy}
                                   onClick={() => {
-                                    setEditingId(area.id);
-                                    setEditValue(area.name);
-                                    setEditIcon(area.icon);
+                                    setEditingId(cat.id);
+                                    setEditValue(cat.name);
+                                    setEditIcon(cat.icon);
                                   }}
                                   type="button"
                                 >
@@ -361,7 +361,7 @@ export function SettingsDialog({
                                   aria-label={t('delete')}
                                   className="settingsDialog__iconBtn settingsDialog__iconBtn--danger"
                                   disabled={busy}
-                                  onClick={() => void handleDelete(area.id, area.name)}
+                                  onClick={() => void handleDelete(cat.id, cat.name)}
                                   type="button"
                                 >
                                   <Trash2 size={15} />

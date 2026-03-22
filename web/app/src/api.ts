@@ -1,4 +1,4 @@
-import type {Area, CreateTaskPayload, Task, TaskDraftPayload} from './types';
+import type {Category, CreateTaskPayload, Task, TaskDraftPayload} from './types';
 
 /**
  * Express API base URL. Empty string = same-origin relative paths (e.g. production on :8787).
@@ -69,24 +69,24 @@ export const tasksApi = {
   },
 };
 
-export const areasApi = {
-  list(): Promise<Area[]> {
-    return request<Area[]>('/api/areas');
+export const categoriesApi = {
+  list(): Promise<Category[]> {
+    return request<Category[]>('/api/categories');
   },
-  create(body: {name: string; icon?: string}): Promise<Area> {
-    return request<Area>('/api/areas', {
+  create(body: {name: string; icon?: string}): Promise<Category> {
+    return request<Category>('/api/categories', {
       method: 'POST',
       body: JSON.stringify(body),
     });
   },
-  update(id: string, body: {name: string; icon?: string}): Promise<Area> {
-    return request<Area>(`/api/areas/${id}`, {
+  update(id: string, body: {name: string; icon?: string}): Promise<Category> {
+    return request<Category>(`/api/categories/${id}`, {
       method: 'PUT',
       body: JSON.stringify(body),
     });
   },
   remove(id: string): Promise<void> {
-    return request<void>(`/api/areas/${id}`, {
+    return request<void>(`/api/categories/${id}`, {
       method: 'DELETE',
     });
   },
@@ -94,7 +94,7 @@ export const areasApi = {
 
 /**
  * Replace the server database with an exported `.sqlite` file (multipart POST, field `database`).
- * After success, refresh task and area lists on the client.
+ * After success, refresh task and category lists on the client.
  */
 export async function uploadDatabaseImport(file: File): Promise<void> {
   const form = new FormData();

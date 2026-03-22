@@ -8,7 +8,7 @@ License [MIT](LICENSE) · [Changelog](CHANGELOG.md)
 
 - **Focused lists** — _Today_, _Upcoming_, _Anytime_, and _Done_ so you see the right workload at the right time, not an endless flat inbox.
 - **Expandable cards** — Open a task for a full editor: **rich text** (headings, bold, italic, bullets, checklists, quotes, code blocks, tables, dividers), **priority**, **pin**, **due date**, **recurrence**, **time estimate**, and a **timer** when you want to track focus.
-- **Areas** — Group work by project or life domain and filter the board from the sidebar.
+- **Categories** — Group work by project or life domain and filter the board from the sidebar.
 - **Quick capture** — Add a thought from the top bar without losing your place on the board.
 - **Your data, your disk** — Export or import the whole database as `.sqlite` from Settings; copy `.data/` for a raw backup.
 - **Interface languages** — English by default, plus French, German, Spanish, Italian, Dutch, Polish, Portuguese, and Japanese (switch in Settings).
@@ -28,7 +28,7 @@ Real UI (English) — same app you get from the **[latest release](https://githu
 
 ![Expanded task: rich text toolbar, notes, and footer with estimate, priority, pin, dates, timer](docs/screenshots/readme-04-task-expanded.png)
 
-_Open a card for headings, lists, checklists, quotes, code, tables — plus estimate, area, priority, pin, schedule, repeat, and timer in the footer._
+_Open a card for headings, lists, checklists, quotes, code, tables — plus estimate, category, priority, pin, schedule, repeat, and timer in the footer._
 
 ## Install and run
 

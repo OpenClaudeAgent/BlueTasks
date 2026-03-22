@@ -1,4 +1,4 @@
-import type {AreaIconId} from './lib/areaIcons';
+import type {CategoryIconId} from './lib/categoryIcons';
 
 export type TaskStatus = 'pending' | 'completed';
 
@@ -9,18 +9,18 @@ export type RecurrenceKind = 'daily' | 'weekly' | 'biweekly' | 'monthly' | 'year
 /** Concrete bucket for a single task (sidebar section "All" is not a bucket). */
 export type TaskSectionBucket = 'today' | 'upcoming' | 'anytime' | 'done';
 
-/** Primary nav: includes "All" (every task in the current area filter). */
+/** Primary nav: includes "All" (every task in the current category filter). */
 export type SectionId = TaskSectionBucket | 'all';
 
-/** Sidebar filter: `AREA_FILTER_ALL`, `AREA_FILTER_UNCATEGORIZED`, or an area id. */
-export const AREA_FILTER_ALL = 'all';
-export const AREA_FILTER_UNCATEGORIZED = 'uncategorized';
-export type AreaFilter = string;
+/** Sidebar filter: `CATEGORY_FILTER_ALL`, `CATEGORY_FILTER_UNCATEGORIZED`, or a category id. */
+export const CATEGORY_FILTER_ALL = 'all';
+export const CATEGORY_FILTER_UNCATEGORIZED = 'uncategorized';
+export type CategoryFilter = string;
 
-export type Area = {
+export type Category = {
   id: string;
   name: string;
-  icon: AreaIconId;
+  icon: CategoryIconId;
   sortIndex: number;
   createdAt: string;
 };
@@ -40,8 +40,8 @@ export type Task = {
   timeSpentSeconds: number;
   timerStartedAt: string | null;
   recurrence: RecurrenceKind | null;
-  /** Area / project (optional). */
-  areaId: string | null;
+  /** Category / project (optional). */
+  categoryId: string | null;
   createdAt: string;
   updatedAt: string;
 };

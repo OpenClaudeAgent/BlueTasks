@@ -13,8 +13,8 @@ export type TaskCardHeaderRowProps = {
   titleInputRef: RefObject<HTMLInputElement | null>;
   pinned: boolean;
   recurrence: RecurrenceKind | null;
-  areaDisplayName: string | null;
-  AreaGlyph: LucideIcon;
+  categoryDisplayName: string | null;
+  CategoryGlyph: LucideIcon;
   trackedSeconds: number;
   dateOpen: boolean;
   onDateOpenChange: (open: boolean) => void;
@@ -33,8 +33,8 @@ export function TaskCardHeaderRow({
   titleInputRef,
   pinned,
   recurrence,
-  areaDisplayName,
-  AreaGlyph,
+  categoryDisplayName,
+  CategoryGlyph,
   trackedSeconds,
   dateOpen,
   onDateOpenChange,
@@ -88,10 +88,12 @@ export function TaskCardHeaderRow({
       </div>
 
       <div className="taskCard__rowTrailing">
-        {task.areaId ? (
-          <span className="taskCard__chip taskCard__chip--area" title={t('areaLabel')}>
-            <AreaGlyph aria-hidden size={11} strokeWidth={2.5} />
-            <span className="taskCard__areaChipText">{areaDisplayName ?? t('areaMissing')}</span>
+        {task.categoryId ? (
+          <span className="taskCard__chip taskCard__chip--category" title={t('categoryLabel')}>
+            <CategoryGlyph aria-hidden size={11} strokeWidth={2.5} />
+            <span className="taskCard__categoryChipText">
+              {categoryDisplayName ?? t('categoryMissing')}
+            </span>
           </span>
         ) : null}
         <span

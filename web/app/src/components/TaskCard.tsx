@@ -10,7 +10,7 @@ export type {TaskCardProps};
 
 function TaskCardComponent({
   task,
-  areas,
+  categories,
   boardChrome,
   expanded,
   autoFocusTitle = false,
@@ -25,7 +25,7 @@ function TaskCardComponent({
   const titleInputRef = useRef<HTMLInputElement>(null);
   const chrome = useTaskCardChrome(
     task,
-    areas,
+    categories,
     i18n.language,
     isSaving,
     onChange,
@@ -50,8 +50,8 @@ function TaskCardComponent({
       className={`taskCard ${expanded ? 'is-expanded' : ''} ${task.status === 'completed' ? 'is-completed' : ''}`}
     >
       <TaskCardHeaderRow
-        AreaGlyph={chrome.AreaGlyph}
-        areaDisplayName={chrome.areaDisplayName}
+        CategoryGlyph={chrome.CategoryGlyph}
+        categoryDisplayName={chrome.categoryDisplayName}
         dateOpen={chrome.dateOpen}
         datePillLabel={chrome.datePillLabel}
         dateTone={chrome.dateTone}

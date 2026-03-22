@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
-import {areasApi, apiUrl, downloadDatabaseExport, tasksApi, uploadDatabaseImport} from './api';
+import {categoriesApi, apiUrl, downloadDatabaseExport, tasksApi, uploadDatabaseImport} from './api';
 
 describe('apiUrl', () => {
   it('returns a path rooted at / when no origin prefix applies', () => {
@@ -14,7 +14,7 @@ describe('apiUrl', () => {
   });
 });
 
-describe('tasksApi / areasApi', () => {
+describe('tasksApi / categoriesApi', () => {
   beforeEach(() => {
     vi.stubGlobal('fetch', vi.fn());
   });
@@ -80,34 +80,34 @@ describe('tasksApi / areasApi', () => {
     await expect(tasksApi.list()).rejects.toThrow('boom');
   });
 
-  it('areasApi.create POSTs name and optional icon', async () => {
+  it('categoriesApi.create POSTs name and optional icon', async () => {
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
       status: 201,
       json: () => Promise.resolve({id: 'a', name: 'Z', icon: 'folder'}),
     } as Response);
-    await areasApi.create({name: 'Z', icon: 'inbox'});
+    await categoriesApi.create({name: 'Z', icon: 'inbox'});
     const init = vi.mocked(fetch).mock.calls[0]?.[1] as RequestInit;
     expect(JSON.parse(String(init.body))).toEqual({name: 'Z', icon: 'inbox'});
   });
 
-  it('areasApi.update sends PUT', async () => {
+  it('categoriesApi.update sends PUT', async () => {
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
       status: 200,
       json: () => Promise.resolve({id: 'a', name: 'Renamed'}),
     } as Response);
-    await areasApi.update('a', {name: 'Renamed'});
-    expect(String(vi.mocked(fetch).mock.calls[0]?.[0])).toMatch(/\/api\/areas\/a$/);
+    await categoriesApi.update('a', {name: 'Renamed'});
+    expect(String(vi.mocked(fetch).mock.calls[0]?.[0])).toMatch(/\/api\/categories\/a$/);
   });
 
-  it('areasApi.remove sends DELETE', async () => {
+  it('categoriesApi.remove sends DELETE', async () => {
     vi.mocked(fetch).mockResolvedValue({
       ok: true,
       status: 204,
       text: () => Promise.resolve(''),
     } as Response);
-    await expect(areasApi.remove('a')).resolves.toBeUndefined();
+    await expect(categoriesApi.remove('a')).resolves.toBeUndefined();
   });
 });
 

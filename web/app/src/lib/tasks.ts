@@ -1,16 +1,16 @@
 import {
   getTaskSectionBucket,
-  taskMatchesAreaFilterRow,
   taskMatchesBoardSectionRow,
+  taskMatchesCategoryFilterRow,
   type BoardSectionId,
 } from '@bluetasks/contract/task-board-filter.js';
 import {todayKey} from './dateKeys';
 import {createEmptyEditorState, lexicalDocsContentEqual} from './editorState';
 import {
-  AREA_FILTER_ALL,
-  AREA_FILTER_UNCATEGORIZED,
-  type Area,
-  type AreaFilter,
+  CATEGORY_FILTER_ALL,
+  CATEGORY_FILTER_UNCATEGORIZED,
+  type Category,
+  type CategoryFilter,
   type SectionId,
   type Task,
   type TaskCounts,
@@ -25,8 +25,8 @@ export type {TaskSectionBucket} from '../types';
 
 export {coercePinned, coerceRecurrence} from './taskPropertyValidation';
 
-/** New task: no default due date (area is not forced here either); the user sets them on the card. */
-export function createTask(title: string, areaId: string | null = null): Task {
+/** New task: no default due date (category is not forced here either); the user sets them on the card. */
+export function createTask(title: string, categoryId: string | null = null): Task {
   const now = new Date().toISOString();
 
   return {
@@ -44,7 +44,7 @@ export function createTask(title: string, areaId: string | null = null): Task {
     timeSpentSeconds: 0,
     timerStartedAt: null,
     recurrence: null,
-    areaId,
+    categoryId,
     createdAt: now,
     updatedAt: now,
   };
@@ -65,7 +65,7 @@ export function toTaskDraftPayload(task: Task): TaskDraftPayload {
     timeSpentSeconds: task.timeSpentSeconds,
     timerStartedAt: task.timerStartedAt,
     recurrence: coerceRecurrence(task.recurrence),
-    areaId: typeof task.areaId === 'string' && task.areaId ? task.areaId : null,
+    categoryId: typeof task.categoryId === 'string' && task.categoryId ? task.categoryId : null,
   };
 }
 
@@ -79,7 +79,7 @@ export function mergeTaskFromApi(task: Task): Task {
     timeSpentSeconds: task.timeSpentSeconds ?? 0,
     timerStartedAt: task.timerStartedAt ?? null,
     recurrence: coerceRecurrence(task.recurrence),
-    areaId: typeof task.areaId === 'string' && task.areaId ? task.areaId : null,
+    categoryId: typeof task.categoryId === 'string' && task.categoryId ? task.categoryId : null,
   };
 }
 
@@ -109,20 +109,20 @@ function toBoardFilterTask(task: Task) {
   return {
     status: task.status,
     taskDate: task.taskDate,
-    areaId: task.areaId,
+    categoryId: task.categoryId,
   };
 }
 
 export function filterTasks(
   tasks: Task[],
   section: SectionId,
-  areaFilter: AreaFilter = AREA_FILTER_ALL,
+  categoryFilter: CategoryFilter = CATEGORY_FILTER_ALL,
 ): Task[] {
   const today = todayKey();
 
   return sortTasks(
     tasks.filter((task) => {
-      if (!taskMatchesAreaFilterRow(toBoardFilterTask(task), areaFilter)) {
+      if (!taskMatchesCategoryFilterRow(toBoardFilterTask(task), categoryFilter)) {
         return false;
       }
       return taskMatchesBoardSectionRow(toBoardFilterTask(task), section as BoardSectionId, today);
@@ -130,11 +130,11 @@ export function filterTasks(
   );
 }
 
-/** One pass over tasks: counts per area row for the sidebar (same rules as `filterTasks`, without sorting). */
-export function getAreaSidebarCounts(
+/** One pass over tasks: counts per category row for the sidebar (same rules as `filterTasks`, without sorting). */
+export function getCategorySidebarCounts(
   tasks: Task[],
   selectedSection: SectionId,
-  areas: Area[],
+  categories: Category[],
 ): {
   all: number;
   uncategorized: number;
@@ -143,8 +143,8 @@ export function getAreaSidebarCounts(
   const today = todayKey();
   const section = selectedSection as BoardSectionId;
   const byId: Record<string, number> = {};
-  for (const area of areas) {
-    byId[area.id] = 0;
+  for (const c of categories) {
+    byId[c.id] = 0;
   }
   let all = 0;
   let uncategorized = 0;
@@ -154,15 +154,15 @@ export function getAreaSidebarCounts(
     if (!taskMatchesBoardSectionRow(row, section, today)) {
       continue;
     }
-    if (taskMatchesAreaFilterRow(row, AREA_FILTER_ALL)) {
+    if (taskMatchesCategoryFilterRow(row, CATEGORY_FILTER_ALL)) {
       all++;
     }
-    if (taskMatchesAreaFilterRow(row, AREA_FILTER_UNCATEGORIZED)) {
+    if (taskMatchesCategoryFilterRow(row, CATEGORY_FILTER_UNCATEGORIZED)) {
       uncategorized++;
     }
-    for (const area of areas) {
-      if (taskMatchesAreaFilterRow(row, area.id)) {
-        byId[area.id]++;
+    for (const c of categories) {
+      if (taskMatchesCategoryFilterRow(row, c.id)) {
+        byId[c.id]++;
       }
     }
   }
@@ -170,13 +170,16 @@ export function getAreaSidebarCounts(
   return {all, uncategorized, byId};
 }
 
-export function getTaskCounts(tasks: Task[], areaFilter: AreaFilter = AREA_FILTER_ALL): TaskCounts {
+export function getTaskCounts(
+  tasks: Task[],
+  categoryFilter: CategoryFilter = CATEGORY_FILTER_ALL,
+): TaskCounts {
   return {
-    all: filterTasks(tasks, 'all', areaFilter).length,
-    today: filterTasks(tasks, 'today', areaFilter).length,
-    upcoming: filterTasks(tasks, 'upcoming', areaFilter).length,
-    anytime: filterTasks(tasks, 'anytime', areaFilter).length,
-    done: filterTasks(tasks, 'done', areaFilter).length,
+    all: filterTasks(tasks, 'all', categoryFilter).length,
+    today: filterTasks(tasks, 'today', categoryFilter).length,
+    upcoming: filterTasks(tasks, 'upcoming', categoryFilter).length,
+    anytime: filterTasks(tasks, 'anytime', categoryFilter).length,
+    done: filterTasks(tasks, 'done', categoryFilter).length,
   };
 }
 
@@ -212,9 +215,9 @@ export function getPreferredTaskId(
   tasks: Task[],
   selectedSection: SectionId,
   selectedTaskId: string | null,
-  areaFilter: AreaFilter = AREA_FILTER_ALL,
+  categoryFilter: CategoryFilter = CATEGORY_FILTER_ALL,
 ): string | null {
-  const visibleTasks = filterTasks(tasks, selectedSection, areaFilter);
+  const visibleTasks = filterTasks(tasks, selectedSection, categoryFilter);
   if (visibleTasks.length === 0) {
     return null;
   }

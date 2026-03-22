@@ -11,10 +11,10 @@ import {
   Settings,
 } from 'lucide-react';
 import {useTranslation} from 'react-i18next';
-import {getAreaIconComponent} from '../lib/areaIcons';
+import {getCategoryIconComponent} from '../lib/categoryIcons';
 import {sectionOrder} from '../lib/tasks';
-import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from '../types';
-import type {Area, AreaFilter, SectionId, TaskCounts} from '../types';
+import {CATEGORY_FILTER_ALL, CATEGORY_FILTER_UNCATEGORIZED} from '../types';
+import type {Category, CategoryFilter, SectionId, TaskCounts} from '../types';
 
 const sectionIcons = {
   /** Full task list across sections */
@@ -28,7 +28,7 @@ const sectionIcons = {
   done: CheckCheck,
 } as const;
 
-export type AreaSidebarCounts = {
+export type CategorySidebarCounts = {
   all: number;
   uncategorized: number;
   byId: Record<string, number>;
@@ -38,10 +38,10 @@ type SidebarProps = {
   selectedSection: SectionId;
   counts: TaskCounts;
   onSelect: (section: SectionId) => void;
-  areas: Area[];
-  areaFilter: AreaFilter;
-  onAreaFilterChange: (filter: AreaFilter) => void;
-  areaRowCounts: AreaSidebarCounts;
+  categories: Category[];
+  categoryFilter: CategoryFilter;
+  onCategoryFilterChange: (filter: CategoryFilter) => void;
+  categoryRowCounts: CategorySidebarCounts;
   onOpenSettings: () => void;
   sidebarWidth: number;
   minSidebarWidth: number;
@@ -53,10 +53,10 @@ export function Sidebar({
   selectedSection,
   counts,
   onSelect,
-  areas,
-  areaFilter,
-  onAreaFilterChange,
-  areaRowCounts,
+  categories,
+  categoryFilter,
+  onCategoryFilterChange,
+  categoryRowCounts,
   onOpenSettings,
   sidebarWidth,
   minSidebarWidth,
@@ -97,47 +97,51 @@ export function Sidebar({
         })}
       </nav>
 
-      <div className="sidebar__areas">
-        <div className="sidebar__areasLabel" id="sidebar-areas-heading">
-          {t('areasNavLabel')}
+      <div className="sidebar__categories">
+        <div className="sidebar__categoriesLabel" id="sidebar-categories-heading">
+          {t('categoriesNavLabel')}
         </div>
-        <div className="sidebar__areasNav" role="group" aria-labelledby="sidebar-areas-heading">
+        <div
+          className="sidebar__categoriesNav"
+          role="group"
+          aria-labelledby="sidebar-categories-heading"
+        >
           <button
-            className={`sidebar__item ${areaFilter === AREA_FILTER_ALL ? 'is-active' : ''}`}
-            onClick={() => onAreaFilterChange(AREA_FILTER_ALL)}
+            className={`sidebar__item ${categoryFilter === CATEGORY_FILTER_ALL ? 'is-active' : ''}`}
+            onClick={() => onCategoryFilterChange(CATEGORY_FILTER_ALL)}
             type="button"
           >
             <span className="sidebar__itemIcon">
               <Layers size={18} />
             </span>
-            <span className="sidebar__itemLabel">{t('areasAll')}</span>
-            <span className="sidebar__itemCount">{areaRowCounts.all}</span>
+            <span className="sidebar__itemLabel">{t('categoriesAll')}</span>
+            <span className="sidebar__itemCount">{categoryRowCounts.all}</span>
           </button>
           <button
-            className={`sidebar__item ${areaFilter === AREA_FILTER_UNCATEGORIZED ? 'is-active' : ''}`}
-            onClick={() => onAreaFilterChange(AREA_FILTER_UNCATEGORIZED)}
+            className={`sidebar__item ${categoryFilter === CATEGORY_FILTER_UNCATEGORIZED ? 'is-active' : ''}`}
+            onClick={() => onCategoryFilterChange(CATEGORY_FILTER_UNCATEGORIZED)}
             type="button"
           >
             <span className="sidebar__itemIcon">
               <Folder size={18} />
             </span>
-            <span className="sidebar__itemLabel">{t('areasUncategorized')}</span>
-            <span className="sidebar__itemCount">{areaRowCounts.uncategorized}</span>
+            <span className="sidebar__itemLabel">{t('categoriesUncategorized')}</span>
+            <span className="sidebar__itemCount">{categoryRowCounts.uncategorized}</span>
           </button>
-          {areas.map((area) => {
-            const AreaIcon = getAreaIconComponent(area.icon);
+          {categories.map((c) => {
+            const CatIcon = getCategoryIconComponent(c.icon);
             return (
               <button
-                key={area.id}
-                className={`sidebar__item ${areaFilter === area.id ? 'is-active' : ''}`}
-                onClick={() => onAreaFilterChange(area.id)}
+                key={c.id}
+                className={`sidebar__item ${categoryFilter === c.id ? 'is-active' : ''}`}
+                onClick={() => onCategoryFilterChange(c.id)}
                 type="button"
               >
                 <span className="sidebar__itemIcon">
-                  <AreaIcon size={18} />
+                  <CatIcon size={18} />
                 </span>
-                <span className="sidebar__itemLabel">{area.name}</span>
-                <span className="sidebar__itemCount">{areaRowCounts.byId[area.id] ?? 0}</span>
+                <span className="sidebar__itemLabel">{c.name}</span>
+                <span className="sidebar__itemCount">{categoryRowCounts.byId[c.id] ?? 0}</span>
               </button>
             );
           })}

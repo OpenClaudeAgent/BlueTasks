@@ -1,7 +1,7 @@
 # Runtime léger : bundle JS (express, cors, multer, etc.) + uniquement la chaîne native
 # better-sqlite3 (compilée / prébuild pour la plateforme dans l’étape deps).
 #
-# Contexte = `npm run package:docker` : docker-bundle.mjs, web/app/dist, server/data/area-icon-ids.json,
+# Contexte = `npm run package:docker` : docker-bundle.mjs, web/app/dist, server/data/category-icon-ids.json,
 # fichiers npm + script de prune (pas de node_modules dans le contexte hôte).
 
 FROM node:22-alpine AS deps

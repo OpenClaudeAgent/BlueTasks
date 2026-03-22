@@ -5,7 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import type {DatabaseContext, CreateAppOptions} from './appTypes.js';
 export type {DatabaseContext, CreateAppOptions} from './appTypes.js';
-import {createAreasRouter} from './routes/areasRoutes.js';
+import {createCategoriesRouter} from './routes/categoriesRoutes.js';
 import {createImportExportRouter} from './routes/importExportRoutes.js';
 import {createTasksRouter} from './routes/tasksRoutes.js';
 
@@ -18,7 +18,7 @@ export function createApp(dbCtx: DatabaseContext, options: CreateAppOptions = {}
   app.use(express.json({limit: '2mb'}));
 
   app.use('/api/tasks', createTasksRouter(getDb));
-  app.use('/api/areas', createAreasRouter(getDb));
+  app.use('/api/categories', createCategoriesRouter(getDb));
   app.use('/api', createImportExportRouter({getDb, dbCtx, options}));
 
   const staticDir = options.staticDir;

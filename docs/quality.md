@@ -52,14 +52,14 @@ Related workflows:
 ## Server
 
 - Validation logic lives in [`server/src/taskSanitize.ts`](../server/src/taskSanitize.ts) (unit tests).
-- HTTP app is wired in [`server/src/createApp.ts`](../server/src/createApp.ts) (mounts [`server/src/routes/`](../server/src/routes/) — tasks, areas, import/export) + in-memory DB for integration tests (`supertest`).
+- HTTP app is wired in [`server/src/createApp.ts`](../server/src/createApp.ts) (mounts [`server/src/routes/`](../server/src/routes/) — tasks, categories, import/export) + in-memory DB for integration tests (`supertest`).
 
 ## Module layout and import-cycle goals
 
 ### API contract checks
 
-- Shared Zod contract assertions live in [`contract/api-contract-validation.ts`](../contract/api-contract-validation.ts) (`assertApiTaskRowContract`, `assertApiAreaRowContract`).
-- Playwright ([`e2e/contract-expectations.ts`](../e2e/contract-expectations.ts)) re-exports `expectApiTaskRow` / `expectApiAreaRow`. Vitest HTTP tests import [`expectApiTaskRow` only from `server/src/api.integration.test.helpers.ts`](../server/src/api.integration.test.helpers.ts) (areas are asserted with `expect.objectContaining` inline). Neither duplicates `parse` logic.
+- Shared Zod contract assertions live in [`contract/api-contract-validation.ts`](../contract/api-contract-validation.ts) (`assertApiTaskRowContract`, `assertApiCategoryRowContract`).
+- Playwright ([`e2e/contract-expectations.ts`](../e2e/contract-expectations.ts)) re-exports `expectApiTaskRow` / `expectApiCategoryRow`. Vitest HTTP tests import [`expectApiTaskRow` only from `server/src/api.integration.test.helpers.ts`](../server/src/api.integration.test.helpers.ts) (categories are asserted with `expect.objectContaining` inline). Neither duplicates `parse` logic.
 
 ### Task property coercion (web)
 
@@ -68,7 +68,7 @@ Related workflows:
 
 ### TaskCard derived values
 
-- Shared pure helpers for the task card (for example `areaNameByIdMap`, checklist ratio) belong in [`web/app/src/components/taskCard/taskCardModel.ts`](../web/app/src/components/taskCard/taskCardModel.ts). When splitting footer pickers into subcomponents, import from here rather than introducing a second model module or duplicating maps.
+- Shared pure helpers for the task card (for example `categoryNameByIdMap`, checklist ratio) belong in [`web/app/src/components/taskCard/taskCardModel.ts`](../web/app/src/components/taskCard/taskCardModel.ts). When splitting footer pickers into subcomponents, import from here rather than introducing a second model module or duplicating maps.
 
 ### RPG / dependency-cycle KPIs
 

@@ -11,7 +11,7 @@ import {
 /**
  * **API-first** scenarios (state setup), then **reload** and **UI assertions**.
  * Complements specs that create everything in the UI: here we assert the board
- * reflects persisted data (dates, priority, area, timer, etc.).
+ * reflects persisted data (dates, priority, category, timer, etc.).
  */
 test.describe('Task board: API-seeded → UI', () => {
   test.describe.configure({mode: 'serial'});
@@ -105,14 +105,14 @@ test.describe('Task board: API-seeded → UI', () => {
     ).toContainText('30 min');
   });
 
-  test('task with API areaId shows area name on chip', async ({page, request}) => {
+  test('task with API categoryId shows category name on chip', async ({page, request}) => {
     const zone = 'Seeded API Zone';
-    const areaRes = await request.post('/api/areas', {data: {name: zone, icon: 'folder'}});
-    expect(areaRes.ok()).toBe(true);
-    const {id: areaId} = (await areaRes.json()) as {id: string};
+    const categoryRes = await request.post('/api/categories', {data: {name: zone, icon: 'folder'}});
+    expect(categoryRes.ok()).toBe(true);
+    const {id: categoryId} = (await categoryRes.json()) as {id: string};
 
-    const title = `Seed area ${Date.now()}`;
-    await createTaskViaApi(request, {title, areaId});
+    const title = `Seed category ${Date.now()}`;
+    await createTaskViaApi(request, {title, categoryId});
 
     await reloadPageAfterApiSeed(page);
     await page
@@ -121,7 +121,7 @@ test.describe('Task board: API-seeded → UI', () => {
       .click();
 
     const card = taskCardByTitle(page, title);
-    await expect(card.locator('.taskCard__chip--area')).toContainText(zone);
+    await expect(card.locator('.taskCard__chip--category')).toContainText(zone);
   });
 
   test('task with API timeSpentSeconds shows duration label in footer', async ({page, request}) => {

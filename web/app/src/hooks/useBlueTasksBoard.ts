@@ -1,21 +1,21 @@
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useTranslation} from 'react-i18next';
-import {filterTasks, getAreaSidebarCounts, getTaskCounts} from '../lib/tasks';
-import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from '../types';
+import {filterTasks, getCategorySidebarCounts, getTaskCounts} from '../lib/tasks';
+import {CATEGORY_FILTER_ALL, CATEGORY_FILTER_UNCATEGORIZED} from '../types';
 import {useBlueTasksTasksAndSaves} from './blueTasks/useBlueTasksTasksAndSaves';
 import {useBlueTasksUiState} from './blueTasks/useBlueTasksUiState';
 import {useBoardTimerNowMs} from './useBoardTimerNowMs';
 
 /**
- * Composes UI state + tasks/areas persistence. See `useBlueTasksUiState` and `useBlueTasksTasksAndSaves`.
+ * Composes UI state + tasks/categories persistence. See `useBlueTasksUiState` and `useBlueTasksTasksAndSaves`.
  */
 export function useBlueTasksBoard() {
   const {t} = useTranslation();
   const [rawDatePopoverTaskId, setDatePopoverTaskId] = useState<string | null>(null);
   const ui = useBlueTasksUiState();
   const {
-    areaFilter,
-    setAreaFilter,
+    categoryFilter,
+    setCategoryFilter,
     selectedSection,
     setSelectedSection,
     selectedTaskId,
@@ -39,9 +39,9 @@ export function useBlueTasksBoard() {
 
   const {
     tasks,
-    areas,
+    categories,
     savingIds,
-    refreshTasksAndAreas,
+    refreshTasksAndCategories,
     handleAddTask,
     handleQuickCapture,
     handleTaskDraftChange,
@@ -50,8 +50,8 @@ export function useBlueTasksBoard() {
   } = core;
 
   const visibleTasks = useMemo(
-    () => filterTasks(tasks, selectedSection, areaFilter),
-    [tasks, selectedSection, areaFilter],
+    () => filterTasks(tasks, selectedSection, categoryFilter),
+    [tasks, selectedSection, categoryFilter],
   );
 
   const liveTimerNowMs = useBoardTimerNowMs(visibleTasks);
@@ -59,30 +59,30 @@ export function useBlueTasksBoard() {
     rawDatePopoverTaskId !== null && visibleTasks.some((task) => task.id === rawDatePopoverTaskId)
       ? rawDatePopoverTaskId
       : null;
-  const counts = useMemo(() => getTaskCounts(tasks, areaFilter), [tasks, areaFilter]);
+  const counts = useMemo(() => getTaskCounts(tasks, categoryFilter), [tasks, categoryFilter]);
 
-  const taskCountByAreaId = useMemo(() => {
+  const taskCountByCategoryId = useMemo(() => {
     const map: Record<string, number> = {};
     for (const task of tasks) {
-      if (task.areaId) {
-        map[task.areaId] = (map[task.areaId] ?? 0) + 1;
+      if (task.categoryId) {
+        map[task.categoryId] = (map[task.categoryId] ?? 0) + 1;
       }
     }
     return map;
   }, [tasks]);
 
-  const areaSidebarCounts = useMemo(
-    () => getAreaSidebarCounts(tasks, selectedSection, areas),
-    [tasks, selectedSection, areas],
+  const categorySidebarCounts = useMemo(
+    () => getCategorySidebarCounts(tasks, selectedSection, categories),
+    [tasks, selectedSection, categories],
   );
 
-  const handleAddTaskForCurrentArea = useCallback(() => {
-    void handleAddTask(areaFilter);
-  }, [handleAddTask, areaFilter]);
+  const handleAddTaskForCurrentCategory = useCallback(() => {
+    void handleAddTask(categoryFilter);
+  }, [handleAddTask, categoryFilter]);
 
   const handleQuickCaptureInContext = useCallback(
-    (title: string) => handleQuickCapture(title, areaFilter, selectedSection),
-    [handleQuickCapture, areaFilter, selectedSection],
+    (title: string) => handleQuickCapture(title, categoryFilter, selectedSection),
+    [handleQuickCapture, categoryFilter, selectedSection],
   );
 
   const toggleTaskExpanded = useCallback(
@@ -97,13 +97,13 @@ export function useBlueTasksBoard() {
   }, [setTitleFocusTaskId]);
 
   useEffect(() => {
-    if (areaFilter === AREA_FILTER_ALL || areaFilter === AREA_FILTER_UNCATEGORIZED) {
+    if (categoryFilter === CATEGORY_FILTER_ALL || categoryFilter === CATEGORY_FILTER_UNCATEGORIZED) {
       return;
     }
-    if (!areas.some((a) => a.id === areaFilter)) {
-      setAreaFilter(AREA_FILTER_ALL);
+    if (!categories.some((c) => c.id === categoryFilter)) {
+      setCategoryFilter(CATEGORY_FILTER_ALL);
     }
-  }, [areas, areaFilter, setAreaFilter]);
+  }, [categories, categoryFilter, setCategoryFilter]);
 
   useEffect(() => {
     setSelectedTaskId((current) => {
@@ -120,9 +120,9 @@ export function useBlueTasksBoard() {
   }, [visibleTasks, setSelectedTaskId]);
 
   return {
-    areas,
-    areaFilter,
-    setAreaFilter,
+    categories,
+    categoryFilter,
+    setCategoryFilter,
     selectedSection,
     setSelectedSection,
     selectedTaskId,
@@ -134,10 +134,10 @@ export function useBlueTasksBoard() {
     savingIds,
     visibleTasks,
     counts,
-    taskCountByAreaId,
-    areaSidebarCounts,
-    refreshTasksAndAreas,
-    handleAddTask: handleAddTaskForCurrentArea,
+    taskCountByCategoryId,
+    categorySidebarCounts,
+    refreshTasksAndCategories,
+    handleAddTask: handleAddTaskForCurrentCategory,
     handleQuickCapture: handleQuickCaptureInContext,
     handleTaskDraftChange,
     handleToggleRecurringStatus,

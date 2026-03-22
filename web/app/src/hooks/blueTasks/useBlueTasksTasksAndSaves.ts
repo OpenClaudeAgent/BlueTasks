@@ -1,8 +1,8 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import type {TFunction} from 'i18next';
-import {areasApi, tasksApi} from '../../api';
+import {categoriesApi, tasksApi} from '../../api';
 import {addDaysToKey, todayKey} from '../../lib/dateKeys';
-import {coerceAreaIcon} from '../../lib/areaIcons';
+import {coerceCategoryIcon} from '../../lib/categoryIcons';
 import {applyRecurringStatusToggle} from '../../lib/taskRecurrence';
 import {
   applySavedTaskPreservingLexicalShape,
@@ -14,10 +14,10 @@ import {
   toTaskDraftPayload,
 } from '../../lib/tasks';
 import {
-  AREA_FILTER_ALL,
-  AREA_FILTER_UNCATEGORIZED,
-  type Area,
-  type AreaFilter,
+  CATEGORY_FILTER_ALL,
+  CATEGORY_FILTER_UNCATEGORIZED,
+  type Category,
+  type CategoryFilter,
   type SectionId,
   type Task,
   type TaskDraftUpdate,
@@ -44,7 +44,7 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
   const tasksRef = useRef<Task[]>(tasks);
   tasksRef.current = tasks;
 
-  const [areas, setAreas] = useState<Area[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [savingIds, setSavingIds] = useState<Record<string, boolean>>({});
   const pendingSavesRef = useRef(new Map<string, PendingTaskSave>());
   const saveRevRef = useRef(new Map<string, number>());
@@ -52,13 +52,13 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
   const flushChainsRef = useRef(new Map<string, Promise<void>>());
 
   const fetchAndApplyLists = useCallback(async () => {
-    const [nextTasks, nextAreas] = await Promise.all([tasksApi.list(), areasApi.list()]);
+    const [nextTasks, nextCategories] = await Promise.all([tasksApi.list(), categoriesApi.list()]);
     setTasks(sortTasks(nextTasks.map((task) => mergeTaskFromApi(task as Task))));
-    setAreas(nextAreas.map((a) => ({...a, icon: coerceAreaIcon(a.icon)})));
+    setCategories(nextCategories.map((c) => ({...c, icon: coerceCategoryIcon(c.icon)})));
     bridgeRef.current.setErrorMessage(null);
   }, []);
 
-  const loadTasksAndAreas = useCallback(async () => {
+  const loadTasksAndCategories = useCallback(async () => {
     try {
       bridgeRef.current.setLoading(true);
       await fetchAndApplyLists();
@@ -78,7 +78,7 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
     const revMap = saveRevRef.current;
     const chainMap = flushChainsRef.current;
 
-    void loadTasksAndAreas();
+    void loadTasksAndCategories();
 
     return () => {
       timerMap.forEach((timeoutId) => window.clearTimeout(timeoutId));
@@ -87,9 +87,9 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
       revMap.clear();
       chainMap.clear();
     };
-  }, [loadTasksAndAreas]);
+  }, [loadTasksAndCategories]);
 
-  const refreshTasksAndAreas = useCallback(async () => {
+  const refreshTasksAndCategories = useCallback(async () => {
     try {
       await fetchAndApplyLists();
     } catch (error) {
@@ -129,10 +129,10 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
         if (options.clearTitleFocusOnError) {
           bridgeRef.current.setTitleFocusTaskId(null);
         }
-        await loadTasksAndAreas();
+        await loadTasksAndCategories();
       }
     },
-    [loadTasksAndAreas],
+    [loadTasksAndCategories],
   );
 
   function setSavingFlag(taskId: string, value: boolean) {
@@ -224,7 +224,7 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
             error instanceof Error ? error.message : tr('errors.updateTask'),
           );
           pendingSavesRef.current.delete(taskId);
-          await loadTasksAndAreas();
+          await loadTasksAndCategories();
           break;
         }
       }
@@ -274,12 +274,12 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
   }, []);
 
   const handleAddTask = useCallback(
-    async (areaFilter: AreaFilter) => {
-      const captureAreaId =
-        areaFilter !== AREA_FILTER_ALL && areaFilter !== AREA_FILTER_UNCATEGORIZED
-          ? areaFilter
+    async (categoryFilter: CategoryFilter) => {
+      const captureCategoryId =
+        categoryFilter !== CATEGORY_FILTER_ALL && categoryFilter !== CATEGORY_FILTER_UNCATEGORIZED
+          ? categoryFilter
           : null;
-      const optimisticTask = createTask('', captureAreaId);
+      const optimisticTask = createTask('', captureCategoryId);
       await persistOptimisticNewTask(optimisticTask, {
         titleFocusTaskId: optimisticTask.id,
         clearTitleFocusOnError: true,
@@ -290,15 +290,15 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
 
   /** Header quick capture: title preset, optional default date from active section (Today / Upcoming). */
   const handleQuickCapture = useCallback(
-    async (rawTitle: string, areaFilter: AreaFilter, sectionHint: SectionId) => {
+    async (rawTitle: string, categoryFilter: CategoryFilter, sectionHint: SectionId) => {
       const title = rawTitle.trim();
       if (!title) {
         return;
       }
 
-      const captureAreaId =
-        areaFilter !== AREA_FILTER_ALL && areaFilter !== AREA_FILTER_UNCATEGORIZED
-          ? areaFilter
+      const captureCategoryId =
+        categoryFilter !== CATEGORY_FILTER_ALL && categoryFilter !== CATEGORY_FILTER_UNCATEGORIZED
+          ? categoryFilter
           : null;
 
       let taskDate: string | null = null;
@@ -308,7 +308,7 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
         taskDate = addDaysToKey(todayKey(), 1);
       }
 
-      const optimisticBase = createTask(title, captureAreaId);
+      const optimisticBase = createTask(title, captureCategoryId);
       const optimisticTask: Task = {
         ...optimisticBase,
         taskDate,
@@ -349,10 +349,10 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
 
   return {
     tasks,
-    areas,
+    categories,
     savingIds,
-    loadTasksAndAreas,
-    refreshTasksAndAreas,
+    loadTasksAndCategories,
+    refreshTasksAndCategories,
     handleAddTask,
     handleQuickCapture,
     handleTaskDraftChange,

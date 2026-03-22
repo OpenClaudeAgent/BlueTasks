@@ -262,7 +262,7 @@ button,
   background: rgba(255, 255, 255, 0.05);
 }
 
-.sidebar__areas {
+.sidebar__categories {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -270,7 +270,7 @@ button,
   border-top: 1px solid var(--border);
 }
 
-.sidebar__areasLabel {
+.sidebar__categoriesLabel {
   padding: 0 8px;
   font-size: 11px;
   font-weight: 600;
@@ -279,7 +279,7 @@ button,
   color: var(--text-soft);
 }
 
-.sidebar__areasNav {
+.sidebar__categoriesNav {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -629,7 +629,7 @@ button,
   background: rgba(107, 207, 143, 0.12);
 }
 
-.taskCard.is-completed .taskCard__chip--area {
+.taskCard.is-completed .taskCard__chip--category {
   color: #b8e8c8;
   border-color: rgba(107, 207, 143, 0.4);
   background: rgba(107, 207, 143, 0.12);
@@ -705,7 +705,7 @@ button,
   gap: 5px;
   flex: 0 1 auto;
   min-width: 0;
-  /* No max-width: otherwise area + timer + date overflow and the date wraps */
+  /* No max-width: otherwise category chip + timer + date overflow and the date wraps */
 }
 
 /* Chips + date: same fixed height (keeps the date control from towering over spans). */
@@ -804,7 +804,7 @@ button,
   background: rgba(245, 176, 122, 0.08);
 }
 
-.taskCard__chip--area {
+.taskCard__chip--category {
   max-width: 9rem;
   text-transform: none;
   letter-spacing: 0.04em;
@@ -815,7 +815,7 @@ button,
   background: rgba(142, 197, 192, 0.1);
 }
 
-.taskCard__areaChipText {
+.taskCard__categoryChipText {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1039,7 +1039,7 @@ button,
   border-color: var(--border-strong);
 }
 
-.taskCard__footerAreaTrigger {
+.taskCard__footerCategoryTrigger {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1061,13 +1061,13 @@ button,
   max-width: 10rem;
 }
 
-.taskCard__footerAreaTrigger:hover {
+.taskCard__footerCategoryTrigger:hover {
   background: var(--chip-bg-hover);
   border-color: var(--border-strong);
   color: var(--text);
 }
 
-.taskCard__footerAreaTriggerText {
+.taskCard__footerCategoryTriggerText {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1965,7 +1965,7 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   }
 }
 
-/* —— Settings dialog (areas) —— */
+/* —— Settings dialog (categories) —— */
 .settingsDialog__overlay {
   position: fixed;
   inset: 0;
@@ -2360,7 +2360,7 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   min-width: 0;
 }
 
-.settingsDialog__areaNew {
+.settingsDialog__categoryNew {
   margin-bottom: 6px;
 }
 
@@ -2380,7 +2380,7 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   color: var(--text-soft);
 }
 
-.areaIconPicker {
+.categoryIconPicker {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
@@ -2390,7 +2390,7 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   margin-bottom: 2px;
 }
 
-.areaIconPicker__btn {
+.categoryIconPicker__btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2408,24 +2408,24 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
     color 0.15s ease;
 }
 
-.areaIconPicker__btn:hover:not(:disabled) {
+.categoryIconPicker__btn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.06);
   border-color: var(--border-strong);
   color: var(--text);
 }
 
-.areaIconPicker__btn.is-selected {
+.categoryIconPicker__btn.is-selected {
   border-color: rgba(126, 184, 255, 0.45);
   background: rgba(126, 184, 255, 0.12);
   color: var(--accent);
 }
 
-.areaIconPicker__btn:disabled {
+.categoryIconPicker__btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 
-.settingsDialog__areaName {
+.settingsDialog__categoryName {
   font-size: 14px;
   font-weight: 560;
   min-width: 0;
@@ -2434,7 +2434,7 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   white-space: nowrap;
 }
 
-.settingsDialog__areaMeta {
+.settingsDialog__categoryMeta {
   font-size: 12px;
   color: var(--text-soft);
   white-space: nowrap;

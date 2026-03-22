@@ -2,13 +2,13 @@ import type {Locale} from 'date-fns';
 import type {Dispatch, SetStateAction} from 'react';
 import {useCallback, useMemo} from 'react';
 import type {LucideIcon} from 'lucide-react';
-import {getAreaIconComponent} from '../../lib/areaIcons';
+import {getCategoryIconComponent} from '../../lib/categoryIcons';
 import {formatTaskDatePill, getDateTone} from '../../lib/dateFormat';
 import {formatTrackedSeconds} from '../../lib/taskCardFormat';
 import {dayPickerLocaleFor} from '../../lib/dayPickerLocale';
 import {coercePinned, coerceRecurrence} from '../../lib/taskPropertyValidation';
-import type {Area, Task, TaskDraftUpdate} from '../../types';
-import {areaNameByIdMap, checklistCompletionRatio} from './taskCardModel';
+import type {Category, Task, TaskDraftUpdate} from '../../types';
+import {categoryNameByIdMap, checklistCompletionRatio} from './taskCardModel';
 import type {TaskCardFooterProps} from './TaskCardFooter';
 
 export type TaskCardBoardChrome = {
@@ -26,8 +26,8 @@ export type TaskCardChrome = {
   trackedSeconds: number;
   pinned: boolean;
   recurrence: ReturnType<typeof coerceRecurrence>;
-  AreaGlyph: LucideIcon;
-  areaDisplayName: string | null;
+  CategoryGlyph: LucideIcon;
+  categoryDisplayName: string | null;
   updateDate: (dateKey: string | null) => void;
   footerProps: TaskCardFooterProps;
 };
@@ -37,7 +37,7 @@ export type TaskCardChrome = {
  */
 export function useTaskCardChrome(
   task: Task,
-  areas: Area[],
+  categories: Category[],
   language: string,
   isSaving: boolean,
   onChange: (taskId: string, update: TaskDraftUpdate) => void,
@@ -71,13 +71,15 @@ export function useTaskCardChrome(
   const pinned = coercePinned(task.pinned);
   const recurrence = coerceRecurrence(task.recurrence);
 
-  const areaNameById = useMemo(() => areaNameByIdMap(areas), [areas]);
-  const areaDisplayName = task.areaId ? (areaNameById[task.areaId] ?? null) : null;
+  const nameById = useMemo(() => categoryNameByIdMap(categories), [categories]);
+  const categoryDisplayName = task.categoryId ? (nameById[task.categoryId] ?? null) : null;
 
-  const AreaGlyph = useMemo(
+  const CategoryGlyph = useMemo(
     () =>
-      getAreaIconComponent(task.areaId ? areas.find((a) => a.id === task.areaId)?.icon : undefined),
-    [areas, task.areaId],
+      getCategoryIconComponent(
+        task.categoryId ? categories.find((c) => c.id === task.categoryId)?.icon : undefined,
+      ),
+    [categories, task.categoryId],
   );
 
   const updateDate = useCallback(
@@ -96,15 +98,15 @@ export function useTaskCardChrome(
       taskTitle: task.title,
       taskDate: task.taskDate,
       estimateMinutes: task.estimateMinutes,
-      areaId: task.areaId,
+      categoryId: task.categoryId,
       priority: task.priority ?? 'normal',
       pinned,
       recurrence,
       timerStartedAt: task.timerStartedAt,
       timeSpentSeconds: task.timeSpentSeconds,
       checklistTotal: task.checklistTotal,
-      areaGlyph: AreaGlyph,
-      areas,
+      categoryGlyph: CategoryGlyph,
+      categories,
       isSaving,
       trackedSeconds,
       checklistRatio,
@@ -113,8 +115,8 @@ export function useTaskCardChrome(
       onOpenHeaderDatePopover,
     }),
     [
-      AreaGlyph,
-      areas,
+      CategoryGlyph,
+      categories,
       checklistRatio,
       isSaving,
       onChange,
@@ -122,7 +124,7 @@ export function useTaskCardChrome(
       onOpenHeaderDatePopover,
       pinned,
       recurrence,
-      task.areaId,
+      task.categoryId,
       task.estimateMinutes,
       task.id,
       task.priority,
@@ -146,8 +148,8 @@ export function useTaskCardChrome(
     trackedSeconds,
     pinned,
     recurrence,
-    AreaGlyph,
-    areaDisplayName,
+    CategoryGlyph,
+    categoryDisplayName,
     updateDate,
     footerProps,
   };

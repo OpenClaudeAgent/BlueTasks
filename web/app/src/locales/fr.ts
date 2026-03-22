@@ -3,35 +3,35 @@ export default {
   brandSubtitle: 'Local-first, net, rapide.',
   primaryNavigation: 'Navigation principale',
   sidebarResizeHandle: 'Redimensionner la barre latérale',
-  areasNavLabel: 'Zones',
-  areasAll: 'Toutes les zones',
-  areasUncategorized: 'Sans zone',
-  areaLabel: 'Zone',
-  areaNone: 'Aucune zone',
-  areaMissing: 'Zone inconnue',
+  categoriesNavLabel: 'Catégories',
+  categoriesAll: 'Toutes les catégories',
+  categoriesUncategorized: 'Sans catégorie',
+  categoryLabel: 'Catégorie',
+  categoryNone: 'Aucune catégorie',
+  categoryMissing: 'Catégorie inconnue',
   settingsTitle: 'Paramètres',
   settingsOpen: 'Paramètres',
-  settingsAreasIntro:
-    'Crée des zones (projets, sphères de vie…) et rattache-y les tâches. La barre latérale permet de filtrer.',
-  settingsAreaIconLabel: 'Icône',
-  settingsAreaIconHint:
-    'Choisis une icône pour cette zone. Tu peux la modifier en éditant la zone.',
-  settingsNewAreaPlaceholder: 'Nom de la zone',
-  settingsAddArea: 'Ajouter',
-  settingsNoAreasYet: 'Aucune zone pour l’instant — ajoute-en une ci-dessus.',
-  settingsAreaTaskCount: '{{count}} tâche(s)',
-  settingsDeleteAreaConfirm: 'Supprimer la zone « {{name}} » ?',
-  settingsDeleteAreaWithTasks:
-    'Supprimer la zone « {{name}} » ? {{count}} tâche(s) passeront en « sans zone ».',
-  settingsRenameArea: 'Renommer la zone',
+  settingsCategoriesIntro:
+    'Crée des catégories (projets, sphères de vie…) et rattache-y les tâches. La barre latérale permet de filtrer.',
+  settingsCategoryIconLabel: 'Icône',
+  settingsCategoryIconHint:
+    'Choisis une icône pour cette catégorie. Tu peux la modifier en éditant la catégorie.',
+  settingsNewCategoryPlaceholder: 'Nom de la catégorie',
+  settingsAddCategory: 'Ajouter',
+  settingsNoCategoriesYet: 'Aucune catégorie pour l’instant — ajoute-en une ci-dessus.',
+  settingsCategoryTaskCount: '{{count}} tâche(s)',
+  settingsDeleteCategoryConfirm: 'Supprimer la catégorie « {{name}} » ?',
+  settingsDeleteCategoryWithTasks:
+    'Supprimer la catégorie « {{name}} » ? {{count}} tâche(s) passeront en « sans catégorie ».',
+  settingsRenameCategory: 'Renommer la catégorie',
   settingsNavLabel: 'Sections des paramètres',
   settingsSectionGeneral: 'Général',
-  settingsSectionAreas: 'Zones',
+  settingsSectionCategories: 'Catégories',
   settingsGeneralHeading: 'Langue',
   settingsGeneralIntro:
     'Choisis la langue de l’interface. Le choix est enregistré dans ce navigateur.',
   settingsSidebarHint:
-    'Les zones (projets / sphères de vie) restent dans la barre latérale — onglet « Zones » ici pour les modifier.',
+    'Les catégories (projets / sphères de vie) restent dans la barre latérale — onglet « Catégories » ici pour les modifier.',
   settingsDataHeading: 'Vos données',
   settingsExportDb: 'Exporter la base SQLite',
   settingsExportDbHelp:
@@ -42,7 +42,7 @@ export default {
   settingsImportDbHelp:
     'Remplace toutes les données du serveur par un fichier .sqlite (par ex. une export précédent). Irréversible.',
   settingsImportDbConfirm:
-    'Remplacer toute la base par le fichier choisi ? Toutes les tâches et zones actuelles sur ce serveur seront perdues.',
+    'Remplacer toute la base par le fichier choisi ? Toutes les tâches et catégories actuelles sur ce serveur seront perdues.',
   settingsImporting: 'Import…',
   settingsImportDbError: 'Impossible d’importer la base.',
   close: 'Fermer',
@@ -55,7 +55,7 @@ export default {
     done: 'Terminées',
   },
   subtitles: {
-    all: 'Toutes les tâches du filtre de zone actuel, ouvertes et terminées.',
+    all: 'Toutes les tâches du filtre de catégorie actuel, ouvertes et terminées.',
     today: "Ce qui mérite votre attention aujourd'hui, y compris le retard.",
     upcoming: 'Les prochaines échéances, sans friction.',
     anytime: 'Votre backlog calme, sans date imposée.',

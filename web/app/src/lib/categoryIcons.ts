@@ -24,11 +24,11 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
-import areaIconIdList from '@bluetasks/server-data/area-icon-ids.json';
+import categoryIconIdList from '@bluetasks/server-data/category-icon-ids.json';
 
-const RAW_AREA_ICON_IDS = areaIconIdList as readonly string[];
+const RAW_CATEGORY_ICON_IDS = categoryIconIdList as readonly string[];
 
-export const DEFAULT_AREA_ICON = 'folder' as const;
+export const DEFAULT_CATEGORY_ICON = 'folder' as const;
 
 const ICON_MAP = {
   folder: Folder,
@@ -56,40 +56,40 @@ const ICON_MAP = {
   sparkles: Sparkles,
 } as const satisfies Record<string, LucideIcon>;
 
-export type AreaIconId = keyof typeof ICON_MAP;
+export type CategoryIconId = keyof typeof ICON_MAP;
 
 function assertIconMapMatchesServerData(): void {
-  for (const id of RAW_AREA_ICON_IDS) {
+  for (const id of RAW_CATEGORY_ICON_IDS) {
     if (!(id in ICON_MAP)) {
       throw new Error(
-        `server/data/area-icon-ids.json contains "${id}" but ICON_MAP has no Lucide entry`,
+        `server/data/category-icon-ids.json contains "${id}" but ICON_MAP has no Lucide entry`,
       );
     }
   }
   for (const key of Object.keys(ICON_MAP)) {
-    if (!RAW_AREA_ICON_IDS.includes(key)) {
-      throw new Error(`ICON_MAP has "${key}" missing from server/data/area-icon-ids.json`);
+    if (!RAW_CATEGORY_ICON_IDS.includes(key)) {
+      throw new Error(`ICON_MAP has "${key}" missing from server/data/category-icon-ids.json`);
     }
   }
 }
 
 assertIconMapMatchesServerData();
 
-export const AREA_ICON_IDS = RAW_AREA_ICON_IDS as readonly AreaIconId[];
+export const CATEGORY_ICON_IDS = RAW_CATEGORY_ICON_IDS as readonly CategoryIconId[];
 
-export function isAreaIconId(value: string): value is AreaIconId {
+export function isCategoryIconId(value: string): value is CategoryIconId {
   return value in ICON_MAP;
 }
 
-export function coerceAreaIcon(value: unknown): AreaIconId {
-  if (typeof value === 'string' && isAreaIconId(value)) {
+export function coerceCategoryIcon(value: unknown): CategoryIconId {
+  if (typeof value === 'string' && isCategoryIconId(value)) {
     return value;
   }
-  return DEFAULT_AREA_ICON;
+  return DEFAULT_CATEGORY_ICON;
 }
 
-export function getAreaIconComponent(id: string | null | undefined): LucideIcon {
-  if (id && isAreaIconId(id)) {
+export function getCategoryIconComponent(id: string | null | undefined): LucideIcon {
+  if (id && isCategoryIconId(id)) {
     return ICON_MAP[id];
   }
   return ICON_MAP.folder;

@@ -1,10 +1,10 @@
 import {useState} from 'react';
-import {AREA_FILTER_ALL} from '../../types';
-import type {AreaFilter, SectionId} from '../../types';
+import {CATEGORY_FILTER_ALL} from '../../types';
+import type {CategoryFilter, SectionId} from '../../types';
 
 /** Sidebar / board chrome: filters, selection, loading and global error (not per-task saves). */
 export function useBlueTasksUiState() {
-  const [areaFilter, setAreaFilter] = useState<AreaFilter>(AREA_FILTER_ALL);
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>(CATEGORY_FILTER_ALL);
   const [selectedSection, setSelectedSection] = useState<SectionId>('today');
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [titleFocusTaskId, setTitleFocusTaskId] = useState<string | null>(null);
@@ -12,8 +12,8 @@ export function useBlueTasksUiState() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   return {
-    areaFilter,
-    setAreaFilter,
+    categoryFilter,
+    setCategoryFilter,
     selectedSection,
     setSelectedSection,
     selectedTaskId,

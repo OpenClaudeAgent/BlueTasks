@@ -2,7 +2,7 @@ import {setTimeout as delay} from 'node:timers/promises';
 
 import {expect, type Locator, type Page} from '@playwright/test';
 import type {APIRequestContext} from '@playwright/test';
-import {deleteAllAreas, deleteAllTasks} from './api-helpers';
+import {deleteAllCategories, deleteAllTasks} from './api-helpers';
 import {gotoWithEnglish} from './helpers';
 
 /** Debounced save delay in the SPA + network slack */
@@ -14,7 +14,7 @@ export function sleepMs(ms: number): Promise<void> {
 }
 
 export async function resetBoard(page: Page, request: APIRequestContext): Promise<void> {
-  await deleteAllAreas(request);
+  await deleteAllCategories(request);
   await deleteAllTasks(request);
   await gotoWithEnglish(page, '/');
   await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
@@ -77,34 +77,34 @@ export function taskCardByTitle(page: Page, title: string) {
   return collapsed.or(expanded);
 }
 
-/** API mutations (areas/tasks) do not update the SPA; reload so lists match the server. */
+/** API mutations (categories/tasks) do not update the SPA; reload so lists match the server. */
 export async function reloadPageAfterApiSeed(page: Page): Promise<void> {
   await page.reload();
   await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
 }
 
 /**
- * Full UI flow: Settings → Areas → name → Add. Closes the dialog; sidebar shows the new zone.
+ * Full UI flow: Settings → Categories → name → Add. Closes the dialog; sidebar shows the new category.
  * Uses English labels (same as {@link gotoWithEnglish}).
  */
-export async function createAreaViaSettingsUi(page: Page, name: string): Promise<{id: string}> {
+export async function createCategoryViaSettingsUi(page: Page, name: string): Promise<{id: string}> {
   await page.getByRole('button', {name: 'Settings'}).click();
   const dialog = page.getByRole('dialog', {name: 'Settings'});
-  await dialog.getByRole('button', {name: 'Areas'}).click();
+  await dialog.getByRole('button', {name: 'Categories'}).click();
 
-  const postArea = page.waitForResponse(
-    (r) => r.url().includes('/api/areas') && r.request().method() === 'POST' && r.status() === 201,
+  const postCategory = page.waitForResponse(
+    (r) => r.url().includes('/api/categories') && r.request().method() === 'POST' && r.status() === 201,
   );
-  await dialog.getByPlaceholder('New area name').fill(name);
+  await dialog.getByPlaceholder('New category name').fill(name);
   await dialog.getByRole('button', {name: 'Add'}).click();
-  const areaRes = await postArea;
-  const created = (await areaRes.json()) as {id: string; name: string};
+  const categoryRes = await postCategory;
+  const created = (await categoryRes.json()) as {id: string; name: string};
   expect(created.name).toBe(name);
 
   await expect(dialog.getByText(name)).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(
-    page.locator('.sidebar__areasNav').getByRole('button', {name: new RegExp(name)}),
+    page.locator('.sidebar__categoriesNav').getByRole('button', {name: new RegExp(name)}),
   ).toBeVisible();
 
   return {id: created.id};
@@ -112,8 +112,8 @@ export async function createAreaViaSettingsUi(page: Page, name: string): Promise
 
 export async function expandTaskCardIfCollapsed(page: Page, title: string): Promise<void> {
   const card = taskCardByTitle(page, title);
-  const areaTrigger = card.locator('.taskCard__footerAreaTrigger');
-  if ((await areaTrigger.count()) === 0 || !(await areaTrigger.isVisible().catch(() => false))) {
+  const categoryTrigger = card.locator('.taskCard__footerCategoryTrigger');
+  if ((await categoryTrigger.count()) === 0 || !(await categoryTrigger.isVisible().catch(() => false))) {
     const collapsedTitle = card.getByRole('button', {name: title, exact: true});
     if ((await collapsedTitle.count()) > 0) {
       await collapsedTitle.click();
@@ -194,25 +194,25 @@ export async function switchLanguageToFrenchFromEnglishShell(page: Page): Promis
     .click();
 }
 
-/** Footer area popover → pick a zone → wait for successful task PUT. */
-export async function assignTaskToAreaFromFooter(
+/** Footer category popover → pick a category → wait for successful task PUT. */
+export async function assignTaskToCategoryFromFooter(
   page: Page,
   title: string,
-  areaName: string,
+  categoryName: string,
 ): Promise<void> {
   const card = taskCardByTitle(page, title);
   await expandTaskCardIfCollapsed(page, title);
-  await card.locator('.taskCard__footerAreaTrigger').click();
+  await card.locator('.taskCard__footerCategoryTrigger').click();
   const put = waitForTaskPutOk(page);
-  await page.locator('.footerPopover').getByRole('button', {name: areaName}).click();
+  await page.locator('.footerPopover').getByRole('button', {name: categoryName}).click();
   await put;
 }
 
-/** Footer area popover → “No area” → wait for successful task PUT. */
-export async function clearTaskAreaFromFooter(page: Page, title: string): Promise<void> {
+/** Footer category popover → “No category” → wait for successful task PUT. */
+export async function clearTaskCategoryFromFooter(page: Page, title: string): Promise<void> {
   const card = taskCardByTitle(page, title);
-  await card.locator('.taskCard__footerAreaTrigger').click();
+  await card.locator('.taskCard__footerCategoryTrigger').click();
   const put = waitForTaskPutOk(page);
-  await page.locator('.footerPopover').getByRole('button', {name: 'No area'}).click();
+  await page.locator('.footerPopover').getByRole('button', {name: 'No category'}).click();
   await put;
 }

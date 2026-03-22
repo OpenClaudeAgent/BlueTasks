@@ -20,7 +20,7 @@ export type TaskRow = {
   timeSpentSeconds: number;
   timerStartedAt: string | null;
   recurrence: RecurrenceKind | null;
-  areaId: string | null;
+  categoryId: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -56,14 +56,14 @@ export function normalizeRecurrence(value: unknown): RecurrenceKind | null {
   return null;
 }
 
-export function normalizeAreaId(value: unknown, database: Database.Database): string | null {
+export function normalizeCategoryId(value: unknown, database: Database.Database): string | null {
   if (value === null || value === undefined || value === '') {
     return null;
   }
   if (typeof value !== 'string') {
     return null;
   }
-  const found = database.prepare('SELECT 1 FROM areas WHERE id = ?').get(value);
+  const found = database.prepare('SELECT 1 FROM categories WHERE id = ?').get(value);
   return found ? value : null;
 }
 
@@ -147,6 +147,6 @@ export function sanitizePayload(
     timeSpentSeconds,
     timerStartedAt,
     recurrence: normalizeRecurrence(input.recurrence),
-    areaId: normalizeAreaId(input.areaId, database),
+    categoryId: normalizeCategoryId(input.categoryId, database),
   };
 }

@@ -1,6 +1,6 @@
 import {expect, test} from '@playwright/test';
-import {deleteAllAreas, deleteAllTasks} from './api-helpers';
-import {expectApiAreaRow} from './contract-expectations';
+import {deleteAllCategories, deleteAllTasks} from './api-helpers';
+import {expectApiCategoryRow} from './contract-expectations';
 import {gotoWithEnglish} from './helpers';
 
 test.describe('End-to-end: navigation and settings', () => {
@@ -33,30 +33,30 @@ test.describe('End-to-end: navigation and settings', () => {
     await expect(dialog.locator('button.settingsDialog__importBtn')).toBeEnabled();
   });
 
-  test('user creates an area from Settings', async ({page, request}) => {
-    await deleteAllAreas(request);
+  test('user creates a category from Settings', async ({page, request}) => {
+    await deleteAllCategories(request);
     await deleteAllTasks(request);
 
-    const areaName = `E2E Area ${Date.now()}`;
+    const categoryName = `E2E Category ${Date.now()}`;
 
     await gotoWithEnglish(page, '/');
     await page.getByRole('button', {name: 'Settings'}).click();
     const dialog = page.getByRole('dialog', {name: 'Settings'});
 
-    await dialog.getByRole('button', {name: 'Areas'}).click();
-    await expect(dialog.getByText(/Create areas/i)).toBeVisible();
+    await dialog.getByRole('button', {name: 'Categories'}).click();
+    await expect(dialog.getByText(/Create categories/i)).toBeVisible();
 
-    const postArea = page.waitForResponse(
+    const postCategory = page.waitForResponse(
       (r) =>
-        r.url().includes('/api/areas') && r.request().method() === 'POST' && r.status() === 201,
+        r.url().includes('/api/categories') && r.request().method() === 'POST' && r.status() === 201,
     );
-    await dialog.getByPlaceholder('New area name').fill(areaName);
+    await dialog.getByPlaceholder('New category name').fill(categoryName);
     await dialog.getByRole('button', {name: 'Add'}).click();
-    const areaRes = await postArea;
-    const created = await areaRes.json();
-    expectApiAreaRow(created);
-    expect(created.name).toBe(areaName);
+    const categoryRes = await postCategory;
+    const created = await categoryRes.json();
+    expectApiCategoryRow(created);
+    expect(created.name).toBe(categoryName);
 
-    await expect(dialog.getByText(areaName)).toBeVisible();
+    await expect(dialog.getByText(categoryName)).toBeVisible();
   });
 });

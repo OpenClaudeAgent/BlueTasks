@@ -26,10 +26,10 @@ describe('API HTTP', () => {
     }
   });
 
-  it('POST /api/areas then POST /api/tasks with areaId returns persisted row in GET list', async () => {
-    const area = await request(app).post('/api/areas').send({name: 'Project'});
-    expect(area.status).toBe(201);
-    expect(area.body).toEqual(
+  it('POST /api/categories then POST /api/tasks with categoryId returns persisted row in GET list', async () => {
+    const category = await request(app).post('/api/categories').send({name: 'Project'});
+    expect(category.status).toBe(201);
+    expect(category.body).toEqual(
       expect.objectContaining({
         id: expect.any(String),
         name: 'Project',
@@ -38,23 +38,23 @@ describe('API HTTP', () => {
         createdAt: expect.any(String),
       }),
     );
-    const areaId = area.body.id as string;
+    const categoryId = category.body.id as string;
 
     const task = await request(app).post('/api/tasks').send({
       title: 'Linked task',
-      areaId,
+      categoryId,
     });
     expect(task.status).toBe(201);
     expectApiTaskRow(task.body);
     expect(task.body.title).toBe('Linked task');
-    expect(task.body.areaId).toBe(areaId);
+    expect(task.body.categoryId).toBe(categoryId);
     expect(task.body.status).toBe('pending');
 
     const list = await request(app).get('/api/tasks');
     expect(list.status).toBe(200);
     const found = list.body.find((t: {id: string}) => t.id === task.body.id);
     expect(found).toEqual(
-      expect.objectContaining({id: task.body.id, title: 'Linked task', areaId}),
+      expect.objectContaining({id: task.body.id, title: 'Linked task', categoryId}),
     );
     expectApiTaskRow(found);
   });
@@ -210,27 +210,27 @@ describe('API HTTP', () => {
     }
   });
 
-  it('POST /api/areas with missing or blank name returns 400', async () => {
-    const a = await request(app).post('/api/areas').send({});
+  it('POST /api/categories with missing or blank name returns 400', async () => {
+    const a = await request(app).post('/api/categories').send({});
     expect(a.status).toBe(400);
     expect(a.body).toEqual({message: 'Name required'});
-    const b = await request(app).post('/api/areas').send({name: '   '});
+    const b = await request(app).post('/api/categories').send({name: '   '});
     expect(b.status).toBe(400);
     expect(b.body).toEqual({message: 'Name required'});
   });
 
-  it('PUT /api/areas/:id missing area returns 404', async () => {
+  it('PUT /api/categories/:id missing category returns 404', async () => {
     const res = await request(app)
-      .put('/api/areas/00000000-0000-4000-8000-000000000001')
+      .put('/api/categories/00000000-0000-4000-8000-000000000001')
       .send({name: 'Nope'});
     expect(res.status).toBe(404);
-    expect(res.body).toEqual({message: 'Area not found'});
+    expect(res.body).toEqual({message: 'Category not found'});
   });
 
-  it('DELETE /api/areas/:id missing area returns 404', async () => {
-    const res = await request(app).delete('/api/areas/00000000-0000-4000-8000-000000000002');
+  it('DELETE /api/categories/:id missing category returns 404', async () => {
+    const res = await request(app).delete('/api/categories/00000000-0000-4000-8000-000000000002');
     expect(res.status).toBe(404);
-    expect(res.body).toEqual({message: 'Area not found'});
+    expect(res.body).toEqual({message: 'Category not found'});
   });
 
   it('PUT /api/tasks/:id missing task returns 404', async () => {
@@ -241,20 +241,20 @@ describe('API HTTP', () => {
     expect(res.body).toEqual({message: 'Task not found'});
   });
 
-  it('PUT /api/areas/:id updates name and keeps icon when omitted', async () => {
-    const created = await request(app).post('/api/areas').send({name: 'Alpha'});
+  it('PUT /api/categories/:id updates name and keeps icon when omitted', async () => {
+    const created = await request(app).post('/api/categories').send({name: 'Alpha'});
     expect(created.status).toBe(201);
     const id = created.body.id as string;
-    const put = await request(app).put(`/api/areas/${id}`).send({name: 'Beta'});
+    const put = await request(app).put(`/api/categories/${id}`).send({name: 'Beta'});
     expect(put.status).toBe(200);
     expect(put.body.name).toBe('Beta');
     expect(put.body.icon).toBe(created.body.icon);
   });
 
-  it('PUT /api/areas/:id accepts explicit icon', async () => {
-    const created = await request(app).post('/api/areas').send({name: 'Gamma'});
+  it('PUT /api/categories/:id accepts explicit icon', async () => {
+    const created = await request(app).post('/api/categories').send({name: 'Gamma'});
     const id = created.body.id as string;
-    const put = await request(app).put(`/api/areas/${id}`).send({name: 'Gamma2', icon: 'folder'});
+    const put = await request(app).put(`/api/categories/${id}`).send({name: 'Gamma2', icon: 'folder'});
     expect(put.status).toBe(200);
     expect(put.body).toEqual(
       expect.objectContaining({
@@ -267,29 +267,29 @@ describe('API HTTP', () => {
     );
   });
 
-  it('PUT /api/areas/:id with invalid name returns 400', async () => {
-    const created = await request(app).post('/api/areas').send({name: 'Delta'});
+  it('PUT /api/categories/:id with invalid name returns 400', async () => {
+    const created = await request(app).post('/api/categories').send({name: 'Delta'});
     const id = created.body.id as string;
-    const a = await request(app).put(`/api/areas/${id}`).send({});
+    const a = await request(app).put(`/api/categories/${id}`).send({});
     expect(a.status).toBe(400);
     expect(a.body).toEqual({message: 'Name required'});
-    const b = await request(app).put(`/api/areas/${id}`).send({name: '  '});
+    const b = await request(app).put(`/api/categories/${id}`).send({name: '  '});
     expect(b.status).toBe(400);
     expect(b.body).toEqual({message: 'Name required'});
   });
 
-  it('DELETE /api/areas/:id clears tasks area_id then removes area', async () => {
-    const area = await request(app).post('/api/areas').send({name: 'Zeta'});
-    const areaId = area.body.id as string;
-    const task = await request(app).post('/api/tasks').send({title: 'Linked', areaId});
+  it('DELETE /api/categories/:id clears tasks category_id then removes category', async () => {
+    const category = await request(app).post('/api/categories').send({name: 'Zeta'});
+    const categoryId = category.body.id as string;
+    const task = await request(app).post('/api/tasks').send({title: 'Linked', categoryId});
     expect(task.status).toBe(201);
 
-    const del = await request(app).delete(`/api/areas/${areaId}`);
+    const del = await request(app).delete(`/api/categories/${categoryId}`);
     expect(del.status).toBe(204);
 
     const tasks = await request(app).get('/api/tasks');
     const row = tasks.body.find((t: {id: string}) => t.id === task.body.id);
-    expect(row).toEqual(expect.objectContaining({id: task.body.id, areaId: null, title: 'Linked'}));
+    expect(row).toEqual(expect.objectContaining({id: task.body.id, categoryId: null, title: 'Linked'}));
     expectApiTaskRow(row);
   });
 
@@ -347,7 +347,7 @@ function contractBaseRow(overrides: Record<string, unknown> = {}): Record<string
     timeSpentSeconds: 0,
     timerStartedAt: null,
     recurrence: null,
-    areaId: null,
+    categoryId: null,
     createdAt: '2025-01-01T00:00:00.000Z',
     updatedAt: '2025-01-02T00:00:00.000Z',
     ...overrides,
@@ -373,9 +373,9 @@ describe('expectApiTaskRow', () => {
     ).not.toThrow();
   });
 
-  it('accepts areaId as a UUID string', () => {
+  it('accepts categoryId as a UUID string', () => {
     expect(() =>
-      expectApiTaskRow(contractBaseRow({areaId: '6ba7b810-9dad-11d1-80b4-00c04fd430c8'})),
+      expectApiTaskRow(contractBaseRow({categoryId: '6ba7b810-9dad-11d1-80b4-00c04fd430c8'})),
     ).not.toThrow();
   });
 
@@ -414,12 +414,12 @@ describe('expectApiTaskRow', () => {
     expect(() => expectApiTaskRow(contractBaseRow({recurrence: 'hourly'}))).toThrow();
   });
 
-  it('fails when areaId is neither null nor a string', () => {
-    expect(() => expectApiTaskRow(contractBaseRow({areaId: 1}))).toThrow();
+  it('fails when categoryId is neither null nor a string', () => {
+    expect(() => expectApiTaskRow(contractBaseRow({categoryId: 1}))).toThrow();
   });
 
-  it('fails when areaId is a string but not a UUID', () => {
-    expect(() => expectApiTaskRow(contractBaseRow({areaId: 'area-uuid'}))).toThrow();
+  it('fails when categoryId is a string but not a UUID', () => {
+    expect(() => expectApiTaskRow(contractBaseRow({categoryId: 'bad-category-uuid'}))).toThrow();
   });
 
   it('fails when timerStartedAt is neither null nor a string', () => {

@@ -36,13 +36,13 @@ function App() {
     >
       <div className="appShell__sidebarColumn">
         <Sidebar
-          areaFilter={board.areaFilter}
-          areaRowCounts={board.areaSidebarCounts}
-          areas={board.areas}
+          categories={board.categories}
+          categoryFilter={board.categoryFilter}
+          categoryRowCounts={board.categorySidebarCounts}
           counts={board.counts}
           maxSidebarWidth={maxWidth}
           minSidebarWidth={minWidth}
-          onAreaFilterChange={board.setAreaFilter}
+          onCategoryFilterChange={board.setCategoryFilter}
           onOpenSettings={() => setSettingsOpen(true)}
           onResizePointerDown={onResizePointerDown}
           onSelect={board.setSelectedSection}
@@ -60,11 +60,11 @@ function App() {
           }
         >
           <LazySettingsDialog
-            areas={board.areas}
-            onAreasUpdated={board.refreshTasksAndAreas}
+            categories={board.categories}
+            onCategoriesUpdated={board.refreshTasksAndCategories}
             onOpenChange={setSettingsOpen}
             open
-            taskCountByAreaId={board.taskCountByAreaId}
+            taskCountByCategoryId={board.taskCountByCategoryId}
           />
         </Suspense>
       ) : null}
@@ -134,7 +134,7 @@ function App() {
               board.visibleTasks.map((task) => (
                 <TaskCard
                   key={task.id}
-                  areas={board.areas}
+                  categories={board.categories}
                   boardChrome={taskCardBoardChrome}
                   autoFocusTitle={board.titleFocusTaskId === task.id}
                   expanded={board.selectedTaskId === task.id}

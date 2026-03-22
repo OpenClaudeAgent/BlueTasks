@@ -33,7 +33,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [0.1.9] - 2026-03-21
 
-- Playwright: API-seeded UI specs (task-seeded-ui), area-ui-journey, shared area footer helpers; createTaskViaApi/putTaskViaApi; docs: releasing via Actions only.
+- Playwright: API-seeded UI specs (task-seeded-ui), category-ui-journey, shared category footer helpers; createTaskViaApi/putTaskViaApi; docs: releasing via Actions only.
 
 ## [0.1.8] - 2026-03-21
 

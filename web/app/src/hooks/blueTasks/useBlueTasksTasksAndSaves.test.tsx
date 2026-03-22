@@ -15,7 +15,7 @@ vi.mock('../../api', () => ({
     update: vi.fn(),
     remove: vi.fn(),
   },
-  areasApi: {
+  categoriesApi: {
     list: vi.fn(),
     create: vi.fn(),
     update: vi.fn(),
@@ -25,8 +25,8 @@ vi.mock('../../api', () => ({
 
 import {createTask, mergeTaskFromApi} from '../../lib/tasks';
 import {addDaysToKey, todayKey} from '../../lib/dateKeys';
-import {AREA_FILTER_ALL} from '../../types';
-import {tasksApi, areasApi} from '../../api';
+import {CATEGORY_FILTER_ALL} from '../../types';
+import {tasksApi, categoriesApi} from '../../api';
 import {SAVE_DELAY_MS} from './constants';
 
 function wrapper({children}: {children: ReactNode}) {
@@ -44,7 +44,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
 
   beforeEach(() => {
     vi.mocked(tasksApi.list).mockResolvedValue([]);
-    vi.mocked(areasApi.list).mockResolvedValue([]);
+    vi.mocked(categoriesApi.list).mockResolvedValue([]);
   });
 
   afterEach(() => {
@@ -52,7 +52,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
     vi.clearAllMocks();
   });
 
-  it('Scenario: Mount — loads tasks and areas then clears loading', async () => {
+  it('Scenario: Mount — loads tasks and categories then clears loading', async () => {
     const {result} = renderHook(
       () => {
         const {t} = useTranslation();
@@ -63,7 +63,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
 
     await waitFor(() => {
       expect(tasksApi.list).toHaveBeenCalled();
-      expect(areasApi.list).toHaveBeenCalled();
+      expect(categoriesApi.list).toHaveBeenCalled();
     });
     await waitFor(() => {
       expect(bridge.setLoading).toHaveBeenCalledWith(false);
@@ -91,7 +91,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
 
   it('Scenario: Add task — POST succeeds and replaces optimistic row', async () => {
     vi.mocked(tasksApi.list).mockResolvedValue([]);
-    vi.mocked(areasApi.list).mockResolvedValue([]);
+    vi.mocked(categoriesApi.list).mockResolvedValue([]);
     const {result} = renderHook(
       () => {
         const {t} = useTranslation();
@@ -106,7 +106,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
     );
 
     await act(async () => {
-      await result.current.handleAddTask(AREA_FILTER_ALL);
+      await result.current.handleAddTask(CATEGORY_FILTER_ALL);
     });
 
     expect(tasksApi.create).toHaveBeenCalled();
@@ -118,7 +118,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
   it('Scenario: Delete task — remove succeeds and list drops row', async () => {
     const row = mergeTaskFromApi({...createTask('X'), id: 'del-1'} as never);
     vi.mocked(tasksApi.list).mockResolvedValue([row as never]);
-    vi.mocked(areasApi.list).mockResolvedValue([]);
+    vi.mocked(categoriesApi.list).mockResolvedValue([]);
     vi.mocked(tasksApi.remove).mockResolvedValue(undefined);
 
     const {result} = renderHook(
@@ -140,7 +140,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
 
   it('Scenario: Quick capture on Today — creates task with today date', async () => {
     vi.mocked(tasksApi.list).mockResolvedValue([]);
-    vi.mocked(areasApi.list).mockResolvedValue([]);
+    vi.mocked(categoriesApi.list).mockResolvedValue([]);
     vi.mocked(tasksApi.create).mockImplementation(async (payload) =>
       mergeTaskFromApi({...(createTask('QC') as never), ...payload} as never),
     );
@@ -155,7 +155,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
     await waitFor(() => expect(bridge.setLoading).toHaveBeenCalledWith(false));
 
     await act(async () => {
-      await result.current.handleQuickCapture('QC title', AREA_FILTER_ALL, 'today');
+      await result.current.handleQuickCapture('QC title', CATEGORY_FILTER_ALL, 'today');
     });
 
     expect(tasksApi.create).toHaveBeenCalled();
@@ -168,7 +168,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
 
   it('Scenario: Quick capture on Upcoming — uses tomorrow key', async () => {
     vi.mocked(tasksApi.list).mockResolvedValue([]);
-    vi.mocked(areasApi.list).mockResolvedValue([]);
+    vi.mocked(categoriesApi.list).mockResolvedValue([]);
     vi.mocked(tasksApi.create).mockImplementation(async (payload) =>
       mergeTaskFromApi({...(createTask('U') as never), ...payload} as never),
     );
@@ -183,7 +183,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
     await waitFor(() => expect(bridge.setLoading).toHaveBeenCalledWith(false));
 
     await act(async () => {
-      await result.current.handleQuickCapture('Future', AREA_FILTER_ALL, 'upcoming');
+      await result.current.handleQuickCapture('Future', CATEGORY_FILTER_ALL, 'upcoming');
     });
 
     const call = vi.mocked(tasksApi.create).mock.calls[0]?.[0] as {taskDate: string | null};
@@ -201,10 +201,10 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
     await waitFor(() => expect(bridge.setLoading).toHaveBeenCalledWith(false));
 
     await act(async () => {
-      await result.current.handleQuickCapture('', AREA_FILTER_ALL, 'today');
+      await result.current.handleQuickCapture('', CATEGORY_FILTER_ALL, 'today');
     });
     await act(async () => {
-      await result.current.handleQuickCapture('   \t\n', AREA_FILTER_ALL, 'today');
+      await result.current.handleQuickCapture('   \t\n', CATEGORY_FILTER_ALL, 'today');
     });
 
     expect(tasksApi.create).not.toHaveBeenCalled();
@@ -223,7 +223,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
     vi.mocked(tasksApi.list).mockRejectedValueOnce(new Error('refresh failed'));
 
     await act(async () => {
-      await result.current.refreshTasksAndAreas();
+      await result.current.refreshTasksAndCategories();
     });
 
     expect(bridge.setErrorMessage).toHaveBeenCalledWith('refresh failed');
@@ -232,7 +232,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
   it('Scenario: User edits a task — debounced save calls update after delay', async () => {
     const row = mergeTaskFromApi({...createTask('Before'), id: 'edit-1'} as never);
     vi.mocked(tasksApi.list).mockResolvedValue([row as never]);
-    vi.mocked(areasApi.list).mockResolvedValue([]);
+    vi.mocked(categoriesApi.list).mockResolvedValue([]);
     vi.mocked(tasksApi.update).mockImplementation(async (_id, payload) =>
       mergeTaskFromApi({...(row as never), ...payload, title: 'After'} as never),
     );
@@ -273,7 +273,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
       taskDate: todayKey(),
     } as never);
     vi.mocked(tasksApi.list).mockResolvedValue([row as never]);
-    vi.mocked(areasApi.list).mockResolvedValue([]);
+    vi.mocked(categoriesApi.list).mockResolvedValue([]);
     vi.mocked(tasksApi.update).mockImplementation(async (id, payload) =>
       mergeTaskFromApi({...(row as never), ...payload, id} as never),
     );
@@ -311,7 +311,7 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
   it('Scenario: Delete task — when remove rejects, task is restored and error is set', async () => {
     const row = mergeTaskFromApi({...createTask('Keep'), id: 'del-fail-1'} as never);
     vi.mocked(tasksApi.list).mockResolvedValue([row as never]);
-    vi.mocked(areasApi.list).mockResolvedValue([]);
+    vi.mocked(categoriesApi.list).mockResolvedValue([]);
     vi.mocked(tasksApi.remove).mockRejectedValue(new Error('delete blocked'));
 
     const {result} = renderHook(

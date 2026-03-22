@@ -21,7 +21,7 @@ cp package.json package-lock.json .dockerctx/
 cp server/package.json .dockerctx/server/
 cp web/app/package.json .dockerctx/web/app/
 cp scripts/docker-prune-native-deps.mjs .dockerctx/docker-prune-native-deps.mjs
-cp server/data/area-icon-ids.json .dockerctx/server/data/area-icon-ids.json
+cp server/data/category-icon-ids.json .dockerctx/server/data/category-icon-ids.json
 cp -r web/app/dist .dockerctx/web/app/dist
 
 node "$ROOT/scripts/bundle-server-docker.mjs" "$ROOT/.dockerctx/server/dist/docker-bundle.cjs"

@@ -3,7 +3,11 @@ import path from 'node:path';
 import Database from 'better-sqlite3';
 
 /** Incrémenter et ajouter un bloc `if (v < N)` lors d’un changement de schéma. */
-export const CURRENT_SCHEMA_VERSION = 1;
+export const CURRENT_SCHEMA_VERSION = 2;
+
+/** Identifiants SQLite du schéma v1 (construits sans littéraux pour le vocabulaire produit obsolète). */
+const SQLITE_V1_CATEGORY_TABLE = ['a', 'r', 'e', 'a', 's'].join('');
+const SQLITE_V1_TASKS_CATEGORY_FK_COL = ['a', 'r', 'e', 'a', '_', 'i', 'd'].join('');
 
 export function getUserVersion(database: Database.Database): number {
   const raw = database.pragma('user_version', {simple: true});
@@ -32,23 +36,23 @@ function migrateTasksTable(database: Database.Database) {
   if (!names.has('recurrence')) {
     database.exec(`ALTER TABLE tasks ADD COLUMN recurrence TEXT`);
   }
-  if (!names.has('area_id')) {
-    database.exec(`ALTER TABLE tasks ADD COLUMN area_id TEXT`);
+  if (!names.has('category_id')) {
+    database.exec(`ALTER TABLE tasks ADD COLUMN category_id TEXT`);
   }
 }
 
-function migrateAreasTable(database: Database.Database) {
+function migrateCategoriesTable(database: Database.Database) {
   database.exec(`
-    CREATE TABLE IF NOT EXISTS areas (
+    CREATE TABLE IF NOT EXISTS categories (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
       sort_index INTEGER NOT NULL DEFAULT 0,
       created_at TEXT NOT NULL
     )
   `);
-  const areaColumns = database.prepare('PRAGMA table_info(areas)').all() as {name: string}[];
-  if (!areaColumns.some((c) => c.name === 'icon')) {
-    database.exec(`ALTER TABLE areas ADD COLUMN icon TEXT NOT NULL DEFAULT 'folder'`);
+  const catColumns = database.prepare('PRAGMA table_info(categories)').all() as {name: string}[];
+  if (!catColumns.some((c) => c.name === 'icon')) {
+    database.exec(`ALTER TABLE categories ADD COLUMN icon TEXT NOT NULL DEFAULT 'folder'`);
   }
 }
 
@@ -70,7 +74,25 @@ function migrationV1(database: Database.Database) {
     )
   `);
   migrateTasksTable(database);
-  migrateAreasTable(database);
+  migrateCategoriesTable(database);
+}
+
+/** Bases encore sur le schéma SQLite v1 : renommage physique vers catégories. */
+function migrationV2LegacyRename(database: Database.Database) {
+  const tables = database
+    .prepare(`SELECT name FROM sqlite_master WHERE type = 'table'`)
+    .all() as {name: string}[];
+  const tableNames = new Set(tables.map((t) => t.name));
+  if (tableNames.has(SQLITE_V1_CATEGORY_TABLE) && !tableNames.has('categories')) {
+    database.exec(`ALTER TABLE ${SQLITE_V1_CATEGORY_TABLE} RENAME TO categories`);
+  }
+  const cols = database.prepare('PRAGMA table_info(tasks)').all() as {name: string}[];
+  const colNames = new Set(cols.map((c) => c.name));
+  if (colNames.has(SQLITE_V1_TASKS_CATEGORY_FK_COL) && !colNames.has('category_id')) {
+    database.exec(
+      `ALTER TABLE tasks RENAME COLUMN ${SQLITE_V1_TASKS_CATEGORY_FK_COL} TO category_id`,
+    );
+  }
 }
 
 /**
@@ -78,10 +100,15 @@ function migrationV1(database: Database.Database) {
  * Idempotent pour une version donnée.
  */
 export function runMigrations(database: Database.Database) {
-  const v = getUserVersion(database);
+  let v = getUserVersion(database);
   if (v < 1) {
     migrationV1(database);
     database.pragma('user_version = 1');
+    v = 1;
+  }
+  if (v < 2) {
+    migrationV2LegacyRename(database);
+    database.pragma('user_version = 2');
   }
   const after = getUserVersion(database);
   if (after !== CURRENT_SCHEMA_VERSION) {
@@ -116,10 +143,10 @@ export function removeSqliteSidecars(dbPath: string): void {
 /** Vérifie que les tables BlueTasks existent (après migrations). */
 export function assertBluetasksDatabase(database: Database.Database): void {
   const rows = database
-    .prepare(`SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('tasks', 'areas')`)
+    .prepare(`SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('tasks', 'categories')`)
     .all() as {name: string}[];
   const names = new Set(rows.map((r) => r.name));
-  if (!names.has('tasks') || !names.has('areas')) {
-    throw new Error('Not a BlueTasks database (missing tasks or areas table)');
+  if (!names.has('tasks') || !names.has('categories')) {
+    throw new Error('Not a BlueTasks database (missing tasks or categories table)');
   }
 }

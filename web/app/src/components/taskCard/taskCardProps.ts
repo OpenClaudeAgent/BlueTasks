@@ -1,9 +1,9 @@
 import type {TaskCardBoardChrome} from './useTaskCardChrome';
-import type {Area, Task, TaskDraftUpdate} from '../../types';
+import type {Category, Task, TaskDraftUpdate} from '../../types';
 
 export type TaskCardProps = {
   task: Task;
-  areas: Area[];
+  categories: Category[];
   boardChrome: TaskCardBoardChrome;
   expanded: boolean;
   /** First expanded render: focus the title field (e.g. after Add). */
@@ -21,7 +21,7 @@ export function taskCardPropsAreEqual(prev: TaskCardProps, next: TaskCardProps):
   if (prev.task !== next.task) {
     return false;
   }
-  if (prev.areas !== next.areas) {
+  if (prev.categories !== next.categories) {
     return false;
   }
   if (prev.expanded !== next.expanded) {

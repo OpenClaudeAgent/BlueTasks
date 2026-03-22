@@ -3,7 +3,7 @@ import {openAndMigrateDatabase} from './dbSetup.js';
 import {
   emptyEditorState,
   isDateKey,
-  normalizeAreaId,
+  normalizeCategoryId,
   normalizePriority,
   normalizeRecurrence,
   sanitizePayload,
@@ -14,18 +14,18 @@ describe('taskSanitize', () => {
 
   beforeAll(() => {
     db.prepare(
-      'INSERT INTO areas (id, name, icon, sort_index, created_at) VALUES (?, ?, ?, ?, ?)',
-    ).run('area-1', 'Zone A', 'folder', 0, new Date().toISOString());
+      'INSERT INTO categories (id, name, icon, sort_index, created_at) VALUES (?, ?, ?, ?, ?)',
+    ).run('cat-1', 'Zone A', 'folder', 0, new Date().toISOString());
   });
 
-  it('sanitizePayload drops unknown areaId values', () => {
-    const p = sanitizePayload({areaId: 'unknown', title: 'T'}, db);
-    expect(p.areaId).toBeNull();
+  it('sanitizePayload drops unknown categoryId values', () => {
+    const p = sanitizePayload({categoryId: 'unknown', title: 'T'}, db);
+    expect(p.categoryId).toBeNull();
   });
 
-  it('sanitizePayload keeps an existing area id', () => {
-    const p = sanitizePayload({areaId: 'area-1', title: 'T'}, db);
-    expect(p.areaId).toBe('area-1');
+  it('sanitizePayload keeps an existing category id', () => {
+    const p = sanitizePayload({categoryId: 'cat-1', title: 'T'}, db);
+    expect(p.categoryId).toBe('cat-1');
   });
 
   it('sanitizePayload caps checklistCompleted at total', () => {
@@ -48,8 +48,8 @@ describe('taskSanitize', () => {
     expect(p.timeSpentSeconds).toBe(0);
   });
 
-  it('normalizeAreaId rejects non-string', () => {
-    expect(normalizeAreaId(123, db)).toBeNull();
+  it('normalizeCategoryId rejects non-string', () => {
+    expect(normalizeCategoryId(123, db)).toBeNull();
   });
 
   it('normalizePriority', () => {

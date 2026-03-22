@@ -1,6 +1,6 @@
 # User journeys
 
-Reference names match the **English** UI (`sections.*` in locales). The sidebar sections are **Today**, **Upcoming**, **Anytime**, and **Done**, plus **Areas** filters and **Settings**.
+Reference names match the **English** UI (`sections.*` in locales). The sidebar sections are **Today**, **Upcoming**, **Anytime**, and **Done**, plus **Categories** filters and **Settings**.
 
 ---
 
@@ -17,20 +17,20 @@ Reference names match the **English** UI (`sections.*` in locales). The sidebar 
 2. See **pending** tasks whose `taskDate` is **today or earlier** (overdue dates roll up here too).
 3. **Mark complete** from the card header or open the card for detail.
 4. **Reschedule** by changing the task date (follow-up date) when the card is expanded.
-5. **Expand** a card to edit **title**, **notes** (Lexical rich text), **checklist**, **priority**, **pin**, **estimate**, **timer**, **recurrence**, and **area**.
+5. **Expand** a card to edit **title**, **notes** (Lexical rich text), **checklist**, **priority**, **pin**, **estimate**, **timer**, **recurrence**, and **category**.
 
 ## Anytime (backlog)
 
 1. Select **Anytime** — lists **pending** tasks with **no `taskDate`** (unscheduled backlog).
 2. Clarify titles and add notes so items are actionable later.
 3. Leave tasks **undated** or set a **task date** when they should appear under **Today** or **Upcoming**.
-4. Use **area** assignment (card or batch flows as implemented) so work groups under **Areas** in the sidebar.
+4. Use **category** assignment (card or batch flows as implemented) so work groups under **Categories** in the sidebar.
 
 ## Upcoming
 
 1. Select **Upcoming**.
 2. See **pending** tasks whose `taskDate` is **strictly after** today (future-dated work only).
-3. Open or expand a task to adjust date, priority, or area.
+3. Open or expand a task to adjust date, priority, or category.
 4. Move work into **Today** naturally as dates arrive or by editing `taskDate`.
 
 ## Done
@@ -38,11 +38,11 @@ Reference names match the **English** UI (`sections.*` in locales). The sidebar 
 1. Select **Done** to review **completed** tasks.
 2. Toggle status back to pending if something was closed by mistake (behaviour as implemented on the card).
 
-## Areas
+## Categories
 
-1. In the sidebar, under **Areas**, choose **All areas**, **Unassigned**, or a **named area**.
+1. In the sidebar, under **Categories**, choose **All categories**, **Unassigned**, or a **named category**.
 2. The main list filters to tasks in that scope (and still respects the selected **section**: Today / Upcoming / Anytime / Done).
-3. **Settings → Areas**: create, rename, pick **icon** (from the canonical icon set), delete (with confirmation if tasks are affected).
+3. **Settings → Categories**: create, rename, pick **icon** (from the canonical icon set), delete (with confirmation if tasks are affected).
 
 ## Settings and data
 
@@ -62,4 +62,4 @@ Reference names match the **English** UI (`sections.*` in locales). The sidebar 
 
 1. Read section **subtitles** under each main heading (they explain Today vs Upcoming vs Anytime).
 2. Start from **Anytime** or **Today** depending on whether you are dumping inputs or executing the day.
-3. Configure **language** and **areas** once in Settings so the sidebar matches your workflow.
+3. Configure **language** and **categories** once in Settings so the sidebar matches your workflow.

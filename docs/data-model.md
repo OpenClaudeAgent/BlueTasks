@@ -20,7 +20,7 @@ This document matches the current SQLite schema and API task shape. See [`server
 | `timeSpentSeconds`   | integer                                                              | ≥ 0                                                       |
 | `timerStartedAt`     | ISO string or null                                                   | Active timer anchor                                       |
 | `recurrence`         | `'daily' \| 'weekly' \| 'biweekly' \| 'monthly' \| 'yearly'` or null |                                                           |
-| `areaId`             | string or null                                                       | FK to `areas.id` if present                               |
+| `categoryId`         | string or null                                                       | FK to `categories.id` if present                          |
 | `createdAt`          | ISO string                                                           | Set by server                                             |
 | `updatedAt`          | ISO string                                                           | Set by server                                             |
 
@@ -32,19 +32,19 @@ This document matches the current SQLite schema and API task shape. See [`server
 - **Completed** tasks appear only in **Done** (section filter in [`filterTasks`](../web/app/src/lib/tasks.ts)).
 - There is a **single** date column per task — no separate “due” vs “scheduled” fields in SQLite.
 
-## `areas` table
+## `categories` table
 
-| Field        | Type    | Notes                                               |
-| ------------ | ------- | --------------------------------------------------- |
-| `id`         | string  | Primary key                                         |
-| `name`       | string  | Required                                            |
-| `sort_index` | integer | Sidebar order                                       |
-| `icon`       | string  | Must be an id from `server/data/area-icon-ids.json` |
-| `created_at` | string  | ISO                                                 |
+| Field        | Type    | Notes                                                  |
+| ------------ | ------- | ------------------------------------------------------ |
+| `id`         | string  | Primary key                                            |
+| `name`       | string  | Required                                               |
+| `sort_index` | integer | Sidebar order                                          |
+| `icon`       | string  | Must be an id from `server/data/category-icon-ids.json` |
+| `created_at` | string  | ISO                                                    |
 
-Areas group tasks for filtering in the sidebar (**All areas**, **Unassigned**, or a specific area).
+Categories group tasks for filtering in the sidebar (**All categories**, **Unassigned**, or a specific category). Persisted in the `categories` table; tasks reference `categoryId`.
 
 ## Schema version
 
 - **`PRAGMA user_version`** — must equal `CURRENT_SCHEMA_VERSION` in `dbSetup.ts` after migrations.
-- Legacy columns are added via idempotent `ALTER` helpers in `migrateTasksTable` / `migrateAreasTable` when opening older files.
+- Legacy columns are added via idempotent `ALTER` helpers in `migrateTasksTable` when opening older files; v2 renames the v1 SQLite physical names to `categories` and `category_id` on tasks (see `migrationV2LegacyRename` in `dbSetup.ts`).

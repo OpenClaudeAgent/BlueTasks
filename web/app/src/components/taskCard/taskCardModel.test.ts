@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {areaNameByIdMap, checklistCompletionRatio} from './taskCardModel';
+import {categoryNameByIdMap, checklistCompletionRatio} from './taskCardModel';
 
 describe('checklistCompletionRatio', () => {
   it('returns 0 when total is 0', () => {
@@ -12,16 +12,16 @@ describe('checklistCompletionRatio', () => {
   });
 });
 
-describe('areaNameByIdMap', () => {
-  it('maps area ids to names', () => {
-    const map = areaNameByIdMap([
+describe('categoryNameByIdMap', () => {
+  it('maps category ids to names', () => {
+    const map = categoryNameByIdMap([
       {id: 'a1', name: 'Work', icon: 'folder', sortIndex: 0, createdAt: ''},
-      {id: 'a2', name: 'Home', icon: 'inbox', sortIndex: 1, createdAt: ''},
+      {id: 'a2', name: 'Home', icon: 'heart', sortIndex: 1, createdAt: ''},
     ]);
     expect(map).toEqual({a1: 'Work', a2: 'Home'});
   });
 
   it('returns empty object for empty list', () => {
-    expect(areaNameByIdMap([])).toEqual({});
+    expect(categoryNameByIdMap([])).toEqual({});
   });
 });

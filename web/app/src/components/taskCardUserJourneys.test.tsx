@@ -11,7 +11,7 @@ import {I18nextProvider} from 'react-i18next';
 import i18n from '../i18n';
 import {createTask} from '../lib/tasks';
 import {todayKey} from '../lib/dateKeys';
-import type {Area, Task, TaskDraftUpdate} from '../types';
+import type {Category, Task, TaskDraftUpdate} from '../types';
 import {TaskCard} from './TaskCard';
 
 vi.mock('./LexicalTaskEditor', () => ({
@@ -42,7 +42,7 @@ vi.mock('./LexicalTaskEditor', () => ({
   ),
 }));
 
-const sampleAreas: Area[] = [
+const sampleCategories: Category[] = [
   {id: 'a1', name: 'Work', icon: 'folder', sortIndex: 0, createdAt: '2025-01-01T00:00:00.000Z'},
 ];
 
@@ -96,7 +96,7 @@ describe('Feature: Task importance in the list', () => {
         <I18nextProvider i18n={i18n}>
           <div>
             <TaskCardHarness
-              areas={[]}
+              categories={[]}
               expanded={false}
               isSaving={false}
               onChange={vi.fn()}
@@ -106,7 +106,7 @@ describe('Feature: Task importance in the list', () => {
               task={high}
             />
             <TaskCardHarness
-              areas={[]}
+              categories={[]}
               expanded={false}
               isSaving={false}
               onChange={vi.fn()}
@@ -116,7 +116,7 @@ describe('Feature: Task importance in the list', () => {
               task={normal}
             />
             <TaskCardHarness
-              areas={[]}
+              categories={[]}
               expanded={false}
               isSaving={false}
               onChange={vi.fn()}
@@ -146,7 +146,7 @@ describe('Feature: Task importance in the list', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <ExpandedTaskLive
-            areas={sampleAreas}
+            categories={sampleCategories}
             initial={initial}
             isSaving={false}
             onChangeSpy={onChangeSpy}
@@ -174,7 +174,7 @@ describe('Feature: Checklist progress when the task is open', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded
             isSaving={false}
             onChange={vi.fn()}
@@ -199,7 +199,7 @@ describe('Feature: Checklist progress when the task is open', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={[]}
+            categories={[]}
             expanded
             isSaving={false}
             onChange={vi.fn()}
@@ -226,7 +226,7 @@ describe('Feature: Task context on the row (collapsed)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={[]}
+            categories={[]}
             expanded={false}
             isSaving={false}
             onChange={vi.fn()}
@@ -243,14 +243,14 @@ describe('Feature: Task context on the row (collapsed)', () => {
     });
   });
 
-  describe('Scenario: User sees which project a task belongs to', () => {
-    it('given a task linked to an area, when the row renders, then the area name appears beside the title', () => {
-      const task = {...createTask('Spec API'), areaId: 'a1'};
+  describe('Scenario: User sees which category a task belongs to', () => {
+    it('given a task linked to a category, when the row renders, then the category name appears beside the title', () => {
+      const task = {...createTask('Spec API'), categoryId: 'a1'};
 
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={sampleAreas}
+            categories={sampleCategories}
             expanded={false}
             isSaving={false}
             onChange={vi.fn()}
@@ -278,7 +278,7 @@ describe('Feature: Task context on the row (collapsed)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={[]}
+            categories={[]}
             expanded={false}
             isSaving={false}
             onChange={vi.fn()}
@@ -306,7 +306,7 @@ describe('Feature: Task context on the row (collapsed)', () => {
       render(
         <I18nextProvider i18n={i18n}>
           <TaskCardHarness
-            areas={[]}
+            categories={[]}
             expanded={false}
             isSaving={false}
             onChange={vi.fn()}
