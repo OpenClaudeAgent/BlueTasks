@@ -463,6 +463,36 @@ describe('Feature: Task card (expanded)', () => {
       );
     });
 
+    it('given expanded card, when user saves edited tracked time, then onChange sets timeSpentSeconds and clears timer', async () => {
+      const user = userEvent.setup();
+      const onChangeSpy = vi.fn();
+      const initial = {...createTask('Edit time'), timerStartedAt: null, timeSpentSeconds: 0};
+      render(
+        <I18nextProvider i18n={i18n}>
+          <ExpandedTaskCardLive
+            areas={sampleAreas}
+            initial={initial}
+            isSaving={false}
+            onChangeSpy={onChangeSpy}
+            onDelete={vi.fn()}
+            onToggleExpand={vi.fn()}
+            onToggleStatus={vi.fn()}
+          />
+        </I18nextProvider>,
+      );
+      const card = screen.getByRole('article');
+      const footer = within(card).getByRole('contentinfo');
+      await user.click(within(footer).getByRole('button', {name: /edit tracked time/i}));
+      const hours = screen.getByRole('textbox', {name: /^hours$/i});
+      await user.clear(hours);
+      await user.type(hours, '1');
+      await user.click(screen.getByRole('button', {name: /^save$/i}));
+      expect(onChangeSpy).toHaveBeenCalledWith(initial.id, {
+        timeSpentSeconds: 3600,
+        timerStartedAt: null,
+      });
+    });
+
     it('given expanded card, when user confirms delete, then onDelete is called', async () => {
       const user = userEvent.setup();
       const onDelete = vi.fn();

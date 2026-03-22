@@ -67,7 +67,7 @@ test.describe('Task board: API-seeded → UI', () => {
     await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
 
     const card = taskCardByTitle(page, title);
-    await expect(card.getByText('Pinned')).toBeVisible();
+    await expect(card.locator('.taskCard__chip--pin')).toBeVisible();
   });
 
   test('task with API estimateMinutes=30 shows 30 min in estimate control', async ({page, request}) => {

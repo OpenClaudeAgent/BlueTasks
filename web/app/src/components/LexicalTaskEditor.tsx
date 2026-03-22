@@ -4,8 +4,12 @@ import {
   $createParagraphNode,
   $getRoot,
   $getSelection,
+  $isElementNode,
   $isRangeSelection,
+  $isTextNode,
+  COMMAND_PRIORITY_HIGH,
   FORMAT_TEXT_COMMAND,
+  INSERT_TAB_COMMAND,
 } from 'lexical';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
@@ -15,8 +19,11 @@ import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
 import {OnChangePlugin} from '@lexical/react/LexicalOnChangePlugin';
 import {CheckListPlugin} from '@lexical/react/LexicalCheckListPlugin';
 import {ListPlugin} from '@lexical/react/LexicalListPlugin';
+import {AutoLinkPlugin} from '@lexical/react/LexicalAutoLinkPlugin';
+import {ClickableLinkPlugin} from '@lexical/react/LexicalClickableLinkPlugin';
 import {LinkPlugin} from '@lexical/react/LexicalLinkPlugin';
 import {MarkdownShortcutPlugin} from '@lexical/react/LexicalMarkdownShortcutPlugin';
+import {TabIndentationPlugin} from '@lexical/react/LexicalTabIndentationPlugin';
 import {HorizontalRulePlugin} from '@lexical/react/LexicalHorizontalRulePlugin';
 import {
   HorizontalRuleNode,
@@ -25,11 +32,18 @@ import {
 import {TablePlugin} from '@lexical/react/LexicalTablePlugin';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {HeadingNode, QuoteNode, $createHeadingNode, $createQuoteNode} from '@lexical/rich-text';
-import {INSERT_CHECK_LIST_COMMAND, INSERT_UNORDERED_LIST_COMMAND, ListItemNode, ListNode} from '@lexical/list';
-import {LinkNode} from '@lexical/link';
-import {CodeNode, $createCodeNode} from '@lexical/code';
+import {
+  INSERT_CHECK_LIST_COMMAND,
+  INSERT_UNORDERED_LIST_COMMAND,
+  ListItemNode,
+  ListNode,
+} from '@lexical/list';
+import {AutoLinkNode, LinkNode} from '@lexical/link';
+import {CodeNode, $createCodeNode, $isCodeNode} from '@lexical/code';
 import {$setBlocksType} from '@lexical/selection';
 import {CHECK_LIST, TRANSFORMERS} from '@lexical/markdown';
+import {LEXICAL_AUTO_LINK_MATCHERS} from '../lib/lexicalAutoLinkMatchers';
+import {MARKDOWN_HORIZONTAL_RULE} from '../lib/lexicalMarkdownHorizontalRule';
 import {
   INSERT_TABLE_COMMAND,
   $insertTableColumnAtSelection,
@@ -54,14 +68,18 @@ import {
   Table,
   Trash2,
 } from 'lucide-react';
-
-const MARKDOWN_TRANSFORMERS = [CHECK_LIST, ...TRANSFORMERS];
 import {
   extractChecklistStats,
   lexicalDocsContentEqual,
   summarizeText,
   type EditorChangePayload,
 } from '../lib/editorState';
+import {registerCheckListAtomicCatchUp} from '../lib/lexicalCheckListAtomicCatchUp';
+import {registerChecklistEmptyEnterNewItem} from '../lib/lexicalChecklistEmptyEnterNewItem';
+import {$tryIndentChecklistItemFromTab} from '../lib/lexicalChecklistTabIndent';
+import {registerParagraphLeadingTabCoalesce} from '../lib/lexicalParagraphLeadingTabCoalesce';
+
+const MARKDOWN_TRANSFORMERS = [CHECK_LIST, MARKDOWN_HORIZONTAL_RULE, ...TRANSFORMERS];
 
 type Props = {
   value: string;
@@ -99,13 +117,18 @@ const theme = {
     listitem: 'editor__listItem',
     listitemChecked: 'editor__listItem editor__listItem--checked',
     listitemUnchecked: 'editor__listItem editor__listItem--unchecked',
+    nested: {
+      list: 'editor__list--nestedSublist',
+      listitem: 'editor__listItem--nested',
+    },
   },
-  link: 'editor__link',
+  link: 'editor__links',
   text: {
     bold: 'editor__text--bold',
     italic: 'editor__text--italic',
     code: 'editor__text--code',
   },
+  tab: 'editor__tab',
   code: 'editor__codeBlock',
   hr: 'editor__horizontalRule',
   hrSelected: 'editor__horizontalRule--selected',
@@ -128,6 +151,7 @@ export function LexicalTaskEditor({value, placeholder, onChange, labels}: Props)
         ListNode,
         ListItemNode,
         LinkNode,
+        AutoLinkNode,
         CodeNode,
         HorizontalRuleNode,
         TableNode,
@@ -154,16 +178,87 @@ export function LexicalTaskEditor({value, placeholder, onChange, labels}: Props)
           <HistoryPlugin />
           <ListPlugin />
           <CheckListPlugin />
-          <LinkPlugin />
-          <TablePlugin hasCellMerge hasTabHandler />
-          <HorizontalRulePlugin />
           <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} />
+          <CheckListAtomicCatchUpPlugin />
+          <ChecklistEmptyEnterNewItemPlugin />
+          <LinkPlugin />
+          <ClickableLinkPlugin newTab />
+          <AutoLinkPlugin matchers={LEXICAL_AUTO_LINK_MATCHERS} />
+          <TablePlugin hasCellMerge hasTabHandler />
+          <CoalesceLeadingTabInParagraphPlugin />
+          <InsertTabAsTextPlugin />
+          <HorizontalRulePlugin />
+          <TabIndentationPlugin />
           <EditorSyncPlugin editorValueRef={editorValueRef} value={value} />
           <EditorChangePlugin editorValueRef={editorValueRef} onChange={onChange} />
         </div>
       </div>
     </LexicalComposer>
   );
+}
+
+function CoalesceLeadingTabInParagraphPlugin() {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => registerParagraphLeadingTabCoalesce(editor), [editor]);
+
+  return null;
+}
+
+function CheckListAtomicCatchUpPlugin() {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => registerCheckListAtomicCatchUp(editor), [editor]);
+
+  return null;
+}
+
+/**
+ * Default INSERT_TAB inserts a separate TabNode. Lexical's markdown shortcuts (e.g. `[] ` →
+ * checklist) require the caret's text node to be the paragraph's *first* child; a leading TabNode
+ * breaks that. Insert U+0009 into the current TextNode instead (still one node with `[] `).
+ *
+ * In checklists, ListItemNode.canIndent() is false, so INDENT_CONTENT_COMMAND does not nest via
+ * $handleIndentAndOutdent. Use ListItemNode.setIndent instead (Lexical's $handleIndent).
+ */
+function InsertTabAsTextPlugin() {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => {
+    return editor.registerCommand(
+      INSERT_TAB_COMMAND,
+      () => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+          return false;
+        }
+        const anchorNode = selection.anchor.getNode();
+        if (!$isTextNode(anchorNode)) {
+          return false;
+        }
+        const block = $findMatchingParent(anchorNode, (n) => $isElementNode(n) && !n.isInline());
+        if (block !== null && $isCodeNode(block)) {
+          return false;
+        }
+        if ($tryIndentChecklistItemFromTab()) {
+          return true;
+        }
+        selection.insertText('\t');
+        return true;
+      },
+      COMMAND_PRIORITY_HIGH,
+    );
+  }, [editor]);
+
+  return null;
+}
+
+function ChecklistEmptyEnterNewItemPlugin() {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => registerChecklistEmptyEnterNewItem(editor), [editor]);
+
+  return null;
 }
 
 function ToolbarPlugin({labels}: Pick<Props, 'labels'>) {

@@ -11,7 +11,8 @@
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/package-lock.json",
-    "**/.git/**"
+    "**/.git/**",
+    "**/desktop/src-tauri/target/**"
   ],
   "reporters": ["console", "html"],
   "output": "./jscpd-report",

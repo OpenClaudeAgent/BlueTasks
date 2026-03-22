@@ -424,13 +424,13 @@ button,
   color: var(--text);
 }
 
-/* Bouton « Add » type référence : fond bleu-nuit discret, libellé pervenche. */
+/* Main header Add: icon+label optical centering (Lucide Plus sits right in its viewBox). */
 .mainHeader__addBtn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 10px 18px;
+  gap: 7px;
+  padding: 10px 17px 10px 13px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.07);
   background: #2d3343;
@@ -452,6 +452,7 @@ button,
 .mainHeader__addBtn svg {
   flex-shrink: 0;
   opacity: 0.95;
+  transform: translateX(-3px);
 }
 
 .mainHeader__addBtn:hover:not(:disabled) {
@@ -726,7 +727,9 @@ button,
 .taskCard__chip--iconOnly {
   text-transform: none;
   letter-spacing: normal;
-  padding-inline: 6px;
+  /* Match height so the pill reads as a circle, not an oval */
+  min-width: var(--task-card-pill-height);
+  padding-inline: 0;
   justify-content: center;
 }
 
@@ -1049,19 +1052,20 @@ button,
 .taskCard__footerPriority {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-1) var(--space-2);
+  gap: 6px;
+  min-height: calc(var(--chip-pad-y) * 2 + var(--chip-font-size) * 1.35);
+  padding: var(--chip-pad-y) var(--chip-pad-x);
   margin: 0;
-  border-radius: var(--radius-sm);
-  border: 1px solid transparent;
-  background: transparent;
+  border-radius: var(--chip-radius-pill);
+  border: var(--chip-border);
+  background: var(--chip-bg);
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .taskCard__footerPriority:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--border);
+  background: var(--chip-bg-hover);
+  border-color: var(--border-strong);
 }
 
 .taskCard__priorityGlyph {
@@ -1123,13 +1127,32 @@ button,
   background: rgba(126, 184, 255, 0.12);
 }
 
-.taskCard__iconBtn--timer {
-  flex-direction: column;
-  gap: 1px;
-  min-width: 44px;
-  height: auto;
+.taskCard__timerControl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.taskCard__timerLabelBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-height: 32px;
-  padding: 4px 2px;
+  min-width: 36px;
+  margin: 0;
+  padding: 4px 6px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  line-height: 1;
+}
+
+.taskCard__timerLabelBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .taskCard__timerLabel {
@@ -1141,7 +1164,7 @@ button,
   line-height: 1;
 }
 
-.taskCard__iconBtn--timer.is-active .taskCard__timerLabel {
+.taskCard__timerLabelBtn.is-active .taskCard__timerLabel {
   color: var(--accent);
 }
 
@@ -1152,6 +1175,7 @@ button,
 
 .editor {
   margin-top: 0;
+  width: 100%;
   min-width: 0;
   max-width: 100%;
   border-radius: var(--radius-sm);
@@ -1164,7 +1188,8 @@ button,
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
-  padding: var(--space-2) 10px;
+  /* Same inset on all sides (was 6px vertical vs 10px horizontal). */
+  padding: var(--space-4);
   border-bottom: 1px solid var(--border);
   background: rgba(0, 0, 0, 0.12);
 }
@@ -1194,6 +1219,8 @@ button,
 }
 
 .editor__input {
+  display: block;
+  width: 100%;
   min-height: 180px;
   max-width: 100%;
   box-sizing: border-box;
@@ -1203,6 +1230,9 @@ button,
   font-size: 14px;
   overflow-wrap: anywhere;
   word-break: break-word;
+  /* Preserve TabNode (\t) width; still wraps long lines. */
+  white-space: pre-wrap;
+  tab-size: 4;
 }
 
 .editor__placeholder {
@@ -1218,6 +1248,11 @@ button,
   margin: 0 0 var(--space-3);
   overflow-wrap: anywhere;
   word-break: break-word;
+  tab-size: 4;
+}
+
+.editor__tab {
+  white-space: pre;
 }
 
 .editor__heading {
@@ -1257,6 +1292,22 @@ button,
   margin: var(--space-1) 0 var(--space-2);
 }
 
+/*
+ * Sous-listes checklist : pas de padding-left supplémentaire par niveau.
+ * Sinon chaque Tab ajoute ~1.35rem à droite (effet « horizontal ») alors que l’attendu
+ * est surtout une nouvelle ligne sous le parent, avec la case alignée sur la même colonne que les items racine.
+ */
+.editor__list--check.editor__list--nestedSublist {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0.2em 0 0;
+  padding-left: 0;
+  margin-left: 0;
+  clear: both;
+}
+
 .editor__listItem {
   margin: var(--space-1) 0;
 }
@@ -1273,6 +1324,21 @@ button,
   box-shadow: none;
   outline: none;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Lexical nest: wrapper li whose first child is a nested ul — no role=checkbox, but theme still adds listitem classes; hide duplicate box */
+.editor__list--check .editor__listItem--checked:has(> ul),
+.editor__list--check .editor__listItem--unchecked:has(> ul) {
+  padding-left: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.editor__list--check .editor__listItem--checked:has(> ul)::before,
+.editor__list--check .editor__listItem--unchecked:has(> ul)::before,
+.editor__list--check .editor__listItem--checked:has(> ul)::after {
+  content: none;
+  display: none;
 }
 
 /* Pas d’anneau « bordure » : on avait un box-shadow focus-visible + le navigateur peut entourer li[role=checkbox] */
@@ -1323,7 +1389,7 @@ button,
   text-decoration: line-through;
 }
 
-.editor__link {
+.editor__links {
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -1346,6 +1412,9 @@ button,
 }
 
 .editor__codeBlock {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
   position: relative;
   margin: var(--space-3) 0;
   padding: 28px 16px 14px;
@@ -1357,7 +1426,9 @@ button,
   white-space: pre-wrap;
   overflow-x: auto;
   max-width: 100%;
-  word-break: break-all;
+  /* Do not use break-all here: it inherits into ::before and stacks the language label letter-by-letter. */
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 .editor__codeBlock::before {
@@ -1371,6 +1442,12 @@ button,
   text-transform: uppercase;
   color: var(--text-muted);
   pointer-events: none;
+  white-space: nowrap;
+  word-break: normal;
+  max-width: calc(100% - 32px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
 }
 
 html:lang(fr) .editor__codeBlock::before {
@@ -1489,6 +1566,95 @@ html:lang(fr) .editor__codeBlock::before {
   opacity: 0.75;
   margin-top: 4px;
   font-size: 12px !important;
+}
+
+.footerPopover--timerEdit {
+  min-width: 248px;
+  max-width: 320px;
+}
+
+.footerPopover__timerNote {
+  margin: 0 0 10px;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.footerPopover__timerFields {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.footerPopover__timerField {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.footerPopover__timerFieldLabel {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.footerPopover__timerInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.2);
+  color: var(--text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  outline: none;
+}
+
+.footerPopover__timerInput:focus-visible {
+  border-color: rgba(126, 184, 255, 0.45);
+  box-shadow: 0 0 0 2px rgba(126, 184, 255, 0.15);
+}
+
+.footerPopover__timerActions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.footerPopover__timerActionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 36px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.footerPopover__timerActionBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.footerPopover__timerActionBtn--primary {
+  border-color: rgba(126, 184, 255, 0.4);
+  background: rgba(126, 184, 255, 0.12);
+  color: var(--accent);
+}
+
+.footerPopover__timerActionBtn--primary:hover {
+  background: rgba(126, 184, 255, 0.18);
 }
 
 .datePopover {
@@ -1846,6 +2012,7 @@ html:lang(fr) .editor__codeBlock::before {
 
 .settingsDialog__addRow {
   display: flex;
+  align-items: center;
   gap: 10px;
   margin-bottom: 16px;
 }
@@ -1870,20 +2037,30 @@ html:lang(fr) .editor__codeBlock::before {
   grid-column: 1 / -2;
 }
 
+/* Settings Add: same optical fixes as mainHeader__addBtn (Lucide Plus, line-box baseline). */
 .settingsDialog__addBtn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 15px 10px 11px;
   border-radius: 10px;
   border: 1px solid var(--border);
   background: var(--accent-soft);
   color: var(--accent);
   font-size: 13px;
   font-weight: 600;
+  line-height: 1;
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.settingsDialog__addBtn svg {
+  flex-shrink: 0;
+  display: block;
+  opacity: 0.95;
+  transform: translate(-2px, 0.5px);
 }
 
 .settingsDialog__addBtn:hover:not(:disabled) {

@@ -276,8 +276,8 @@ export function SettingsDialog({
                         onClick={() => void handleAdd()}
                         type="button"
                       >
-                        <Plus size={16} />
-                        {t('settingsAddArea')}
+                        <Plus aria-hidden size={16} strokeWidth={2.25} />
+                        <span>{t('settingsAddArea')}</span>
                       </button>
                     </div>
                   </div>

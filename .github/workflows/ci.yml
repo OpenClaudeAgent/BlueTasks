@@ -116,7 +116,7 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
-      - name: Tests with coverage gate (≥80%)
+      - name: Tests with coverage gate (lines/statements/funcs ≥80%, branches ≥73% web)
         run: npm run test:coverage:gate
       - name: Upload web coverage (gate scope)
         uses: actions/upload-artifact@v7

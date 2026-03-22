@@ -54,8 +54,6 @@ export function TaskCardFooter({
   return (
     <footer className="taskCard__footerBar">
       <div className="taskCard__footerLeft">
-        {!taskDate ? <span className="taskCard__footerMeta">{t('later')}</span> : null}
-
         <TaskCardFooterEstimatePicker estimateMinutes={estimateMinutes} onChange={onChange} taskId={taskId} />
 
         <TaskCardFooterAreaPicker
