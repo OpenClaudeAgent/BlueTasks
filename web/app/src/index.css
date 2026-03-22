@@ -623,6 +623,13 @@ button,
   background: rgba(107, 207, 143, 0.12);
 }
 
+.taskCard.is-completed .taskCard__chip--priority .taskCard__priorityGlyph,
+.taskCard.is-completed .taskCard__chip--priority .taskCard__priorityGlyph--high,
+.taskCard.is-completed .taskCard__chip--priority .taskCard__priorityGlyph--low {
+  color: #b8e8c8;
+  opacity: 1;
+}
+
 .taskCard.is-completed .taskCard__footerMeta--priority-high,
 .taskCard.is-completed .taskCard__footerMeta--priority-normal,
 .taskCard.is-completed .taskCard__footerMeta--priority-low {
@@ -727,6 +734,37 @@ button,
   background: rgba(126, 184, 255, 0.08);
 }
 
+.taskCard__chip--priority {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+/* Same visual recipe as `.taskCard__chip--pin` (tinted border + light fill + icon = `color`). */
+.taskCard__chip--priority-high {
+  color: var(--priority-high);
+  border-color: rgba(232, 165, 74, 0.4);
+  background: rgba(232, 165, 74, 0.08);
+}
+
+.taskCard__chip--priority-normal {
+  color: var(--accent);
+  border-color: rgba(126, 184, 255, 0.4);
+  background: rgba(126, 184, 255, 0.08);
+}
+
+.taskCard__chip--priority-low {
+  color: var(--text-secondary);
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.taskCard__chip--priority .taskCard__priorityGlyph,
+.taskCard__chip--priority .taskCard__priorityGlyph--high,
+.taskCard__chip--priority .taskCard__priorityGlyph--low {
+  color: currentColor;
+  opacity: 1;
+}
+
 .taskCard__chip--iconOnly {
   text-transform: none;
   letter-spacing: normal;
@@ -738,8 +776,8 @@ button,
 
 .taskCard__chip--recurring {
   color: #c9b8ff;
-  border-color: rgba(201, 184, 255, 0.35);
-  background: rgba(139, 92, 246, 0.1);
+  border-color: rgba(201, 184, 255, 0.4);
+  background: rgba(139, 92, 246, 0.08);
 }
 
 .taskCard__chip--timer {
@@ -1027,7 +1065,7 @@ button,
 }
 
 .taskCard__datePill--recurring {
-  border-color: rgba(126, 184, 255, 0.35);
+  border-color: rgba(201, 184, 255, 0.4);
 }
 
 .taskCard__footerEstimateInput {
@@ -1471,6 +1509,20 @@ html:lang(fr) .editor__codeBlock::before {
 .editor__horizontalRule.selected,
 .editor__horizontalRule--selected {
   border-top-color: var(--accent);
+}
+
+.editor__imageWrap {
+  display: block;
+  margin: var(--space-3) 0;
+  max-width: 100%;
+}
+
+.editor__imageWrap img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
 }
 
 .editor__table {

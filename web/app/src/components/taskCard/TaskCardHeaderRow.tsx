@@ -5,6 +5,7 @@ import type {RefObject} from 'react';
 import {formatDurationLabel} from '../../lib/taskCardFormat';
 import type {RecurrenceKind, Task, TaskDraftUpdate} from '../../types';
 import {TaskCardHeaderDatePopover} from './TaskCardHeaderDatePopover';
+import {TaskCardPriorityIcon} from './TaskCardPriorityIcon';
 
 export type TaskCardHeaderRowProps = {
   task: Task;
@@ -93,6 +94,14 @@ export function TaskCardHeaderRow({
             <span className="taskCard__areaChipText">{areaDisplayName ?? t('areaMissing')}</span>
           </span>
         ) : null}
+        <span
+          aria-label={t(`priorityShort.${task.priority}`)}
+          className={`taskCard__chip taskCard__chip--iconOnly taskCard__chip--priority taskCard__chip--priority-${task.priority}`}
+          role="img"
+          title={t(`priorityShort.${task.priority}`)}
+        >
+          <TaskCardPriorityIcon priority={task.priority} size={11} />
+        </span>
         {pinned ? (
           <span
             aria-label={t('pin')}
