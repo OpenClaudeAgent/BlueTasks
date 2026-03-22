@@ -71,6 +71,7 @@ export function TaskCardFooterRight({
         trackedSeconds={trackedSeconds}
       />
       <button
+        aria-label={t('delete')}
         className="taskCard__iconBtn taskCard__iconBtn--danger"
         onClick={(event) => {
           event.stopPropagation();
