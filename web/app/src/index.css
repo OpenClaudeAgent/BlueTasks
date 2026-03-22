@@ -1293,9 +1293,9 @@ button,
 }
 
 /*
- * Sous-listes checklist : pas de padding-left supplémentaire par niveau.
- * Sinon chaque Tab ajoute ~1.35rem à droite (effet « horizontal ») alors que l’attendu
- * est surtout une nouvelle ligne sous le parent, avec la case alignée sur la même colonne que les items racine.
+ * Sous-listes checklist : retrait visible par niveau (Tab / setIndent), sinon la structure
+ * change dans le document mais l’UI reste identique — on garde un pas modéré pour limiter
+ * le débordement horizontal sur petits écrans.
  */
 .editor__list--check.editor__list--nestedSublist {
   display: block;
@@ -1303,7 +1303,7 @@ button,
   max-width: 100%;
   box-sizing: border-box;
   margin: 0.2em 0 0;
-  padding-left: 0;
+  padding-left: 1.1rem;
   margin-left: 0;
   clear: both;
 }

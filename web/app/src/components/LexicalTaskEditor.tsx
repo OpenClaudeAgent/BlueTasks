@@ -1,15 +1,12 @@
-import {useEffect, useMemo, useRef} from 'react';
+import {useEffect, useLayoutEffect, useMemo, useRef} from 'react';
 import type {MutableRefObject, ReactNode} from 'react';
 import {
   $createParagraphNode,
   $getRoot,
   $getSelection,
-  $isElementNode,
   $isRangeSelection,
-  $isTextNode,
-  COMMAND_PRIORITY_HIGH,
   FORMAT_TEXT_COMMAND,
-  INSERT_TAB_COMMAND,
+  type LexicalEditor,
 } from 'lexical';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
@@ -39,7 +36,7 @@ import {
   ListNode,
 } from '@lexical/list';
 import {AutoLinkNode, LinkNode} from '@lexical/link';
-import {CodeNode, $createCodeNode, $isCodeNode} from '@lexical/code';
+import {CodeNode, $createCodeNode} from '@lexical/code';
 import {$setBlocksType} from '@lexical/selection';
 import {CHECK_LIST, TRANSFORMERS} from '@lexical/markdown';
 import {LEXICAL_AUTO_LINK_MATCHERS} from '../lib/lexicalAutoLinkMatchers';
@@ -76,8 +73,8 @@ import {
 } from '../lib/editorState';
 import {registerCheckListAtomicCatchUp} from '../lib/lexicalCheckListAtomicCatchUp';
 import {registerChecklistEmptyEnterNewItem} from '../lib/lexicalChecklistEmptyEnterNewItem';
-import {$tryIndentChecklistItemFromTab} from '../lib/lexicalChecklistTabIndent';
 import {registerParagraphLeadingTabCoalesce} from '../lib/lexicalParagraphLeadingTabCoalesce';
+import {registerTaskEditorTabCommands} from '../lib/lexicalTaskEditorTabCommands';
 
 const MARKDOWN_TRANSFORMERS = [CHECK_LIST, MARKDOWN_HORIZONTAL_RULE, ...TRANSFORMERS];
 
@@ -213,42 +210,10 @@ function CheckListAtomicCatchUpPlugin() {
   return null;
 }
 
-/**
- * Default INSERT_TAB inserts a separate TabNode. Lexical's markdown shortcuts (e.g. `[] ` →
- * checklist) require the caret's text node to be the paragraph's *first* child; a leading TabNode
- * breaks that. Insert U+0009 into the current TextNode instead (still one node with `[] `).
- *
- * In checklists, ListItemNode.canIndent() is false, so INDENT_CONTENT_COMMAND does not nest via
- * $handleIndentAndOutdent. Use ListItemNode.setIndent instead (Lexical's $handleIndent).
- */
 function InsertTabAsTextPlugin() {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(() => {
-    return editor.registerCommand(
-      INSERT_TAB_COMMAND,
-      () => {
-        const selection = $getSelection();
-        if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
-          return false;
-        }
-        const anchorNode = selection.anchor.getNode();
-        if (!$isTextNode(anchorNode)) {
-          return false;
-        }
-        const block = $findMatchingParent(anchorNode, (n) => $isElementNode(n) && !n.isInline());
-        if (block !== null && $isCodeNode(block)) {
-          return false;
-        }
-        if ($tryIndentChecklistItemFromTab()) {
-          return true;
-        }
-        selection.insertText('\t');
-        return true;
-      },
-      COMMAND_PRIORITY_HIGH,
-    );
-  }, [editor]);
+  useLayoutEffect(() => registerTaskEditorTabCommands(editor), [editor]);
 
   return null;
 }
@@ -261,45 +226,68 @@ function ChecklistEmptyEnterNewItemPlugin() {
   return null;
 }
 
+/** Toolbar clicks must not steal focus from the contenteditable, or Lexical loses RangeSelection and commands no-op. */
+function runToolbarAction(editor: LexicalEditor, fn: () => void) {
+  editor.focus(() => {
+    fn();
+  });
+}
+
 function ToolbarPlugin({labels}: Pick<Props, 'labels'>) {
   const [editor] = useLexicalComposerContext();
 
   return (
     <div className="editor__toolbar">
-      <ToolbarButton label={labels.bold} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}>
+      <ToolbarButton
+        label={labels.bold}
+        onClick={() => runToolbarAction(editor, () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold'))}
+      >
         <Bold size={14} />
       </ToolbarButton>
-      <ToolbarButton label={labels.italic} onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}>
+      <ToolbarButton
+        label={labels.italic}
+        onClick={() => runToolbarAction(editor, () => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic'))}
+      >
         <Italic size={14} />
       </ToolbarButton>
       <ToolbarButton
         label={labels.heading}
         onClick={() =>
-          editor.update(() => {
-            const selection = $getSelection();
-            if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createHeadingNode('h1'));
-            }
-          })
+          runToolbarAction(editor, () =>
+            editor.update(() => {
+              const selection = $getSelection();
+              if ($isRangeSelection(selection)) {
+                $setBlocksType(selection, () => $createHeadingNode('h1'));
+              }
+            }),
+          )
         }
       >
         <Heading1 size={14} />
       </ToolbarButton>
-      <ToolbarButton label={labels.checklist} onClick={() => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)}>
+      <ToolbarButton
+        label={labels.checklist}
+        onClick={() => runToolbarAction(editor, () => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined))}
+      >
         <ListChecks size={14} />
       </ToolbarButton>
-      <ToolbarButton label={labels.bulletList} onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)}>
+      <ToolbarButton
+        label={labels.bulletList}
+        onClick={() => runToolbarAction(editor, () => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined))}
+      >
         <List size={14} />
       </ToolbarButton>
       <ToolbarButton
         label={labels.quote}
         onClick={() =>
-          editor.update(() => {
-            const selection = $getSelection();
-            if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createQuoteNode());
-            }
-          })
+          runToolbarAction(editor, () =>
+            editor.update(() => {
+              const selection = $getSelection();
+              if ($isRangeSelection(selection)) {
+                $setBlocksType(selection, () => $createQuoteNode());
+              }
+            }),
+          )
         }
       >
         <MessageSquareQuote size={14} />
@@ -307,29 +295,33 @@ function ToolbarPlugin({labels}: Pick<Props, 'labels'>) {
       <ToolbarButton
         label={labels.code}
         onClick={() =>
-          editor.update(() => {
-            const selection = $getSelection();
-            if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createCodeNode());
-            }
-          })
+          runToolbarAction(editor, () =>
+            editor.update(() => {
+              const selection = $getSelection();
+              if ($isRangeSelection(selection)) {
+                $setBlocksType(selection, () => $createCodeNode());
+              }
+            }),
+          )
         }
       >
         <Code2 size={14} />
       </ToolbarButton>
       <ToolbarButton
         label={labels.horizontalRule}
-        onClick={() => editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined)}
+        onClick={() => runToolbarAction(editor, () => editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined))}
       >
         <Minus size={14} />
       </ToolbarButton>
       <ToolbarButton
         label={labels.insertTable}
         onClick={() =>
-          editor.dispatchCommand(INSERT_TABLE_COMMAND, {
-            columns: '2',
-            rows: '2',
-          })
+          runToolbarAction(editor, () =>
+            editor.dispatchCommand(INSERT_TABLE_COMMAND, {
+              columns: '2',
+              rows: '2',
+            }),
+          )
         }
       >
         <Table size={14} />
@@ -337,8 +329,10 @@ function ToolbarPlugin({labels}: Pick<Props, 'labels'>) {
       <ToolbarButton
         label={labels.addTableColumn}
         onClick={() =>
-          editor.update(() => {
-            $insertTableColumnAtSelection(true);
+          runToolbarAction(editor, () => {
+            editor.update(() => {
+              $insertTableColumnAtSelection(true);
+            });
           })
         }
       >
@@ -347,8 +341,10 @@ function ToolbarPlugin({labels}: Pick<Props, 'labels'>) {
       <ToolbarButton
         label={labels.addTableRow}
         onClick={() =>
-          editor.update(() => {
-            $insertTableRowAtSelection(true);
+          runToolbarAction(editor, () => {
+            editor.update(() => {
+              $insertTableRowAtSelection(true);
+            });
           })
         }
       >
@@ -360,17 +356,19 @@ function ToolbarPlugin({labels}: Pick<Props, 'labels'>) {
           if (!window.confirm(labels.deleteTableConfirm)) {
             return;
           }
-          editor.update(() => {
-            const selection = $getSelection();
-            if (!$isRangeSelection(selection)) return;
-            const anchorNode = selection.anchor.getNode();
-            const tableNode = $findMatchingParent(anchorNode, $isTableNode);
-            if (tableNode) {
-              const paragraph = $createParagraphNode();
-              tableNode.replace(paragraph);
-              paragraph.select();
-            }
-          });
+          runToolbarAction(editor, () =>
+            editor.update(() => {
+              const selection = $getSelection();
+              if (!$isRangeSelection(selection)) return;
+              const anchorNode = selection.anchor.getNode();
+              const tableNode = $findMatchingParent(anchorNode, $isTableNode);
+              if (tableNode) {
+                const paragraph = $createParagraphNode();
+                tableNode.replace(paragraph);
+                paragraph.select();
+              }
+            }),
+          );
         }}
       >
         <Trash2 size={14} />
@@ -389,7 +387,13 @@ function ToolbarButton({
   onClick: () => void;
 }) {
   return (
-    <button aria-label={label} className="editor__toolbarButton" onClick={onClick} type="button">
+    <button
+      aria-label={label}
+      className="editor__toolbarButton"
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={onClick}
+      type="button"
+    >
       {children}
     </button>
   );

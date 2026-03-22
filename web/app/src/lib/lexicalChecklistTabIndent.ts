@@ -1,5 +1,5 @@
-import {$getSelection, $isRangeSelection, $isTextNode} from 'lexical';
-import {$isListItemNode, $isListNode} from '@lexical/list';
+import {$getSelection, $isRangeSelection} from 'lexical';
+import {$isListItemNode, $isListNode, type ListItemNode} from '@lexical/list';
 import {$findMatchingParent} from '@lexical/utils';
 
 /**
@@ -12,10 +12,9 @@ export function $tryIndentChecklistItemFromTab(): boolean {
     return false;
   }
   const anchorNode = selection.anchor.getNode();
-  if (!$isTextNode(anchorNode)) {
-    return false;
-  }
-  const listItem = $findMatchingParent(anchorNode, $isListItemNode);
+  const listItem: ListItemNode | null = $isListItemNode(anchorNode)
+    ? anchorNode
+    : $findMatchingParent(anchorNode, $isListItemNode);
   if (listItem === null) {
     return false;
   }

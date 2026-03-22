@@ -28,8 +28,7 @@ export default mergeConfig(
         thresholds: {
           lines: 80,
           statements: 80,
-          // Aggregate can sit just under 75% when many UI helpers carry optional branches; keep lines/statements strict.
-          branches: 73,
+          branches: 75,
           functions: 80,
         },
       },
