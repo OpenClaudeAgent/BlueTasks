@@ -1,16 +1,63 @@
 # BlueTasks
 
-**Local-first** tasks: one board, expandable cards, rich notes, a due date per task, **SQLite** on disk, **FR / EN** UI.
+**BlueTasks** is a calm, **local-first** task board: your data stays in **SQLite** on your machine, the UI stays fast, and each task can grow from a single line into a full note when you need it.
 
 License [MIT](LICENSE) · [Changelog](CHANGELOG.md)
 
+## What you get
+
+- **Focused lists** — *Today*, *Upcoming*, *Anytime*, and *Done* so you see the right workload at the right time, not an endless flat inbox.
+- **Expandable cards** — Open a task for a full editor: **rich text** (headings, bold, italic, bullets, checklists, quotes, code blocks, tables, dividers), **priority**, **pin**, **due date**, **recurrence**, **time estimate**, and a **timer** when you want to track focus.
+- **Areas** — Group work by project or life domain and filter the board from the sidebar.
+- **Quick capture** — Add a thought from the top bar without losing your place on the board.
+- **Your data, your disk** — Export or import the whole database as `.sqlite` from Settings; copy `.data/` for a raw backup.
+- **Interface languages** — English by default, plus French, German, Spanish, Italian, Dutch, Polish, Portuguese, and Japanese (switch in Settings).
+
+## Screenshots
+
+Real UI (English) — same app you get from the **[latest release](https://github.com/OpenClaudeAgent/BlueTasks/releases/latest)**.  
+Paths are **relative to the repo root** so they resolve correctly in **GitHub’s README preview** on `github.com`.
+
+### Board views
+
+
+
+
+| **Today**                                             | **Anytime**                                          | **Upcoming**                                            |
+| ----------------------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------- |
+|                                                       |                                                      |                                                         |
+| *What needs attention now — scan the day in seconds.* | *Ideas and someday tasks without forced scheduling.* | *Light list of what’s next, including recurring items.* |
+
+
+### Rich notes inside a task
+
+
+
+*Open a card for headings, lists, checklists, quotes, code, tables — plus estimate, area, priority, pin, schedule, repeat, and timer in the footer.*
+
 ## Install and run
 
-### Docker (prebuilt image)
+### Recommended: download the latest release
 
-Log in to GHCR if the image is private: `docker login ghcr.io`
+**[→ Latest GitHub release](https://github.com/OpenClaudeAgent/BlueTasks/releases/latest)**
 
-Pick a tag from [Releases](https://github.com/OpenClaudeAgent/BlueTasks/tags) (or use `:latest`). Example:
+Pick the **desktop installer or archive** for your OS (**macOS**, **Windows**, **Linux**). Those assets are built and attached automatically by **GitHub Actions** — no compile step on your side.
+
+### Other ways to run
+
+**Node (server only, browser UI)** — useful for development or a headless host. Requires [Node.js 22](https://nodejs.org/).
+
+```bash
+git clone https://github.com/OpenClaudeAgent/BlueTasks.git
+cd BlueTasks
+npm install
+npm run build
+npm run start
+```
+
+Then open **[http://localhost:8787](http://localhost:8787)** in your browser. Data under `**.data/`** at the project root (`bluetasks.sqlite`).
+
+**Docker (prebuilt image)** — good for servers or homelab. Pick a tag from [Releases](https://github.com/OpenClaudeAgent/BlueTasks/tags) (or `:latest`):
 
 ```bash
 docker pull ghcr.io/openclaudeagent/bluetasks:latest
@@ -22,21 +69,7 @@ docker run --rm -d \
   ghcr.io/openclaudeagent/bluetasks:latest
 ```
 
-Stop: `docker stop bluetasks`
-
-### Node (no Docker)
-
-Requires [Node.js 22](https://nodejs.org/).
-
-```bash
-git clone https://github.com/OpenClaudeAgent/BlueTasks.git
-cd BlueTasks
-npm install
-npm run build
-npm run start
-```
-
-### Docker Compose (from source)
+**Docker Compose (from source)**
 
 ```bash
 git clone https://github.com/OpenClaudeAgent/BlueTasks.git
@@ -45,20 +78,21 @@ npm run docker:release
 docker compose up --build -d
 ```
 
-More detail: [docs/docker.md](docs/docker.md)
+More on Docker: [docs/docker.md](docs/docker.md).
 
-### Desktop app (Tauri)
+### Building the desktop app from source
 
-Native shell with embedded Node — same server stack as Docker. See [desktop/README.md](desktop/README.md) (prep, `tauri dev` / `tauri build`).
+For contributors or custom builds: Rust + Node 22, `npm run desktop:prep`, then `npm run tauri build` or `npm run tauri dev` from `desktop/`. Full steps: **[desktop/README.md](desktop/README.md)**.
 
 ## Using the app
 
-Open **http://localhost:8787** (or the URL shown by your setup). Data lives under **`.data/`** at the project root (e.g. `bluetasks.sqlite`), or in the folder you mounted for Docker.
+- **Desktop (Tauri):** the app opens the UI for you; data lives in the OS app data directory (see [desktop/README.md](desktop/README.md)).
+- **Browser + `npm run start` or Docker:** open **[http://localhost:8787](http://localhost:8787)** (or the URL your setup prints). Data in `**.data/`** (or the volume you mounted for Docker).
 
 ## Backup
 
 - **In the app:** Settings → General → export / import a `.sqlite` file.
-- **Files:** copy the **`.data`** directory (or your Docker volume folder).
+- **Files:** for **Node / Docker**, copy `**.data/`** (or your Docker volume). For **Tauri**, SQLite lives under the OS app data directory — see [desktop/README.md](desktop/README.md).
 
 ## Repository layout
 
@@ -75,15 +109,15 @@ npm install
 npm run dev
 ```
 
-- UI: http://localhost:5173 · API: http://localhost:8787 (root `npm run dev` starts both.)
+- UI: [http://localhost:5173](http://localhost:5173) · API: [http://localhost:8787](http://localhost:8787) (root `npm run dev` starts both.)
 
 Same checks as CI: `npm run ci` — details in [docs/quality.md](docs/quality.md).
 
 Optional: `web/app/.env` with `VITE_API_ORIGIN=https://your-api` (no trailing slash) if the API is not on `localhost:8787`.
 
-**Releases:** one semver across packages; ship via GitHub **Actions → Release** workflow (see [docs/releasing.md](docs/releasing.md)). Forks: replace `OpenClaudeAgent/BlueTasks` and `openclaudeagent` in URLs / image names with your org.
+**Shipping releases:** maintainers use the GitHub **Actions → Release** workflow (see [docs/releasing.md](docs/releasing.md)). Forks: replace `OpenClaudeAgent/BlueTasks` and `openclaudeagent` in URLs / image names with your org.
 
 ---
 
-[![CI](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml)
-[![Docker image](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml)
+[CI](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml)
+[Docker image](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml)
