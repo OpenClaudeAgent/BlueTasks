@@ -111,6 +111,16 @@ test.describe('Accessibility (axe)', () => {
     await expectNoAxeViolations(page);
   });
 
+  test('task delete confirm alertdialog has no axe violations', async ({page, request}) => {
+    await resetBoard(page, request);
+    const title = `A11y delete confirm ${Date.now()}`;
+    await addTaskWithTitle(page, title);
+    await firstCard(page).getByRole('button', {name: 'Delete', exact: true}).click();
+    await expect(page.getByRole('alertdialog')).toBeVisible();
+    await expect(page.getByRole('alertdialog')).toContainText(title);
+    await expectNoAxeViolations(page);
+  });
+
   test('date popover open on task card has no axe violations', async ({page, request}) => {
     await resetBoard(page, request);
     await addTaskWithTitle(page, `A11y date ${Date.now()}`);

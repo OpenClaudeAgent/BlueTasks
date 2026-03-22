@@ -64,4 +64,23 @@ test.describe('Task delete', () => {
     const rows = (await res.json()) as {title: string}[];
     expect(rows.some((t) => t.title === title)).toBe(true);
   });
+
+  test('user dismisses delete dialog with Escape; task remains in API', async ({page}) => {
+    const title = `E2E delete escape ${Date.now()}`;
+    await addTaskWithTitle(page, title);
+
+    const card = taskCardByTitle(page, title);
+    await card.getByRole('button', {name: 'Delete', exact: true}).click();
+    const dialog = page.getByRole('alertdialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText(title);
+
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('alertdialog')).toHaveCount(0);
+
+    await expect(card.getByRole('textbox', {name: 'Task title'})).toBeVisible();
+    const res = await page.request.get('/api/tasks');
+    const rows = (await res.json()) as {title: string}[];
+    expect(rows.some((t) => t.title === title)).toBe(true);
+  });
 });

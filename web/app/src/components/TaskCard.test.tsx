@@ -525,6 +525,33 @@ describe('Feature: Task card (expanded)', () => {
       expect(onDelete).toHaveBeenCalledWith(task.id);
     });
 
+    it('given expanded card, when user cancels delete dialog, then onDelete is not called', async () => {
+      const user = userEvent.setup();
+      const onDelete = vi.fn();
+      const task = createTask('Keep me');
+      render(
+        <I18nextProvider i18n={i18n}>
+          <TaskCardHarness
+            areas={sampleAreas}
+            expanded
+            isSaving={false}
+            onChange={vi.fn()}
+            onDelete={onDelete}
+            onToggleExpandTask={vi.fn()}
+            onToggleStatus={vi.fn()}
+            task={task}
+          />
+        </I18nextProvider>,
+      );
+      const card = screen.getByRole('article');
+      const footer = within(card).getByRole('contentinfo');
+      await user.click(within(footer).getByRole('button', {name: 'Delete'}));
+      const dialog = await screen.findByRole('alertdialog');
+      await user.click(within(dialog).getByRole('button', {name: 'Cancel'}));
+      expect(onDelete).not.toHaveBeenCalled();
+      expect(within(card).getByRole('textbox', {name: 'Task title'})).toBeVisible();
+    });
+
     it('given expanded card, when user sets estimate, then onChange receives minutes', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();

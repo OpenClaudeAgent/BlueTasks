@@ -1724,13 +1724,15 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
 }
 
 .confirmDialog__btn--danger {
-  background: rgba(255, 122, 122, 0.18);
-  color: var(--danger);
-  border-color: rgba(255, 122, 122, 0.35);
+  background: #b03d40;
+  color: #fff;
+  border-color: #962f32;
 }
 
 .confirmDialog__btn--danger:hover {
-  background: rgba(255, 122, 122, 0.28);
+  background: #c94a4d;
+  color: #fff;
+  border-color: #b03d40;
 }
 
 .footerPopover__title {
