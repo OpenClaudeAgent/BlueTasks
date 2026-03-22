@@ -1,4 +1,4 @@
-import {type LinkMatcher} from '@lexical/link';
+import type {LinkMatcher} from '@lexical/link';
 
 /** Strip common sentence punctuation mistakenly glued to the end of a URL (not `!`, often in query strings). */
 function trimTrailingSentencePunct(url: string): string {

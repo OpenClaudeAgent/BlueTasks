@@ -2,6 +2,7 @@ import js from '@eslint/js';
 import vitest from '@vitest/eslint-plugin';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import {complexityPlugins, complexityRules} from '../../eslint.complexity.mjs';
+import {patternPlugins, patternRules} from '../../eslint.patterns.mjs';
 import globals from 'globals';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import reactHooks from 'eslint-plugin-react-hooks';
@@ -21,7 +22,7 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite,
     ],
-    plugins: complexityPlugins,
+    plugins: {...complexityPlugins, ...patternPlugins},
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
@@ -31,6 +32,7 @@ export default defineConfig([
       },
     },
     rules: {
+      ...patternRules,
       ...complexityRules,
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-misused-promises': [
