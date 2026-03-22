@@ -31,7 +31,9 @@ function App() {
   return (
     <Fragment>
       <div
+        aria-label={t('appName')}
         className="appShell"
+        role="region"
         style={{
           gridTemplateColumns: `${sidebarWidth}px ${SIDEBAR_RESIZE_LANE_PX}px minmax(0, 1fr)`,
         }}
