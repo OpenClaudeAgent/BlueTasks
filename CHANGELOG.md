@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-03-22
+
+- Web: date popover calendar stays inside panel (fixed table layout, selected-day typography).
+
 ## [0.3.1] - 2026-03-22
 
 - macOS DMG built with Tauri (app + Applications); release workflow refreshes `Cargo.lock` after version bump.
@@ -80,7 +84,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial published image tag `v0.1.0` (multi-arch GHCR workflow).
 
-[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.2...HEAD
+[0.3.2]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.1...v0.3.2
 [0.3.1]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.5...v0.3.0
 [0.2.5]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.4...v0.2.5
