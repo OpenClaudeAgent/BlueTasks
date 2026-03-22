@@ -28,7 +28,11 @@ export function taskMatchesAreaFilterRow(task: BoardFilterTask, areaFilter: stri
   return task.areaId === areaFilter;
 }
 
-export function taskMatchesBoardSectionRow(task: BoardFilterTask, section: BoardSectionId, today: string): boolean {
+export function taskMatchesBoardSectionRow(
+  task: BoardFilterTask,
+  section: BoardSectionId,
+  today: string,
+): boolean {
   if (section === 'all') {
     return true;
   }

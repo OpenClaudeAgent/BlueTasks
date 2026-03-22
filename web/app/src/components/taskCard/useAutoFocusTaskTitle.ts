@@ -8,7 +8,13 @@ type Args = {
   onConsumed?: () => void;
 };
 
-export function useAutoFocusTaskTitle({expanded, autoFocusTitle, taskId, titleInputRef, onConsumed}: Args): void {
+export function useAutoFocusTaskTitle({
+  expanded,
+  autoFocusTitle,
+  taskId,
+  titleInputRef,
+  onConsumed,
+}: Args): void {
   const onConsumedRef = useRef(onConsumed);
 
   useEffect(() => {

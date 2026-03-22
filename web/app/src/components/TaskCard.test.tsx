@@ -350,7 +350,11 @@ describe('Feature: Task card (expanded)', () => {
       );
       const card = screen.getByRole('article');
       const pillLabel = formatTaskDatePill(dateKey, 'en');
-      await user.click(within(card).getByRole('button', {name: new RegExp(pillLabel.replace(/\s+/g, '\\s+'), 'i')}));
+      await user.click(
+        within(card).getByRole('button', {
+          name: new RegExp(pillLabel.replace(/\s+/g, '\\s+'), 'i'),
+        }),
+      );
       await user.click(screen.getByRole('button', {name: /^clear$/i}));
       expect(onChange).toHaveBeenCalledWith(task.id, {taskDate: null, recurrence: null});
     });
@@ -626,7 +630,10 @@ describe('Feature: TaskCard memo comparator', () => {
   });
 
   it('given active timer, when liveTimerNowMs changes, then props are not equal', () => {
-    const taskWithTimer = {...baseTask, timerStartedAt: new Date('2025-01-01T12:00:00.000Z').toISOString()};
+    const taskWithTimer = {
+      ...baseTask,
+      timerStartedAt: new Date('2025-01-01T12:00:00.000Z').toISOString(),
+    };
     const prev: TaskCardProps = {
       ...baseProps(),
       task: taskWithTimer,

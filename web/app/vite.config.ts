@@ -1,10 +1,13 @@
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { defineConfig } from 'vite';
+import {fileURLToPath} from 'node:url';
+import {defineConfig} from 'vite';
 import react from '@vitejs/plugin-react';
 
 const contractRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../contract');
-const serverDataRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../server/data');
+const serverDataRoot = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  '../../server/data',
+);
 
 export default defineConfig({
   plugins: [react()],

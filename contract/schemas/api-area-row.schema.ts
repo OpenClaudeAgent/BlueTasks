@@ -6,7 +6,9 @@ export const apiAreaRowSchema = z
     name: z.string().refine((n) => n.trim().length > 0, 'expected non-empty string'),
     icon: z.string().regex(/^[a-z0-9-]+$/, 'expected slug'),
     sortIndex: z.number().int().min(0),
-    createdAt: z.string().refine((s) => !Number.isNaN(Date.parse(s)), 'expected parseable ISO string'),
+    createdAt: z
+      .string()
+      .refine((s) => !Number.isNaN(Date.parse(s)), 'expected parseable ISO string'),
   })
   .strict();
 

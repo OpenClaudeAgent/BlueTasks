@@ -103,7 +103,9 @@ export async function createAreaViaSettingsUi(page: Page, name: string): Promise
 
   await expect(dialog.getByText(name)).toBeVisible();
   await page.keyboard.press('Escape');
-  await expect(page.locator('.sidebar__areasNav').getByRole('button', {name: new RegExp(name)})).toBeVisible();
+  await expect(
+    page.locator('.sidebar__areasNav').getByRole('button', {name: new RegExp(name)}),
+  ).toBeVisible();
 
   return {id: created.id};
 }
@@ -126,7 +128,11 @@ function waitForTaskPutOk(page: Page) {
 }
 
 /** Footer area popover → pick a zone → wait for successful task PUT. */
-export async function assignTaskToAreaFromFooter(page: Page, title: string, areaName: string): Promise<void> {
+export async function assignTaskToAreaFromFooter(
+  page: Page,
+  title: string,
+  areaName: string,
+): Promise<void> {
   const card = taskCardByTitle(page, title);
   await expandTaskCardIfCollapsed(page, title);
   await card.locator('.taskCard__footerAreaTrigger').click();

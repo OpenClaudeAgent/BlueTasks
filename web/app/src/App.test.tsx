@@ -149,7 +149,9 @@ describe('Feature: App shell', () => {
         <App />
       </I18nextProvider>,
     );
-    await user.click(within(screen.getByRole('complementary')).getByRole('button', {name: /settings/i}));
+    await user.click(
+      within(screen.getByRole('complementary')).getByRole('button', {name: /settings/i}),
+    );
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeVisible();
     });

@@ -29,9 +29,7 @@ export function TaskCardHeaderDatePopover({
   onSelectDate,
 }: TaskCardHeaderDatePopoverProps) {
   const {t} = useTranslation();
-  const [month, setMonth] = useState(() =>
-    taskDate ? parseTaskDate(taskDate) : new Date(),
-  );
+  const [month, setMonth] = useState(() => (taskDate ? parseTaskDate(taskDate) : new Date()));
 
   const handleOpenChange = (next: boolean) => {
     if (next) {
@@ -52,7 +50,14 @@ export function TaskCardHeaderDatePopover({
         >
           <span className="taskCard__datePillInner">
             {datePillLabel ?? t('noDateShort')}
-            {recurrence ? <RotateCw aria-hidden className="taskCard__datePillRepeat" size={11} strokeWidth={2.5} /> : null}
+            {recurrence ? (
+              <RotateCw
+                aria-hidden
+                className="taskCard__datePillRepeat"
+                size={11}
+                strokeWidth={2.5}
+              />
+            ) : null}
           </span>
         </button>
       </Popover.Trigger>

@@ -4,7 +4,10 @@ import {gotoWithEnglish} from './helpers';
 import {resetBoard} from './task-flow-helpers';
 
 test.describe('App shell', () => {
-  test('after load: no global error, loading cleared, primary actions ready', async ({page, request}) => {
+  test('after load: no global error, loading cleared, primary actions ready', async ({
+    page,
+    request,
+  }) => {
     await resetBoard(page, request);
 
     // Wait for the shell to be interactive first (slow CI / cold build); then assert no error UI.

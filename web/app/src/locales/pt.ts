@@ -20,8 +20,7 @@ export default {
   settingsNoAreasYet: 'Ainda não há áreas — adicione uma acima.',
   settingsAreaTaskCount: '{{count}} tarefas',
   settingsDeleteAreaConfirm: 'Eliminar a área «{{name}}»?',
-  settingsDeleteAreaWithTasks:
-    'Eliminar a área «{{name}}»? {{count}} tarefa(s) ficarão sem área.',
+  settingsDeleteAreaWithTasks: 'Eliminar a área «{{name}}»? {{count}} tarefa(s) ficarão sem área.',
   settingsRenameArea: 'Renomear área',
   settingsNavLabel: 'Secções das definições',
   settingsSectionGeneral: 'Geral',

@@ -118,18 +118,18 @@ export function Sidebar({
           {areas.map((area) => {
             const AreaIcon = getAreaIconComponent(area.icon);
             return (
-            <button
-              key={area.id}
-              className={`sidebar__item ${areaFilter === area.id ? 'is-active' : ''}`}
-              onClick={() => onAreaFilterChange(area.id)}
-              type="button"
-            >
-              <span className="sidebar__itemIcon">
-                <AreaIcon size={18} />
-              </span>
-              <span className="sidebar__itemLabel">{area.name}</span>
-              <span className="sidebar__itemCount">{areaRowCounts.byId[area.id] ?? 0}</span>
-            </button>
+              <button
+                key={area.id}
+                className={`sidebar__item ${areaFilter === area.id ? 'is-active' : ''}`}
+                onClick={() => onAreaFilterChange(area.id)}
+                type="button"
+              >
+                <span className="sidebar__itemIcon">
+                  <AreaIcon size={18} />
+                </span>
+                <span className="sidebar__itemLabel">{area.name}</span>
+                <span className="sidebar__itemCount">{areaRowCounts.byId[area.id] ?? 0}</span>
+              </button>
             );
           })}
         </div>

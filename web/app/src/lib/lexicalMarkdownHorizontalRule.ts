@@ -20,7 +20,12 @@ export const MARKDOWN_HORIZONTAL_RULE: ElementTransformer = {
   dependencies: [HorizontalRuleNode],
   export: (node) => ($isHorizontalRuleNode(node) ? '---' : null),
   regExp: /^(?:\*{3,}|_{3,}|-{3,})(?:\s+)?$/,
-  replace: (parentNode: ElementNode, children: LexicalNode[], _match: string[], isImport: boolean) => {
+  replace: (
+    parentNode: ElementNode,
+    children: LexicalNode[],
+    _match: string[],
+    isImport: boolean,
+  ) => {
     const hr = $createHorizontalRuleNode();
     parentNode.replace(hr);
     const rest = children.filter((n) => !$isTextNode(n) || n.getTextContent().length > 0);

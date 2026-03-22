@@ -14,7 +14,10 @@ test.describe('Area filters', () => {
     await resetBoard(page, request);
   });
 
-  test('user selects Unassigned and only tasks without area are listed', async ({page, request}) => {
+  test('user selects Unassigned and only tasks without area are listed', async ({
+    page,
+    request,
+  }) => {
     const areaRes = await request.post('/api/areas', {data: {name: 'Work Zone', icon: 'folder'}});
     expect(areaRes.ok()).toBe(true);
     const area = (await areaRes.json()) as {id: string};
@@ -25,7 +28,10 @@ test.describe('Area filters', () => {
 
     await assignTaskToAreaFromFooter(page, 'In zone task', 'Work Zone');
 
-    await page.locator('.sidebar__areasNav').getByRole('button', {name: /Unassigned/}).click();
+    await page
+      .locator('.sidebar__areasNav')
+      .getByRole('button', {name: /Unassigned/})
+      .click();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
     await expect(taskCardByTitle(page, 'No area task')).toBeVisible();
     await expect(taskCardByTitle(page, 'In zone task')).toHaveCount(0);
@@ -34,7 +40,9 @@ test.describe('Area filters', () => {
   });
 
   test('user selects a named area and only tasks in that area appear', async ({page, request}) => {
-    const areaRes = await request.post('/api/areas', {data: {name: 'Project X', icon: 'briefcase'}});
+    const areaRes = await request.post('/api/areas', {
+      data: {name: 'Project X', icon: 'briefcase'},
+    });
     expect(areaRes.ok()).toBe(true);
     const area = (await areaRes.json()) as {id: string};
     await reloadPageAfterApiSeed(page);
@@ -44,7 +52,10 @@ test.describe('Area filters', () => {
 
     await assignTaskToAreaFromFooter(page, 'Assigned', 'Project X');
 
-    await page.locator('.sidebar__areasNav').getByRole('button', {name: /Project X/}).click();
+    await page
+      .locator('.sidebar__areasNav')
+      .getByRole('button', {name: /Project X/})
+      .click();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
     await expect(page.getByRole('button', {name: 'Assigned'})).toBeVisible();
 
@@ -59,10 +70,16 @@ test.describe('Area filters', () => {
     await addTaskWithTitle(page, 'A');
     await addTaskWithTitle(page, 'B');
 
-    await page.locator('.sidebar__areasNav').getByRole('button', {name: /Unassigned/}).click();
+    await page
+      .locator('.sidebar__areasNav')
+      .getByRole('button', {name: /Unassigned/})
+      .click();
     await expect(page.locator('.taskBoard__count')).toHaveText('2');
 
-    await page.locator('.sidebar__areasNav').getByRole('button', {name: /All areas/}).click();
+    await page
+      .locator('.sidebar__areasNav')
+      .getByRole('button', {name: /All areas/})
+      .click();
     await expect(page.locator('.taskBoard__count')).toHaveText('2');
 
     await request.delete(`/api/areas/${area.id}`);

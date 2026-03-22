@@ -23,7 +23,15 @@ function TaskCardComponent({
 }: TaskCardProps) {
   const {i18n} = useTranslation();
   const titleInputRef = useRef<HTMLInputElement>(null);
-  const chrome = useTaskCardChrome(task, areas, i18n.language, isSaving, onChange, onDelete, boardChrome);
+  const chrome = useTaskCardChrome(
+    task,
+    areas,
+    i18n.language,
+    isSaving,
+    onChange,
+    onDelete,
+    boardChrome,
+  );
 
   const handleToggleExpand = useCallback(() => {
     onToggleExpandTask(task.id);
@@ -38,7 +46,9 @@ function TaskCardComponent({
   });
 
   return (
-    <article className={`taskCard ${expanded ? 'is-expanded' : ''} ${task.status === 'completed' ? 'is-completed' : ''}`}>
+    <article
+      className={`taskCard ${expanded ? 'is-expanded' : ''} ${task.status === 'completed' ? 'is-completed' : ''}`}
+    >
       <TaskCardHeaderRow
         AreaGlyph={chrome.AreaGlyph}
         areaDisplayName={chrome.areaDisplayName}

@@ -1,4 +1,5 @@
 # Build JS on the runner, then copy artifacts into `.dockerctx/` (no npm in the final image layer).
+# Image build uses BuildKit cache (type=gha) per arch so layer reuse speeds up repeat tag builds.
 # Trigger: tag push `v*` or manual `workflow_dispatch` (pushes to GHCR with the given tag).
 name: Docker image
 run-name: Docker image ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
@@ -6,11 +7,11 @@ run-name: Docker image ${{ github.event_name == 'workflow_dispatch' && github.ev
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
   workflow_dispatch:
     inputs:
       tag:
-        description: "Image tag (e.g. v0.2.0-rc1). Creates :tag, :tag-amd64, :tag-arm64, and :latest."
+        description: 'Image tag (e.g. v0.2.0-rc1). Creates :tag, :tag-amd64, :tag-arm64, and :latest.'
         required: true
         type: string
 
@@ -44,7 +45,7 @@ jobs:
 
       - uses: actions/setup-node@v6
         with:
-          node-version: "22"
+          node-version: '22'
           cache: npm
 
       - name: Install (dev + prod)

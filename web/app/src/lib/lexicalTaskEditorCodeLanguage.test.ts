@@ -89,9 +89,7 @@ describe('$getCodeNodeFromSelection', () => {
 });
 
 describe('Code block language change with Shiki', () => {
-  it(
-    'setLanguage updates CodeNode and Shiki injects code-highlight children for Python',
-    async () => {
+  it('setLanguage updates CodeNode and Shiki injects code-highlight children for Python', async () => {
     const source = 'def foo(): pass';
     const onError = vi.fn();
     const editor = createEditor({
@@ -171,7 +169,5 @@ describe('Code block language change with Shiki', () => {
     expect(onError).not.toHaveBeenCalled();
     unregister();
     expect(() => unregister()).not.toThrow();
-    },
-    25_000,
-  );
+  }, 25_000);
 });

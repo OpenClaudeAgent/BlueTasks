@@ -14,13 +14,7 @@ import {
 } from 'lexical';
 import {registerMarkdownShortcuts} from '@lexical/markdown';
 import {CHECK_LIST_FLAT_TABS} from './lexicalMarkdownCheckListFlatTabs';
-import {
-  $isListNode,
-  ListItemNode,
-  ListNode,
-  registerCheckList,
-  registerList,
-} from '@lexical/list';
+import {$isListNode, ListItemNode, ListNode, registerCheckList, registerList} from '@lexical/list';
 import {registerCheckListAtomicCatchUp} from './lexicalCheckListAtomicCatchUp';
 
 describe('registerCheckListAtomicCatchUp', () => {

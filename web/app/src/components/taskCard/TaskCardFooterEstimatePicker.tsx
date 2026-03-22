@@ -27,7 +27,11 @@ export function TaskCardFooterEstimatePicker({
   return (
     <Popover.Root onOpenChange={setOpen} open={open}>
       <Popover.Trigger asChild>
-        <button className="taskCard__footerEstimateTrigger" title={t('footerEstimate')} type="button">
+        <button
+          className="taskCard__footerEstimateTrigger"
+          title={t('footerEstimate')}
+          type="button"
+        >
           <span className="taskCard__srOnly">{t('footerEstimate')}</span>
           {label}
         </button>

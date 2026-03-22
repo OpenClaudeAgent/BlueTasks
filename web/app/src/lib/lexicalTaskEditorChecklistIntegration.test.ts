@@ -16,13 +16,7 @@ import {
   TextNode,
 } from 'lexical';
 import {registerMarkdownShortcuts} from '@lexical/markdown';
-import {
-  $isListNode,
-  ListItemNode,
-  ListNode,
-  registerCheckList,
-  registerList,
-} from '@lexical/list';
+import {$isListNode, ListItemNode, ListNode, registerCheckList, registerList} from '@lexical/list';
 import {registerCheckListAtomicCatchUp} from './lexicalCheckListAtomicCatchUp';
 import {registerCheckListRichEmptyParagraphExit} from './lexicalCheckListRichEmptyParagraphExit';
 import {extractChecklistStats} from './editorState';

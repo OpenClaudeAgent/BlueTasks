@@ -61,7 +61,10 @@ test.describe('Task timer', () => {
 
     await page.reload();
     await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
     await page.getByRole('button', {name: title}).click();
 
     const after = firstCard(page);
@@ -93,7 +96,10 @@ test.describe('Task timer', () => {
 
     await page.reload();
     await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
     await page.getByRole('button', {name: title}).click();
 
     await expect

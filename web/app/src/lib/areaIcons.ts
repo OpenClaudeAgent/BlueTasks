@@ -61,7 +61,9 @@ export type AreaIconId = keyof typeof ICON_MAP;
 function assertIconMapMatchesServerData(): void {
   for (const id of RAW_AREA_ICON_IDS) {
     if (!(id in ICON_MAP)) {
-      throw new Error(`server/data/area-icon-ids.json contains "${id}" but ICON_MAP has no Lucide entry`);
+      throw new Error(
+        `server/data/area-icon-ids.json contains "${id}" but ICON_MAP has no Lucide entry`,
+      );
     }
   }
   for (const key of Object.keys(ICON_MAP)) {

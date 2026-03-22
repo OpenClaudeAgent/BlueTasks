@@ -102,7 +102,11 @@ describe('tasksApi / areasApi', () => {
   });
 
   it('areasApi.remove sends DELETE', async () => {
-    vi.mocked(fetch).mockResolvedValue({ok: true, status: 204, text: () => Promise.resolve('')} as Response);
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      status: 204,
+      text: () => Promise.resolve(''),
+    } as Response);
     await expect(areasApi.remove('a')).resolves.toBeUndefined();
   });
 });
@@ -117,7 +121,11 @@ describe('uploadDatabaseImport', () => {
   });
 
   it('resolves on 204', async () => {
-    vi.mocked(fetch).mockResolvedValue({ok: true, status: 204, text: () => Promise.resolve('')} as Response);
+    vi.mocked(fetch).mockResolvedValue({
+      ok: true,
+      status: 204,
+      text: () => Promise.resolve(''),
+    } as Response);
     const file = new File([new Uint8Array([1, 2])], 'x.sqlite');
     await expect(uploadDatabaseImport(file)).resolves.toBeUndefined();
     const init = vi.mocked(fetch).mock.calls[0]?.[1] as RequestInit;

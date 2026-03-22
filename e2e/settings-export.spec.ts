@@ -6,7 +6,9 @@ import {gotoWithEnglish} from './helpers';
 const SQLITE_MAGIC = Buffer.from('SQLite format 3\0');
 
 test.describe('Settings: export database', () => {
-  test('Scenario: user exports SQLite backup; file name and magic bytes match API contract', async ({page}) => {
+  test('Scenario: user exports SQLite backup; file name and magic bytes match API contract', async ({
+    page,
+  }) => {
     await gotoWithEnglish(page, '/');
     await page.getByRole('button', {name: 'Settings'}).click();
 

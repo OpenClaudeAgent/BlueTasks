@@ -26,7 +26,10 @@ test.describe('Task board: API-seeded → UI', () => {
     await putTaskViaApi(request, String(row.id), {...row, taskDate: localDateYmd()});
 
     await reloadPageAfterApiSeed(page);
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Today\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Today\b/})
+      .click();
 
     await expect(page.getByRole('button', {name: title})).toBeVisible();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
@@ -38,19 +41,28 @@ test.describe('Task board: API-seeded → UI', () => {
     await putTaskViaApi(request, String(row.id), {...row, status: 'completed'});
 
     await reloadPageAfterApiSeed(page);
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Done\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Done\b/})
+      .click();
 
     await expect(page.getByRole('button', {name: title})).toBeVisible();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
   });
 
-  test('task with API priority=high shows High in footer when expanded', async ({page, request}) => {
+  test('task with API priority=high shows High in footer when expanded', async ({
+    page,
+    request,
+  }) => {
     const title = `Seed prio ${Date.now()}`;
     const row = await createTaskViaApi(request, {title});
     await putTaskViaApi(request, String(row.id), {...row, priority: 'high'});
 
     await reloadPageAfterApiSeed(page);
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
 
     const card = taskCardByTitle(page, title);
     await expandTaskCardIfCollapsed(page, title);
@@ -64,22 +76,33 @@ test.describe('Task board: API-seeded → UI', () => {
     await putTaskViaApi(request, String(row.id), {...row, pinned: true});
 
     await reloadPageAfterApiSeed(page);
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
 
     const card = taskCardByTitle(page, title);
     await expect(card.locator('.taskCard__chip--pin')).toBeVisible();
   });
 
-  test('task with API estimateMinutes=30 shows 30 min in estimate control', async ({page, request}) => {
+  test('task with API estimateMinutes=30 shows 30 min in estimate control', async ({
+    page,
+    request,
+  }) => {
     const title = `Seed est ${Date.now()}`;
     const row = await createTaskViaApi(request, {title});
     await putTaskViaApi(request, String(row.id), {...row, estimateMinutes: 30});
 
     await reloadPageAfterApiSeed(page);
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
 
     await expandTaskCardIfCollapsed(page, title);
-    await expect(taskCardByTitle(page, title).locator('.taskCard__footerEstimateTrigger')).toContainText('30 min');
+    await expect(
+      taskCardByTitle(page, title).locator('.taskCard__footerEstimateTrigger'),
+    ).toContainText('30 min');
   });
 
   test('task with API areaId shows area name on chip', async ({page, request}) => {
@@ -92,7 +115,10 @@ test.describe('Task board: API-seeded → UI', () => {
     await createTaskViaApi(request, {title, areaId});
 
     await reloadPageAfterApiSeed(page);
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
 
     const card = taskCardByTitle(page, title);
     await expect(card.locator('.taskCard__chip--area')).toContainText(zone);
@@ -104,7 +130,10 @@ test.describe('Task board: API-seeded → UI', () => {
     await putTaskViaApi(request, String(row.id), {...row, timeSpentSeconds: 125});
 
     await reloadPageAfterApiSeed(page);
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
 
     await expandTaskCardIfCollapsed(page, title);
     await expect(taskCardByTitle(page, title).locator('.taskCard__timerLabel')).toHaveText('2:05');
@@ -120,7 +149,10 @@ test.describe('Task board: API-seeded → UI', () => {
     await putTaskViaApi(request, String(row.id), {...row, taskDate: tomorrow});
 
     await reloadPageAfterApiSeed(page);
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Upcoming\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Upcoming\b/})
+      .click();
     await expect(page.getByRole('button', {name: title})).toBeVisible();
 
     const card = taskCardByTitle(page, title);
@@ -132,12 +164,18 @@ test.describe('Task board: API-seeded → UI', () => {
     await page.locator('.datePopover__quickActions').getByRole('button', {name: 'Clear'}).click();
     await put;
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
     await expect(page.getByRole('button', {name: title})).toBeVisible();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
   });
 
-  test('task with API recurrence weekly + taskDate today shows Weekly chip', async ({page, request}) => {
+  test('task with API recurrence weekly + taskDate today shows Weekly chip', async ({
+    page,
+    request,
+  }) => {
     const title = `Seed rec ${Date.now()}`;
     const row = await createTaskViaApi(request, {title});
     await putTaskViaApi(request, String(row.id), {
@@ -147,7 +185,10 @@ test.describe('Task board: API-seeded → UI', () => {
     });
 
     await reloadPageAfterApiSeed(page);
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Today\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Today\b/})
+      .click();
 
     const card = taskCardByTitle(page, title);
     await expect(card.locator('.taskCard__datePill--recurring')).toBeVisible();

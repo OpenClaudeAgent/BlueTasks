@@ -24,7 +24,9 @@ test.describe('Settings: areas CRUD', () => {
     await expect(dialog.getByText('NewBrand')).toBeVisible();
     await page.keyboard.press('Escape');
 
-    await expect(page.locator('.sidebar__areasNav').getByRole('button', {name: /NewBrand/})).toBeVisible();
+    await expect(
+      page.locator('.sidebar__areasNav').getByRole('button', {name: /NewBrand/}),
+    ).toBeVisible();
   });
 
   test('user changes area icon and it reflects on the sidebar row', async ({page}) => {
@@ -36,11 +38,16 @@ test.describe('Settings: areas CRUD', () => {
     await dialog.getByRole('button', {name: 'Add'}).click();
 
     await dialog.getByRole('button', {name: 'Rename area'}).click();
-    await dialog.locator('.settingsDialog__rowEdit .areaIconPicker').getByRole('button', {name: 'briefcase', exact: true}).click();
+    await dialog
+      .locator('.settingsDialog__rowEdit .areaIconPicker')
+      .getByRole('button', {name: 'briefcase', exact: true})
+      .click();
     await dialog.getByRole('button', {name: 'Save'}).click();
     await page.keyboard.press('Escape');
 
-    await expect(page.locator('.sidebar__areasNav').getByRole('button', {name: /IconTest/})).toBeVisible();
+    await expect(
+      page.locator('.sidebar__areasNav').getByRole('button', {name: /IconTest/}),
+    ).toBeVisible();
   });
 
   test('user deletes an empty area and it disappears from sidebar', async ({page}) => {
@@ -52,14 +59,23 @@ test.describe('Settings: areas CRUD', () => {
     await dialog.getByRole('button', {name: 'Add'}).click();
 
     page.once('dialog', (d) => void d.accept());
-    await dialog.locator('.settingsDialog__row').filter({hasText: 'EmptyZone'}).getByRole('button', {name: 'Delete'}).click();
+    await dialog
+      .locator('.settingsDialog__row')
+      .filter({hasText: 'EmptyZone'})
+      .getByRole('button', {name: 'Delete'})
+      .click();
 
     await expect(dialog.getByText('EmptyZone')).toHaveCount(0);
     await page.keyboard.press('Escape');
-    await expect(page.locator('.sidebar__areasNav').getByRole('button', {name: /EmptyZone/})).toHaveCount(0);
+    await expect(
+      page.locator('.sidebar__areasNav').getByRole('button', {name: /EmptyZone/}),
+    ).toHaveCount(0);
   });
 
-  test('user deletes an area with tasks and tasks become unassigned (confirm copy)', async ({page, request}) => {
+  test('user deletes an area with tasks and tasks become unassigned (confirm copy)', async ({
+    page,
+    request,
+  }) => {
     const areaRes = await request.post('/api/areas', {data: {name: 'WithTasks', icon: 'folder'}});
     const area = (await areaRes.json()) as {id: string};
     await request.post('/api/tasks', {data: {title: 'Linked', areaId: area.id}});
@@ -75,7 +91,11 @@ test.describe('Settings: areas CRUD', () => {
       expect(d.message()).toContain('WithTasks');
       void d.accept();
     });
-    await dialog.locator('.settingsDialog__row').filter({hasText: 'WithTasks'}).getByRole('button', {name: 'Delete'}).click();
+    await dialog
+      .locator('.settingsDialog__row')
+      .filter({hasText: 'WithTasks'})
+      .getByRole('button', {name: 'Delete'})
+      .click();
 
     await expect(dialog.getByText('WithTasks')).toHaveCount(0);
     await page.keyboard.press('Escape');

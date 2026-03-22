@@ -15,7 +15,10 @@ test.describe('Assign task to area', () => {
     await resetBoard(page, request);
   });
 
-  test('user assigns an unscheduled task to an existing area from the card', async ({page, request}) => {
+  test('user assigns an unscheduled task to an existing area from the card', async ({
+    page,
+    request,
+  }) => {
     const areaRes = await request.post('/api/areas', {data: {name: 'My Area', icon: 'heart'}});
     expect(areaRes.ok()).toBe(true);
     const {id: areaId} = (await areaRes.json()) as {id: string};

@@ -6,7 +6,7 @@ License [MIT](LICENSE) · [Changelog](CHANGELOG.md)
 
 ## What you get
 
-- **Focused lists** — *Today*, *Upcoming*, *Anytime*, and *Done* so you see the right workload at the right time, not an endless flat inbox.
+- **Focused lists** — _Today_, _Upcoming_, _Anytime_, and _Done_ so you see the right workload at the right time, not an endless flat inbox.
 - **Expandable cards** — Open a task for a full editor: **rich text** (headings, bold, italic, bullets, checklists, quotes, code blocks, tables, dividers), **priority**, **pin**, **due date**, **recurrence**, **time estimate**, and a **timer** when you want to track focus.
 - **Areas** — Group work by project or life domain and filter the board from the sidebar.
 - **Quick capture** — Add a thought from the top bar without losing your place on the board.
@@ -19,16 +19,16 @@ Real UI (English) — same app you get from the **[latest release](https://githu
 
 ### Board views
 
-| **Today** | **Anytime** | **Upcoming** |
-| :---: | :---: | :---: |
+|                                         **Today**                                         |                                     **Anytime**                                      |                                       **Upcoming**                                        |
+| :---------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
 | ![Today: priorities, pins, dates, recurrence](docs/screenshots/readme-01-board-today.png) | ![Anytime: backlog without a due date](docs/screenshots/readme-02-board-anytime.png) | ![Upcoming: next due dates and recurrence](docs/screenshots/readme-03-board-upcoming.png) |
-| *What needs attention now — scan the day in seconds.* | *Ideas and someday tasks without forced scheduling.* | *Light list of what's next, including recurring items.* |
+|                   _What needs attention now — scan the day in seconds._                   |                 _Ideas and someday tasks without forced scheduling._                 |                  _Light list of what's next, including recurring items._                  |
 
 ### Rich notes inside a task
 
 ![Expanded task: rich text toolbar, notes, and footer with estimate, priority, pin, dates, timer](docs/screenshots/readme-04-task-expanded.png)
 
-*Open a card for headings, lists, checklists, quotes, code, tables — plus estimate, area, priority, pin, schedule, repeat, and timer in the footer.*
+_Open a card for headings, lists, checklists, quotes, code, tables — plus estimate, area, priority, pin, schedule, repeat, and timer in the footer._
 
 ## Install and run
 
@@ -50,7 +50,7 @@ npm run build
 npm run start
 ```
 
-Then open **[http://localhost:8787](http://localhost:8787)** in your browser. Data under `**.data/`** at the project root (`bluetasks.sqlite`).
+Then open **[http://localhost:8787](http://localhost:8787)** in your browser. Data under **`.data/`** at the project root (`bluetasks.sqlite`).
 
 **Docker (prebuilt image)** — good for servers or homelab. Pick a tag from [Releases](https://github.com/OpenClaudeAgent/BlueTasks/tags) (or `:latest`):
 
@@ -64,7 +64,7 @@ docker run --rm -d \
   ghcr.io/openclaudeagent/bluetasks:latest
 ```
 
-**Docker Compose (from source)**
+#### Docker Compose (from source)
 
 ```bash
 git clone https://github.com/OpenClaudeAgent/BlueTasks.git
@@ -82,12 +82,12 @@ For contributors or custom builds: Rust + Node 22, `npm run desktop:prep`, then 
 ## Using the app
 
 - **Desktop (Tauri):** the app opens the UI for you; data lives in the OS app data directory (see [desktop/README.md](desktop/README.md)).
-- **Browser + `npm run start` or Docker:** open **[http://localhost:8787](http://localhost:8787)** (or the URL your setup prints). Data in `**.data/`** (or the volume you mounted for Docker).
+- **Browser + `npm run start` or Docker:** open **[http://localhost:8787](http://localhost:8787)** (or the URL your setup prints). Data in **`.data/`** (or the volume you mounted for Docker).
 
 ## Backup
 
 - **In the app:** Settings → General → export / import a `.sqlite` file.
-- **Files:** for **Node / Docker**, copy `**.data/`** (or your Docker volume). For **Tauri**, SQLite lives under the OS app data directory — see [desktop/README.md](desktop/README.md).
+- **Files:** for **Node / Docker**, copy **`.data/`** (or your Docker volume). For **Tauri**, SQLite lives under the OS app data directory — see [desktop/README.md](desktop/README.md).
 
 ## Repository layout
 
@@ -106,7 +106,7 @@ npm run dev
 
 - UI: [http://localhost:5173](http://localhost:5173) · API: [http://localhost:8787](http://localhost:8787) (root `npm run dev` starts both.)
 
-Same checks as CI: `npm run ci` — details in [docs/quality.md](docs/quality.md).
+Same checks as CI: `npm run ci` — details in [docs/quality.md](docs/quality.md). GitHub Actions also runs **Semgrep** (Docker); locally use `npm run ci:with-semgrep` if you have Docker, or run Semgrep via `pip`/`brew` as documented in **quality.md**.
 
 Optional: `web/app/.env` with `VITE_API_ORIGIN=https://your-api` (no trailing slash) if the API is not on `localhost:8787`.
 

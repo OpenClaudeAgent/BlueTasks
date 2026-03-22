@@ -12,6 +12,8 @@ import {createTasksRouter} from './routes/tasksRoutes.js';
 export function createApp(dbCtx: DatabaseContext, options: CreateAppOptions = {}): Application {
   const getDb = () => dbCtx.current;
   const app = express();
+  // Bundled UI (Vite dev server or Tauri webview) calls this API from another origin — not a public internet API.
+  // eslint-disable-next-line sonarjs/cors -- intentional open CORS for local-first desktop + dev
   app.use(cors());
   app.use(express.json({limit: '2mb'}));
 

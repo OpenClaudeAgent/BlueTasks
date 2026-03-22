@@ -1,5 +1,11 @@
 import {expect, test} from '@playwright/test';
-import {AUTOSAVE_SETTLE_MS, addTaskWithTitle, firstCard, resetBoard, taskCardByTitle} from './task-flow-helpers';
+import {
+  AUTOSAVE_SETTLE_MS,
+  addTaskWithTitle,
+  firstCard,
+  resetBoard,
+  taskCardByTitle,
+} from './task-flow-helpers';
 
 test.describe('Notes', () => {
   test.describe.configure({mode: 'serial'});
@@ -32,7 +38,10 @@ test.describe('Notes', () => {
 
     await page.reload();
     await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Anytime\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Anytime\b/})
+      .click();
     await page.getByRole('button', {name: title}).click();
 
     await expect(taskCardByTitle(page, title).locator('.editor__input')).toContainText(noteSnippet);

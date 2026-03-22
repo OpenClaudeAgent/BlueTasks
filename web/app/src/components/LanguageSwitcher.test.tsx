@@ -9,9 +9,7 @@ describe('Feature: Language switcher', () => {
     it('given French active, when user clicks English, then onChange is called with en', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
-      render(
-        <LanguageSwitcher label="Language" language="fr" onChange={onChange} />,
-      );
+      render(<LanguageSwitcher label="Language" language="fr" onChange={onChange} />);
 
       const group = screen.getByRole('group', {name: 'Language'});
       await user.click(within(group).getByRole('button', {name: 'English'}));
@@ -20,9 +18,7 @@ describe('Feature: Language switcher', () => {
     });
 
     it('given English active, when rendered, then English button has active class', () => {
-      render(
-        <LanguageSwitcher label="Language" language="en" onChange={vi.fn()} />,
-      );
+      render(<LanguageSwitcher label="Language" language="en" onChange={vi.fn()} />);
       const en = screen.getByRole('button', {name: 'English'});
       expect(en).toHaveClass('is-active');
       expect(screen.getByRole('button', {name: 'Français'})).not.toHaveClass('is-active');

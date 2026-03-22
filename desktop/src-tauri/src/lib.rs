@@ -157,16 +157,13 @@ pub fn run() {
         .expect("error while building tauri application");
 
     app.run(move |_app_handle, event| {
-        match event {
-            RunEvent::Exit => {
-                if let Ok(mut guard) = child_for_run.lock() {
-                    if let Some(mut child) = guard.take() {
-                        let _ = child.kill();
-                        let _ = child.wait();
-                    }
+        if let RunEvent::Exit = event {
+            if let Ok(mut guard) = child_for_run.lock() {
+                if let Some(mut child) = guard.take() {
+                    let _ = child.kill();
+                    let _ = child.wait();
                 }
             }
-            _ => {}
         }
     });
 }

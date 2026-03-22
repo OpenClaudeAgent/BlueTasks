@@ -1,11 +1,7 @@
 import type Database from 'better-sqlite3';
 import {Router} from 'express';
 import type {TaskPayload, TaskRow} from '../taskSanitize.js';
-import {
-  normalizePinnedInput,
-  normalizeRecurrence,
-  sanitizePayload,
-} from '../taskSanitize.js';
+import {normalizePinnedInput, normalizeRecurrence, sanitizePayload} from '../taskSanitize.js';
 
 export function createTasksRouter(getDb: () => Database.Database): Router {
   const r = Router();
@@ -48,7 +44,8 @@ export function createTasksRouter(getDb: () => Database.Database): Router {
       estimateMinutes: row.estimateMinutes ?? null,
       pinned: normalizePinnedInput(row.pinned),
       timeSpentSeconds: Number(row.timeSpentSeconds) || 0,
-      timerStartedAt: typeof row.timerStartedAt === 'string' && row.timerStartedAt ? row.timerStartedAt : null,
+      timerStartedAt:
+        typeof row.timerStartedAt === 'string' && row.timerStartedAt ? row.timerStartedAt : null,
       recurrence: normalizeRecurrence(row.recurrence),
       areaId: typeof row.areaId === 'string' && row.areaId ? row.areaId : null,
     }));

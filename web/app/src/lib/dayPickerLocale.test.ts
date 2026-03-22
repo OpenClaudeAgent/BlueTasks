@@ -17,9 +17,12 @@ describe('dayPickerLocaleFor', () => {
     ['pt-BR', pt],
     ['ja', ja],
     ['JA-jp', ja],
-  ] as const)('Given %s When dayPickerLocaleFor Then returns matching date-fns locale', (lng, expected) => {
-    expect(dayPickerLocaleFor(lng)).toBe(expected);
-  });
+  ] as const)(
+    'Given %s When dayPickerLocaleFor Then returns matching date-fns locale',
+    (lng, expected) => {
+      expect(dayPickerLocaleFor(lng)).toBe(expected);
+    },
+  );
 
   it('Given unknown or English When dayPickerLocaleFor Then returns enUS', () => {
     expect(dayPickerLocaleFor('en')).toBe(enUS);

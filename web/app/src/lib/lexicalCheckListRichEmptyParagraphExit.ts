@@ -27,11 +27,7 @@ function $isCheckListItemWhitespaceOnlyRichText(listItem: ListItemNode): boolean
     if ($isListNode(child)) {
       return false;
     }
-    if ($isParagraphNode(child)) {
-      if (child.getTextContent().trim() !== '') {
-        return false;
-      }
-    } else if ($isTextNode(child)) {
+    if ($isParagraphNode(child) || $isTextNode(child)) {
       if (child.getTextContent().trim() !== '') {
         return false;
       }

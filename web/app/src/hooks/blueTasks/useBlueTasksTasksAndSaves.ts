@@ -64,7 +64,9 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
       await fetchAndApplyLists();
     } catch (error) {
       const tr = tRef.current;
-      bridgeRef.current.setErrorMessage(error instanceof Error ? error.message : tr('errors.loadTasks'));
+      bridgeRef.current.setErrorMessage(
+        error instanceof Error ? error.message : tr('errors.loadTasks'),
+      );
     } finally {
       bridgeRef.current.setLoading(false);
     }
@@ -92,7 +94,9 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
       await fetchAndApplyLists();
     } catch (error) {
       const tr = tRef.current;
-      bridgeRef.current.setErrorMessage(error instanceof Error ? error.message : tr('errors.loadTasks'));
+      bridgeRef.current.setErrorMessage(
+        error instanceof Error ? error.message : tr('errors.loadTasks'),
+      );
     }
   }, [fetchAndApplyLists]);
 
@@ -113,11 +117,15 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
           ...toTaskDraftPayload(optimisticTask),
         });
         setTasks((current) =>
-          sortTasks(current.map((task) => (task.id === saved.id ? mergeTaskFromApi(saved as Task) : task))),
+          sortTasks(
+            current.map((task) => (task.id === saved.id ? mergeTaskFromApi(saved as Task) : task)),
+          ),
         );
       } catch (error) {
         const tr = tRef.current;
-        bridgeRef.current.setErrorMessage(error instanceof Error ? error.message : tr('errors.createTask'));
+        bridgeRef.current.setErrorMessage(
+          error instanceof Error ? error.message : tr('errors.createTask'),
+        );
         if (options.clearTitleFocusOnError) {
           bridgeRef.current.setTitleFocusTaskId(null);
         }
@@ -212,7 +220,9 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
           bridgeRef.current.setErrorMessage(null);
         } catch (error) {
           const tr = tRef.current;
-          bridgeRef.current.setErrorMessage(error instanceof Error ? error.message : tr('errors.updateTask'));
+          bridgeRef.current.setErrorMessage(
+            error instanceof Error ? error.message : tr('errors.updateTask'),
+          );
           pendingSavesRef.current.delete(taskId);
           await loadTasksAndAreas();
           break;
@@ -266,7 +276,9 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
   const handleAddTask = useCallback(
     async (areaFilter: AreaFilter) => {
       const captureAreaId =
-        areaFilter !== AREA_FILTER_ALL && areaFilter !== AREA_FILTER_UNCATEGORIZED ? areaFilter : null;
+        areaFilter !== AREA_FILTER_ALL && areaFilter !== AREA_FILTER_UNCATEGORIZED
+          ? areaFilter
+          : null;
       const optimisticTask = createTask('', captureAreaId);
       await persistOptimisticNewTask(optimisticTask, {
         titleFocusTaskId: optimisticTask.id,
@@ -285,7 +297,9 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
       }
 
       const captureAreaId =
-        areaFilter !== AREA_FILTER_ALL && areaFilter !== AREA_FILTER_UNCATEGORIZED ? areaFilter : null;
+        areaFilter !== AREA_FILTER_ALL && areaFilter !== AREA_FILTER_UNCATEGORIZED
+          ? areaFilter
+          : null;
 
       let taskDate: string | null = null;
       if (sectionHint === 'today') {
@@ -326,7 +340,9 @@ export function useBlueTasksTasksAndSaves(bridge: BlueTasksUiBridge, t: TFunctio
       await tasksApi.remove(taskId);
     } catch (error) {
       const tr = tRef.current;
-      bridgeRef.current.setErrorMessage(error instanceof Error ? error.message : tr('errors.deleteTask'));
+      bridgeRef.current.setErrorMessage(
+        error instanceof Error ? error.message : tr('errors.deleteTask'),
+      );
       setTasks(previousTasks);
     }
   }, []);

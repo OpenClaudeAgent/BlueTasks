@@ -1,15 +1,5 @@
 import type {Locale} from 'date-fns';
-import {
-  de,
-  enUS,
-  es,
-  fr as frLocale,
-  it,
-  ja,
-  nl,
-  pl,
-  pt,
-} from 'date-fns/locale';
+import {de, enUS, es, fr as frLocale, it, ja, nl, pl, pt} from 'date-fns/locale';
 
 /** Match `i18n.language` (e.g. `de`, `de-DE`) to a date-fns locale for react-day-picker. */
 export function dayPickerLocaleFor(i18nLanguage: string): Locale {

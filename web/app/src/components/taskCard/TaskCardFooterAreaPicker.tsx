@@ -25,7 +25,7 @@ export function TaskCardFooterAreaPicker({
   const [open, setOpen] = useState(false);
 
   const areaNameById = useMemo(() => areaNameByIdMap(areas), [areas]);
-  const areaDisplayName = areaId ? areaNameById[areaId] ?? null : null;
+  const areaDisplayName = areaId ? (areaNameById[areaId] ?? null) : null;
 
   const footerLabel = areaId ? (areaDisplayName ?? t('areaMissing')) : t('areaNone');
 

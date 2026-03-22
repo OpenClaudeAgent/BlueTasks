@@ -14,12 +14,18 @@ test.describe('Upcoming section', () => {
 
     const card = firstCard(page);
     await card.locator('.taskCard__datePill').click();
-    await page.locator('.datePopover__quickActions').getByRole('button', {name: 'Tomorrow'}).click();
+    await page
+      .locator('.datePopover__quickActions')
+      .getByRole('button', {name: 'Tomorrow'})
+      .click();
     await page.waitForResponse(
       (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
     );
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Upcoming\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Upcoming\b/})
+      .click();
     await expect(page.getByRole('heading', {level: 1, name: 'Upcoming'})).toBeVisible();
     await expect(page.getByRole('button', {name: title})).toBeVisible();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
@@ -31,21 +37,33 @@ test.describe('Upcoming section', () => {
 
     const card = firstCard(page);
     await card.locator('.taskCard__datePill').click();
-    await page.locator('.datePopover__quickActions').getByRole('button', {name: 'Tomorrow'}).click();
+    await page
+      .locator('.datePopover__quickActions')
+      .getByRole('button', {name: 'Tomorrow'})
+      .click();
     await page.waitForResponse(
       (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
     );
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Upcoming\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Upcoming\b/})
+      .click();
     await page.getByRole('button', {name: title}).click();
 
     await firstCard(page).locator('.taskCard__datePill').click();
-    await page.locator('.datePopover__quickActions').getByRole('button', {name: 'Today', exact: true}).click();
+    await page
+      .locator('.datePopover__quickActions')
+      .getByRole('button', {name: 'Today', exact: true})
+      .click();
     await page.waitForResponse(
       (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
     );
 
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Today\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Today\b/})
+      .click();
     await expect(page.getByRole('button', {name: title})).toBeVisible();
   });
 });
@@ -68,7 +86,10 @@ test.describe('Today section (overdue / roll-up)', () => {
 
     await page.reload();
     await expect(page.getByRole('button', {name: 'Add task'})).toBeEnabled({timeout: 30_000});
-    await page.getByRole('navigation', {name: 'Primary navigation'}).getByRole('button', {name: /^Today\b/}).click();
+    await page
+      .getByRole('navigation', {name: 'Primary navigation'})
+      .getByRole('button', {name: /^Today\b/})
+      .click();
     await expect(page.getByRole('button', {name: 'Overdue API seed'})).toBeVisible();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
   });

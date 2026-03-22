@@ -41,7 +41,10 @@ for (const [from, to] of [
   cpSync(from, to);
 }
 
-cpSync(join(root, 'scripts', 'docker-prune-native-deps.mjs'), join(ctx, 'docker-prune-native-deps.mjs'));
+cpSync(
+  join(root, 'scripts', 'docker-prune-native-deps.mjs'),
+  join(ctx, 'docker-prune-native-deps.mjs'),
+);
 
 console.log('[desktop-runtime] npm ci (production, server workspace) in .desktopctx/ …');
 execSync('npm ci --omit=dev -w @bluetasks/server', {cwd: ctx, stdio: 'inherit'});

@@ -1,6 +1,6 @@
 # BlueTasks (Tauri desktop)
 
-Native shell around the same stack as Docker: **embedded Node.js** runs `server/dist/docker-bundle.cjs` (Express + SQLite), and the window loads **http://127.0.0.1:8787`.
+Native shell around the same stack as Docker: **embedded Node.js** runs `server/dist/docker-bundle.cjs` (Express + SQLite), and the window loads **`http://127.0.0.1:8787`**.
 
 **Scope (for now):** desktop only (**macOS**, **Windows**, **Linux**). **No** iOS or Android in this repo yet — Tauri mobile is not set up. Linux release bundles use **`.deb`** (`src-tauri/tauri.linux.conf.json`).
 

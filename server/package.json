@@ -30,6 +30,7 @@
     "@vitest/coverage-v8": "^4.1.0",
     "@vitest/eslint-plugin": "^1.6.12",
     "eslint": "^10.1.0",
+    "eslint-plugin-security": "^4.0.0",
     "globals": "^17.4.0",
     "supertest": "^7.1.4",
     "tsx": "^4.20.6",

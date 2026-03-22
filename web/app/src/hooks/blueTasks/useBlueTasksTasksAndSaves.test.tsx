@@ -159,7 +159,10 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
     });
 
     expect(tasksApi.create).toHaveBeenCalled();
-    const call = vi.mocked(tasksApi.create).mock.calls[0]?.[0] as {taskDate: string | null; title?: string};
+    const call = vi.mocked(tasksApi.create).mock.calls[0]?.[0] as {
+      taskDate: string | null;
+      title?: string;
+    };
     expect(call.taskDate).toBe(todayKey());
   });
 
@@ -298,7 +301,9 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
     await waitFor(() => {
       expect(tasksApi.update).toHaveBeenCalledWith('rec-1', expect.any(Object));
     });
-    const updatePayload = vi.mocked(tasksApi.update).mock.calls[0]?.[1] as {taskDate: string | null};
+    const updatePayload = vi.mocked(tasksApi.update).mock.calls[0]?.[1] as {
+      taskDate: string | null;
+    };
     expect(updatePayload.taskDate).not.toBe(row.taskDate);
     expect(updatePayload.taskDate).toBeTruthy();
   });

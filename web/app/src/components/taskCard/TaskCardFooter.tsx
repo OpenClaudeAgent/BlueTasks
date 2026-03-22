@@ -54,7 +54,11 @@ export function TaskCardFooter({
   return (
     <footer className="taskCard__footerBar">
       <div className="taskCard__footerLeft">
-        <TaskCardFooterEstimatePicker estimateMinutes={estimateMinutes} onChange={onChange} taskId={taskId} />
+        <TaskCardFooterEstimatePicker
+          estimateMinutes={estimateMinutes}
+          onChange={onChange}
+          taskId={taskId}
+        />
 
         <TaskCardFooterAreaPicker
           areaGlyph={areaGlyph}
@@ -67,7 +71,9 @@ export function TaskCardFooter({
         <TaskCardFooterPriorityButton onChange={onChange} priority={priority} taskId={taskId} />
 
         <span className="taskCard__footerMeta">
-          {checklistTotal ? t('footerSubtasksPercent', {percent: checklistRatio}) : t('footerNoSubtasks')}
+          {checklistTotal
+            ? t('footerSubtasksPercent', {percent: checklistRatio})
+            : t('footerNoSubtasks')}
         </span>
 
         <span className={`taskCard__saveState ${isSaving ? 'is-saving' : ''}`}>

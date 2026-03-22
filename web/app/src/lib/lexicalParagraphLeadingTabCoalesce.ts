@@ -15,12 +15,7 @@ export function registerParagraphLeadingTabCoalesce(editor: LexicalEditor): () =
   return editor.registerNodeTransform(ParagraphNode, (paragraph) => {
     let first = paragraph.getFirstChild();
     let second = first?.getNextSibling();
-    while (
-      first !== null &&
-      second !== null &&
-      $isTabNode(first) &&
-      $isTextNode(second)
-    ) {
+    while (first !== null && second !== null && $isTabNode(first) && $isTextNode(second)) {
       const sizeBefore = second.getTextContentSize();
       second.spliceText(0, 0, '\t');
       if (sizeBefore > 0) {

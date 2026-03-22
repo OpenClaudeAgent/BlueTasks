@@ -194,7 +194,9 @@ test.describe('API (production server)', () => {
     await request.delete(`/api/areas/${area.id}`);
   });
 
-  test('DELETE /api/tasks/:id returns 204 even when id is unknown (idempotent)', async ({request}) => {
+  test('DELETE /api/tasks/:id returns 204 even when id is unknown (idempotent)', async ({
+    request,
+  }) => {
     const res = await request.delete('/api/tasks/00000000-0000-4000-8000-000000009999');
     expect(res.status()).toBe(204);
   });
