@@ -4,12 +4,14 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 const contractRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../contract');
+const serverDataRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../server/data');
 
 export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
       '@bluetasks/contract': contractRoot,
+      '@bluetasks/server-data': serverDataRoot,
     },
   },
   server: {

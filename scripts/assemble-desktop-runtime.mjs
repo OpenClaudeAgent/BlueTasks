@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Assembles `desktop/src-tauri/resources/bluetasks-runtime/` with the same layout as the
- * Docker image: CJS server bundle, Vite dist, shared assets, and pruned node_modules for the
+ * Docker image: CJS server bundle, Vite dist, server/data (area icon ids), and pruned node_modules for the
  * current platform (better-sqlite3 native build).
  *
  * Prerequisites: `npm run build` (server/dist + web/app/dist).
@@ -48,9 +48,13 @@ execSync('npm ci --omit=dev -w @bluetasks/server', {cwd: ctx, stdio: 'inherit'})
 
 rmSync(out, {recursive: true, force: true});
 mkdirSync(join(out, 'server', 'dist'), {recursive: true});
+mkdirSync(join(out, 'server', 'data'), {recursive: true});
 mkdirSync(join(out, 'web', 'app'), {recursive: true});
 
-cpSync(join(root, 'shared'), join(out, 'shared'), {recursive: true});
+cpSync(
+  join(root, 'server', 'data', 'area-icon-ids.json'),
+  join(out, 'server', 'data', 'area-icon-ids.json'),
+);
 cpSync(webDist, join(out, 'web', 'app', 'dist'), {recursive: true});
 
 const bundleScript = join(root, 'scripts', 'bundle-server-docker.mjs');

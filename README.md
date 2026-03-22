@@ -1,48 +1,32 @@
 # BlueTasks
 
-[![CI](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml)
-[![Docker image](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml)
+**Local-first** tasks: one board, expandable cards, rich notes, a due date per task, **SQLite** on disk, **FR / EN** UI.
 
-**Local-first** task app: single main panel, expandable cards, rich notes (Lexical), one follow-up date per task, on-disk **SQLite**, **FR / EN** UI.
+License [MIT](LICENSE) · [Changelog](CHANGELOG.md)
 
-License: [MIT](LICENSE). Changelog: [CHANGELOG.md](CHANGELOG.md).
+## Install and run
 
-**App URL:** http://localhost:8787 · **SQLite (clone / Compose / `npm run start`):** `.data/bluetasks.sqlite` at the repo root (Compose mounts the `.data` folder).
+### Docker (prebuilt image)
 
----
+Log in to GHCR if the image is private: `docker login ghcr.io`
 
-## Prebuilt image
-
-Use any [release tag](https://github.com/OpenClaudeAgent/BlueTasks/tags) instead of `v0.1.4`. Private package: `docker login ghcr.io` first.
+Pick a tag from [Releases](https://github.com/OpenClaudeAgent/BlueTasks/tags) (or use `:latest`). Example:
 
 ```bash
-docker pull ghcr.io/openclaudeagent/bluetasks:v0.1.4
+docker pull ghcr.io/openclaudeagent/bluetasks:latest
 mkdir -p ./bluetasks-data
 docker run --rm -d \
   --name bluetasks \
   -p 8787:8787 \
   -v "$(pwd)/bluetasks-data:/app/.data" \
-  ghcr.io/openclaudeagent/bluetasks:v0.1.4
+  ghcr.io/openclaudeagent/bluetasks:latest
 ```
 
 Stop: `docker stop bluetasks`
 
----
+### Node (no Docker)
 
-## From source (Compose)
-
-Requires [Node.js 22](https://nodejs.org/) and Docker.
-
-```bash
-git clone https://github.com/OpenClaudeAgent/BlueTasks.git
-cd BlueTasks
-npm run docker:release   # npm ci + build + .dockerctx/
-docker compose up --build -d
-```
-
----
-
-## Without Docker (Node only)
+Requires [Node.js 22](https://nodejs.org/).
 
 ```bash
 git clone https://github.com/OpenClaudeAgent/BlueTasks.git
@@ -52,65 +36,54 @@ npm run build
 npm run start
 ```
 
----
+### Docker Compose (from source)
 
-## Desktop app (Tauri + embedded Node)
+```bash
+git clone https://github.com/OpenClaudeAgent/BlueTasks.git
+cd BlueTasks
+npm run docker:release
+docker compose up --build -d
+```
 
-Experimental native wrapper: **Tauri** starts an **embedded Node.js** runtime (same `docker-bundle.cjs` stack) and opens **http://127.0.0.1:8787** in the system webview. See [desktop/README.md](desktop/README.md) for Rust prerequisites, `npm run desktop:prep`, and `tauri dev` / `tauri build`.
+More detail: [docs/docker.md](docs/docker.md)
 
----
+### Desktop app (Tauri)
 
-## Data backup
+Native shell with embedded Node — same server stack as Docker. See [desktop/README.md](desktop/README.md) (prep, `tauri dev` / `tauri build`).
 
-- **In-app**: Settings → General → export / import a **`.sqlite`** database file.
-- **Files**: copy the **`.data`** directory (or `bluetasks-data` if you used the `docker run` example above).
+## Using the app
 
----
+Open **http://localhost:8787** (or the URL shown by your setup). Data lives under **`.data/`** at the project root (e.g. `bluetasks.sqlite`), or in the folder you mounted for Docker.
 
-## Development
+## Backup
+
+- **In the app:** Settings → General → export / import a `.sqlite` file.
+- **Files:** copy the **`.data`** directory (or your Docker volume folder).
+
+## Repository layout
+
+High level: `web/app` (React UI), `server` (API + SQLite), `contract` (shared types/schemas), `desktop` (Tauri), `e2e` (Playwright), `scripts` (build / Docker / desktop). See [docs/architecture.md](docs/architecture.md).
+
+## Documentation and development
+
+More topics (product, data model, i18n, tests, releases): **[docs/](docs/)**.
+
+Run the full stack locally:
 
 ```bash
 npm install
 npm run dev
 ```
 
-- Frontend: **http://localhost:5173** (Vite).
-- API: **http://localhost:8787** — the client calls this port in dev; run both (e.g. `npm run dev` at the repo root).
+- UI: http://localhost:5173 · API: http://localhost:8787 (root `npm run dev` starts both.)
+
+Same checks as CI: `npm run ci` — details in [docs/quality.md](docs/quality.md).
 
 Optional: `web/app/.env` with `VITE_API_ORIGIN=https://your-api` (no trailing slash) if the API is not on `localhost:8787`.
 
-### Quality gate (same as CI)
-
-Runs lint, duplication scan, **Vitest coverage gate (≥80% on web `src/lib/**` and server `src/`)**, production build, and Playwright end-to-end tests.
-
-```bash
-npm run ci
-```
+**Releases:** one semver across packages; ship via GitHub **Actions → Release** workflow (see [docs/releasing.md](docs/releasing.md)). Forks: replace `OpenClaudeAgent/BlueTasks` and `openclaudeagent` in URLs / image names with your org.
 
 ---
 
-## Documentation
-
-| Topic | Doc |
-|--------|-----|
-| Product brief | [docs/product-brief.md](docs/product-brief.md) |
-| User journeys (flows) | [docs/user-journeys.md](docs/user-journeys.md) |
-| Design principles & visual direction | [docs/design-principles.md](docs/design-principles.md), [docs/visual-direction.md](docs/visual-direction.md) |
-| Data model (SQLite / API task shape) | [docs/data-model.md](docs/data-model.md) |
-| i18n | [docs/i18n-strategy.md](docs/i18n-strategy.md) |
-| Architecture, API, SQLite | [docs/architecture.md](docs/architecture.md) |
-| Quality, tests, coverage, workflows | [docs/quality.md](docs/quality.md) |
-| BDD layers (unit / integration / scenario tests) | [docs/testing-strategy.md](docs/testing-strategy.md) |
-| Accessibility (lint) | [docs/a11y.md](docs/a11y.md) |
-| Docker, GHCR, tags `v*`, manual dispatch | [docs/docker.md](docs/docker.md) |
-| Versioning, Release workflow, CHANGELOG | [docs/releasing.md](docs/releasing.md) |
-| Third-party / dependency licenses (MIT compatibility) | [docs/dependency-licenses.md](docs/dependency-licenses.md) |
-
----
-
-## Releases and images
-
-- **One version everywhere**: root, `web/app`, and `server` `package.json` share the same semver (see [docs/releasing.md](docs/releasing.md)).
-- **Ship a release**: GitHub **Actions → Release → Run workflow** → enter `0.2.0` (no `v`). That bumps packages + lockfile + `CHANGELOG.md`, commits, pushes tag **`v0.2.0`**, which triggers **Docker image** on GHCR (`:v0.2.0` and `:latest`).
-- **Manual tag only**: `git tag v0.2.0 && git push origin v0.2.0` still builds Docker, but keep `package.json` / lockfile in sync or versions will lie.
-- For forks, replace `OpenClaudeAgent/BlueTasks` and `openclaudeagent` in URLs / image names with your org (GHCR image names are lowercase).
+[![CI](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml)
+[![Docker image](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml)

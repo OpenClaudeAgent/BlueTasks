@@ -39,7 +39,7 @@ This document matches the current SQLite schema and API task shape. See [`server
 | `id` | string | Primary key |
 | `name` | string | Required |
 | `sort_index` | integer | Sidebar order |
-| `icon` | string | Must be an id from `shared/area-icon-ids.json` |
+| `icon` | string | Must be an id from `server/data/area-icon-ids.json` |
 | `created_at` | string | ISO |
 
 Areas group tasks for filtering in the sidebar (**All areas**, **Unassigned**, or a specific area).

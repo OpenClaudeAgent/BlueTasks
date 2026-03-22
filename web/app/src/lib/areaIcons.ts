@@ -24,7 +24,7 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
-import areaIconIdList from '../../../../shared/area-icon-ids.json';
+import areaIconIdList from '@bluetasks/server-data/area-icon-ids.json';
 
 const RAW_AREA_ICON_IDS = areaIconIdList as readonly string[];
 
@@ -58,20 +58,20 @@ const ICON_MAP = {
 
 export type AreaIconId = keyof typeof ICON_MAP;
 
-function assertIconMapMatchesSharedList(): void {
+function assertIconMapMatchesServerData(): void {
   for (const id of RAW_AREA_ICON_IDS) {
     if (!(id in ICON_MAP)) {
-      throw new Error(`shared/area-icon-ids.json contains "${id}" but ICON_MAP has no Lucide entry`);
+      throw new Error(`server/data/area-icon-ids.json contains "${id}" but ICON_MAP has no Lucide entry`);
     }
   }
   for (const key of Object.keys(ICON_MAP)) {
     if (!RAW_AREA_ICON_IDS.includes(key)) {
-      throw new Error(`ICON_MAP has "${key}" missing from shared/area-icon-ids.json`);
+      throw new Error(`ICON_MAP has "${key}" missing from server/data/area-icon-ids.json`);
     }
   }
 }
 
-assertIconMapMatchesSharedList();
+assertIconMapMatchesServerData();
 
 export const AREA_ICON_IDS = RAW_AREA_ICON_IDS as readonly AreaIconId[];
 

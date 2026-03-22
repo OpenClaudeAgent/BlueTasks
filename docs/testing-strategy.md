@@ -7,7 +7,7 @@ We describe behaviour with **Feature → Scenario → Given / When / Then** (Ghe
 Every test should defend a **behaviour someone cares about** (user journey, API contract, or invariant), and the title should make that obvious.
 
 - **Before adding a test**, name the behaviour: e.g. “quick capture on Today assigns today’s date”, “export DB triggers download with server filename”, “invalid area filter resets to All”.
-- **Do not** add cases whose only goal is to raise a coverage percentage, or vague examples (`it('works')`, `it('renders')` without a stated outcome). If coverage is low on a file, treat that as a **backlog of behaviours** to specify (often already partially covered by Playwright under [`scenario/`](../scenario/)), not as a prompt to touch arbitrary lines.
+- **Do not** add cases whose only goal is to raise a coverage percentage, or vague examples (`it('works')`, `it('renders')` without a stated outcome). If coverage is low on a file, treat that as a **backlog of behaviours** to specify (often already partially covered by Playwright under [`e2e/`](../e2e/)), not as a prompt to touch arbitrary lines.
 - **Coverage gates** ([`vitest.coverage-gate.config.ts`](../web/app/vitest.coverage-gate.config.ts)) are a **regression guardrail**: they catch accidental deletion of exercised paths. They do **not** replace a clear scenario list. When a gate and “100% behaviour coverage” disagree, **behaviour and docs win**; then we either add a real scenario or accept a documented exclusion.
 
 ---
@@ -67,13 +67,13 @@ describe('Feature: Task card time display', () => {
 ### Integration
 
 - **REST API + SQLite (memory or temp file)**: [`server/src/api.integration.test.ts`](../server/src/api.integration.test.ts), [`dbSetup.test.ts`](../server/src/dbSetup.test.ts).
-- **Public API JSON (Zod)**: [`contract/`](../contract/) — Vitest ([`server/src/api.integration.test.helpers.ts`](../server/src/api.integration.test.helpers.ts)); Playwright ([`scenario/contract-expectations.ts`](../scenario/contract-expectations.ts)).
+- **Public API JSON (Zod)**: [`contract/`](../contract/) — Vitest ([`server/src/api.integration.test.helpers.ts`](../server/src/api.integration.test.helpers.ts)); Playwright ([`e2e/contract-expectations.ts`](../e2e/contract-expectations.ts)).
 - **Client API wrapper**: [`web/app/src/api.test.ts`](../web/app/src/api.test.ts).
 - **Components (RTL)**: settings, language toggle, task row behaviour with i18n — [`SettingsDialog.test.tsx`](../web/app/src/components/SettingsDialog.test.tsx), [`LanguageSwitcher.test.tsx`](../web/app/src/components/LanguageSwitcher.test.tsx), [`TaskCard.test.tsx`](../web/app/src/components/TaskCard.test.tsx) (mock heavy editors), [`useTaskCardChrome.test.tsx`](../web/app/src/components/taskCard/useTaskCardChrome.test.tsx) (task card chrome hook).
 
 ### End-to-end
 
-- **Scenario tests (browser)**: Playwright under [`scenario/`](../scenario/) — [`api.production.spec.ts`](../scenario/api.production.spec.ts) (**contract only**: HTTP against the live build, no `page`; shared JSON helpers in [`api-production-helpers.ts`](../scenario/api-production-helpers.ts)). All **other** scenario specs must exercise the **UI** (`page`, roles, visible state); the API may **seed** state (`POST`/`PUT` then `reload`) when that keeps tests fast and stable — see [`task-seeded-ui.spec.ts`](../scenario/task-seeded-ui.spec.ts). Also: [`app-shell.spec.ts`](../scenario/app-shell.spec.ts) (initial load, SPA fallback), [`task-lifecycle.spec.ts`](../scenario/task-lifecycle.spec.ts), [`navigation-settings.spec.ts`](../scenario/navigation-settings.spec.ts), [`settings-export.spec.ts`](../scenario/settings-export.spec.ts), [`editor-toolbar.spec.ts`](../scenario/editor-toolbar.spec.ts) (plus [`editor-toolbar-helpers.ts`](../scenario/editor-toolbar-helpers.ts)); shared helpers [`scenario/helpers.ts`](../scenario/helpers.ts), [`scenario/api-helpers.ts`](../scenario/api-helpers.ts), [`scenario/task-flow-helpers.ts`](../scenario/task-flow-helpers.ts) (see [`playwright.config.ts`](../playwright.config.ts)). Further specs cover estimates, recurrence, timer, areas, settings, language/import, quick capture, Upcoming, filters, and [`area-ui-journey.spec.ts`](../scenario/area-ui-journey.spec.ts) (areas created entirely through the UI).
+- **E2E tests (browser)**: Playwright under [`e2e/`](../e2e/) — [`api.production.spec.ts`](../e2e/api.production.spec.ts) (**contract only**: HTTP against the live build, no `page`; shared JSON helpers in [`api-production-helpers.ts`](../e2e/api-production-helpers.ts)). All **other** E2E specs must exercise the **UI** (`page`, roles, visible state); the API may **seed** state (`POST`/`PUT` then `reload`) when that keeps tests fast and stable — see [`task-seeded-ui.spec.ts`](../e2e/task-seeded-ui.spec.ts). Also: [`app-shell.spec.ts`](../e2e/app-shell.spec.ts) (initial load, SPA fallback), [`task-lifecycle.spec.ts`](../e2e/task-lifecycle.spec.ts), [`navigation-settings.spec.ts`](../e2e/navigation-settings.spec.ts), [`settings-export.spec.ts`](../e2e/settings-export.spec.ts), [`editor-toolbar.spec.ts`](../e2e/editor-toolbar.spec.ts) (plus [`editor-toolbar-helpers.ts`](../e2e/editor-toolbar-helpers.ts)); shared helpers [`e2e/helpers.ts`](../e2e/helpers.ts), [`e2e/api-helpers.ts`](../e2e/api-helpers.ts), [`e2e/task-flow-helpers.ts`](../e2e/task-flow-helpers.ts) (see [`playwright.config.ts`](../playwright.config.ts)). Further specs cover estimates, recurrence, timer, areas, settings, language/import, quick capture, Upcoming, filters, and [`area-ui-journey.spec.ts`](../e2e/area-ui-journey.spec.ts) (areas created entirely through the UI).
 
 **Parallelism:** [`playwright.config.ts`](../playwright.config.ts) uses **`workers: 1`** by default. The E2E server shares one SQLite file; raising workers on a single job would interleave tests against the same DB and cause **flaky** failures. **CI** runs the suite in **two shards** (`playwright test --shard=1/2` and `--shard=2/2`) as separate jobs — each runner has its own server and DB, so wall-clock time improves without cross-test races. Optional override: `PLAYWRIGHT_WORKERS` (use only if you understand the tradeoff).
 
@@ -98,13 +98,13 @@ Coverage is a **guardrail**, not the goal: prefer scenarios that document behavi
 | `npm run test` | All Vitest unit/integration (web + server) |
 | `npm run test:coverage` | Vitest + coverage (broader web scope, softer thresholds) |
 | `npm run test:coverage:gate` | Web gate (almost full `web/app/src/`, see config exclusions) + server `src/**` (except `index.ts`); see § Coverage policy |
-| `npm run test:scenario` | Playwright scenario suite (starts `npm run build` + `npm run start` unless reusing a server) |
-| `npm run ci` | Lint, jscpd, **coverage gate**, production build, scenario tests |
+| `npm run test:scenario` | Playwright E2E suite under `e2e/` (starts `npm run build` + `npm run start` unless reusing a server) |
+| `npm run ci` | Lint, jscpd, **coverage gate**, production build, Playwright E2E tests |
 
 ---
 
 ## CI
 
-- **CI workflow**: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — parallel jobs for lint, tests + coverage, build, and **scenario tests** (Chromium + system deps on Ubuntu).
+- **CI workflow**: [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) — parallel jobs for lint, tests + coverage, build, and **E2E tests** (Chromium + system deps on Ubuntu).
 
 New features follow the same layers: add unit, integration, or scenario tests alongside the code; prefer the lightest layer that still proves the behaviour.

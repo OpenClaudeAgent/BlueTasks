@@ -1,19 +1,60 @@
 # BlueTasks architecture
 
+## Repository layout
+
+npm **workspaces** at the root: `web/app` (`@bluetasks/app`) and `server` (`@bluetasks/server`). Other top-level folders are not separate npm packages but belong to the same repo.
+
+```
+BlueTasks/
+├── contract/      Zod + shared API contract checks (Vitest + Playwright import these)
+├── desktop/       Tauri shell (embedded Node + same server bundle as Docker)
+├── docs/          Product, quality, Docker, releasing, this file
+├── e2e/           Playwright specs (production-shaped server on 8787)
+├── scripts/       Docker context, desktop runtime assembly, embedded Node fetch
+├── server/        Express API, SQLite, serves `web/app/dist` in production
+├── shared/        JSON and assets shared without cross-workspace deps (e.g. area icon ids)
+└── web/app/       React + Vite client
+```
+
+High-level data flow:
+
+```mermaid
+flowchart LR
+  subgraph users [Users]
+    Browser[Browser]
+    DockerHost[Docker]
+    Desktop[Desktop_Tauri]
+  end
+  subgraph repo [Repo]
+    WebApp[web/app]
+    Server[server]
+    Contract[contract]
+    DesktopShell[desktop]
+  end
+  Browser --> WebApp
+  Browser --> Server
+  DockerHost --> Server
+  Desktop --> DesktopShell
+  DesktopShell --> Server
+  WebApp --> Contract
+  Server --> Contract
+```
+
+The root [README](../README.md) summarizes this tree in one paragraph for new contributors.
+
 ## Repositories and runtime
 
 - **`web/app`** — React client (Vite), UI, i18n, HTTP calls to the API.
 - **`server`** — Express API, **SQLite** persistence (`better-sqlite3`), serves the static client build in production.
-- **`shared/`** — Shared artifacts between client and server without cross npm dependencies.
 
 In development the front runs on the Vite port (e.g. 5173) and talks to the API on **8787** (same origin or `VITE_API_ORIGIN`). In production the server serves `web/app/dist` and exposes the API and static files on one host.
 
-## Area icon contract
+## Area icons (canonical list)
 
-**`shared/area-icon-ids.json`** is the canonical list of icon ids for areas.
+**`server/data/area-icon-ids.json`** is the canonical list of icon ids for areas (next to server code that validates them).
 
 - The **server** loads this JSON at startup (`server/src/areaIconIds.ts`) and rejects unknown values via `normalizeAreaIcon`.
-- The **client** imports the same JSON in `web/app/src/lib/areaIcons.ts` and maps each id to a Lucide component. A guard at module load checks that the map and JSON stay aligned.
+- The **client** imports the same file via the `@bluetasks/server-data` alias in `web/app/src/lib/areaIcons.ts` and maps each id to a Lucide component. A guard at module load checks that the map and JSON stay aligned.
 
 Adding an icon requires updating the JSON, the Lucide map on the web app, and any UI copy (picker).
 

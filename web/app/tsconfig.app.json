@@ -18,7 +18,8 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@bluetasks/contract/*": ["../../contract/*"]
+      "@bluetasks/contract/*": ["../../contract/*"],
+      "@bluetasks/server-data/*": ["../../server/data/*"]
     },
 
     /* Linting */

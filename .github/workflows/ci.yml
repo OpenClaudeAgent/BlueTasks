@@ -54,8 +54,8 @@ jobs:
       - run: npm ci
       - run: npm run lint:eslint-server
 
-  eslint-scenario:
-    name: ESLint (Playwright scenario)
+  eslint-e2e:
+    name: ESLint (Playwright e2e)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -65,7 +65,7 @@ jobs:
           node-version: "22"
           cache: npm
       - run: npm ci
-      - run: npm run lint:eslint-scenario
+      - run: npm run lint:eslint-e2e
 
   eslint-tooling:
     name: ESLint (contract, scripts, Playwright config)
@@ -94,7 +94,7 @@ jobs:
       - run: npm run duplicates
 
   semgrep:
-    name: Semgrep (full web/app + server + contract + scenario + scripts + root configs)
+    name: Semgrep (full web/app + server + contract + e2e + scripts + root configs)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -103,7 +103,7 @@ jobs:
         run: |
           docker run --rm -v "${{ github.workspace }}:/src" -w /src semgrep/semgrep sh -c \
             'semgrep scan --config p/typescript --config p/react --error web/app && \
-             semgrep scan --config p/typescript --error server contract scenario scripts playwright.config.ts eslint.tooling.config.mjs eslint.scenario.config.mjs'
+             semgrep scan --config p/typescript --error server contract e2e scripts playwright.config.ts eslint.tooling.config.mjs eslint.e2e.config.mjs'
 
   test:
     name: Tests & coverage
@@ -146,8 +146,8 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-  scenario:
-    name: Scenario tests (Playwright ${{ matrix.shard }}/2)
+  e2e:
+    name: E2E tests (Playwright ${{ matrix.shard }}/2)
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -163,7 +163,7 @@ jobs:
       - run: npm ci
       - name: Install Playwright Chromium
         run: npx playwright install chromium --with-deps
-      - name: Run Playwright (scenario shard)
+      - name: Run Playwright (e2e shard)
         env:
           CI: "true"
         run: npx playwright test --shard=${{ matrix.shard }}/2

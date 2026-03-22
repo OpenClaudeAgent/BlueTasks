@@ -3,10 +3,10 @@ import globals from 'globals'
 import tseslint from 'typescript-eslint'
 import { defineConfig } from 'eslint/config'
 
-/** Root-level TS/JS not covered by web, server, or scenario workspaces. */
+/** Root-level TS/JS not covered by web, server, or e2e workspaces. */
 export default defineConfig([
   {
-    files: ['eslint.tooling.config.mjs', 'eslint.scenario.config.mjs'],
+    files: ['eslint.tooling.config.mjs', 'eslint.e2e.config.mjs'],
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
     languageOptions: {
       ecmaVersion: 2022,

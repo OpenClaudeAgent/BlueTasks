@@ -1,7 +1,7 @@
 # Runtime léger : bundle JS (express, cors, multer, etc.) + uniquement la chaîne native
 # better-sqlite3 (compilée / prébuild pour la plateforme dans l’étape deps).
 #
-# Contexte = `npm run package:docker` : docker-bundle.mjs, web/app/dist, shared,
+# Contexte = `npm run package:docker` : docker-bundle.mjs, web/app/dist, server/data/area-icon-ids.json,
 # fichiers npm + script de prune (pas de node_modules dans le contexte hôte).
 
 FROM node:22-alpine AS deps
@@ -24,7 +24,7 @@ ENV PORT=8787
 COPY --from=deps /opt/pruned/node_modules ./node_modules
 COPY server/dist/docker-bundle.cjs ./server/dist/docker-bundle.cjs
 COPY web/app/dist ./web/app/dist
-COPY shared ./shared
+COPY server/data ./server/data
 
 EXPOSE 8787
 

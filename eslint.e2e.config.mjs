@@ -5,7 +5,7 @@ import { defineConfig } from 'eslint/config'
 
 export default defineConfig([
   {
-    files: ['scenario/**/*.ts'],
+    files: ['e2e/**/*.ts'],
     extends: [
       js.configs.recommended,
       ...tseslint.configs.recommended,

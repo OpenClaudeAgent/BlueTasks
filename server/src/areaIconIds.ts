@@ -2,12 +2,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {getAppRoot} from './appPaths.js';
 
-const idsPath = path.join(getAppRoot(), 'shared', 'area-icon-ids.json');
+const idsPath = path.join(getAppRoot(), 'server', 'data', 'area-icon-ids.json');
 
 const raw = fs.readFileSync(idsPath, 'utf8');
 const parsed = JSON.parse(raw) as unknown;
 if (!Array.isArray(parsed) || !parsed.every((x) => typeof x === 'string')) {
-  throw new Error(`Invalid shared/area-icon-ids.json at ${idsPath}`);
+  throw new Error(`Invalid server/data/area-icon-ids.json at ${idsPath}`);
 }
 
 export const AREA_ICON_IDS = parsed as readonly string[];
