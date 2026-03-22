@@ -3,6 +3,8 @@ export default {
   brandSubtitle: 'Local-first, clean, fast.',
   primaryNavigation: 'Primary navigation',
   sidebarResizeHandle: 'Resize sidebar',
+  /** Landmark wrapping the sidebar width separator (axe region rule) */
+  sidebarResizeLaneRegion: 'Sidebar resize',
   categoriesNavLabel: 'Categories',
   categoriesAll: 'All categories',
   categoriesUncategorized: 'Unassigned',

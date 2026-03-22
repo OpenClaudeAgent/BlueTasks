@@ -3,6 +3,7 @@ export default {
   brandSubtitle: 'Lokaal-first, helder, snel.',
   primaryNavigation: 'Hoofdnavigatie',
   sidebarResizeHandle: 'Zijbalk breder of smaller maken',
+  sidebarResizeLaneRegion: 'Zijbalkbreedte aanpassen',
   categoriesNavLabel: 'Categorieën',
   categoriesAll: 'Alle categorieën',
   categoriesUncategorized: 'Niet toegewezen',

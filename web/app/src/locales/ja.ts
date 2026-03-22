@@ -3,6 +3,7 @@ export default {
   brandSubtitle: 'ローカルファースト。シンプルで速い。',
   primaryNavigation: 'メインナビゲーション',
   sidebarResizeHandle: 'サイドバーの幅を変更',
+  sidebarResizeLaneRegion: 'サイドバー幅の調整',
   categoriesNavLabel: 'カテゴリ',
   categoriesAll: 'すべてのカテゴリ',
   categoriesUncategorized: '未分類',

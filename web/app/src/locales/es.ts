@@ -3,6 +3,7 @@ export default {
   brandSubtitle: 'Local-first, claro y rápido.',
   primaryNavigation: 'Navegación principal',
   sidebarResizeHandle: 'Redimensionar la barra lateral',
+  sidebarResizeLaneRegion: 'Redimensionar barra lateral',
   categoriesNavLabel: 'Categorías',
   categoriesAll: 'Todas las categorías',
   categoriesUncategorized: 'Sin categoría',

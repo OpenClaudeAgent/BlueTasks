@@ -3,6 +3,7 @@ export default {
   brandSubtitle: 'Lokalnie, przejrzyście, szybko.',
   primaryNavigation: 'Nawigacja główna',
   sidebarResizeHandle: 'Zmień szerokość paska bocznego',
+  sidebarResizeLaneRegion: 'Obszar zmiany szerokości paska',
   categoriesNavLabel: 'Kategorie',
   categoriesAll: 'Wszystkie kategorie',
   categoriesUncategorized: 'Bez kategorii',

@@ -3,6 +3,7 @@ export default {
   brandSubtitle: 'Lokal-first, klar, schnell.',
   primaryNavigation: 'Hauptnavigation',
   sidebarResizeHandle: 'Seitenleiste breiter oder schmaler ziehen',
+  sidebarResizeLaneRegion: 'Seitenleistenbreite anpassen',
   categoriesNavLabel: 'Kategorien',
   categoriesAll: 'Alle Kategorien',
   categoriesUncategorized: 'Ohne Kategorie',

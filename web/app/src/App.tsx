@@ -31,9 +31,7 @@ function App() {
   return (
     <Fragment>
       <div
-        aria-label={t('appName')}
         className="appShell"
-        role="region"
         style={{
           gridTemplateColumns: `${sidebarWidth}px ${SIDEBAR_RESIZE_LANE_PX}px minmax(0, 1fr)`,
         }}
@@ -52,15 +50,21 @@ function App() {
           />
         </div>
         <div
-          aria-label={t('sidebarResizeHandle')}
-          aria-orientation="vertical"
-          aria-valuemax={maxWidth}
-          aria-valuemin={minWidth}
-          aria-valuenow={Math.round(sidebarWidth)}
-          className="appShell__resizeLane"
-          onPointerDown={onResizePointerDown}
-          role="separator"
-        />
+          aria-label={t('sidebarResizeLaneRegion')}
+          className="appShell__resizeLaneHost"
+          role="region"
+        >
+          <div
+            aria-label={t('sidebarResizeHandle')}
+            aria-orientation="vertical"
+            aria-valuemax={maxWidth}
+            aria-valuemin={minWidth}
+            aria-valuenow={Math.round(sidebarWidth)}
+            className="appShell__resizeLane"
+            onPointerDown={onResizePointerDown}
+            role="separator"
+          />
+        </div>
         <main className="mainPanel">
           <header className="mainHeader">
             <div>
