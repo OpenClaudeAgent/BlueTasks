@@ -124,7 +124,9 @@ test.describe('End-to-end: Lexical toolbar', () => {
     await expect(list.locator('.editor__listItem').first()).toContainText('From markdown');
   });
 
-  test('Checklist: Enter on empty markdown line adds a second checkbox row', async ({page}) => {
+  test('Checklist: Enter on empty row after [] exits the list; text is typed as a normal paragraph', async ({
+    page,
+  }) => {
     const title = `E2E editor check enter ${Date.now()}`;
     await addTaskWithTitle(page, title);
 
@@ -134,15 +136,13 @@ test.describe('End-to-end: Lexical toolbar', () => {
     await editor.click();
     await editor.pressSequentially('[] ');
     await editor.press('Enter');
-    await editor.pressSequentially('Ligne deux');
+    await editor.pressSequentially('Sous la liste');
 
-    const list = card.locator('.editor__list--check');
-    await expect(list).toBeVisible();
-    await expect(list.locator('.editor__listItem')).toHaveCount(2);
-    await expect(list.locator('.editor__listItem').nth(1)).toContainText('Ligne deux');
+    await expect(card.locator('.editor__list--check')).toHaveCount(0);
+    await expect(editor.getByText('Sous la liste', {exact: true})).toBeVisible();
   });
 
-  test('Checklist: Tab after new line nests a sub-item under the previous row', async ({page}) => {
+  test('Checklist: Tab after new line inserts a tab in the row (no nested sub-list)', async ({page}) => {
     const title = `E2E editor check tab ${Date.now()}`;
     await addTaskWithTitle(page, title);
 
@@ -160,32 +160,8 @@ test.describe('End-to-end: Lexical toolbar', () => {
     await expect(rootList).toBeVisible();
     await expect(rootList.locator(':scope > .editor__listItem')).toHaveCount(2);
     await expect(editor.getByRole('checkbox')).toHaveCount(2);
-    const nestedList = card.locator('.editor__list--check').nth(1);
-    await expect(nestedList).toBeVisible();
-    await expect(nestedList.locator('.editor__listItem').first()).toContainText('Enfant');
-  });
-
-  test('Checklist: markdown Enter then [] then Tab keeps two visible checkboxes', async ({page}) => {
-    const title = `E2E editor md check tab ${Date.now()}`;
-    await addTaskWithTitle(page, title);
-
-    const card = firstCard(page);
-    const editor = card.locator('.editor__input');
-
-    await editor.click();
-    await editor.pressSequentially('[] ');
-    await editor.press('Enter');
-    await editor.pressSequentially('[] ');
-    await editor.press('Tab');
-    await editor.pressSequentially('Sous-ligne');
-
-    const rootList = card.locator('.editor__list--check').first();
-    await expect(rootList).toBeVisible();
-    await expect(rootList.locator(':scope > .editor__listItem')).toHaveCount(2);
-    await expect(editor.getByRole('checkbox')).toHaveCount(2);
-    const nestedList = card.locator('.editor__list--check').nth(1);
-    await expect(nestedList).toBeVisible();
-    await expect(nestedList.locator('.editor__listItem').first()).toContainText('Sous-ligne');
+    await expect(card.locator('.editor__list--check')).toHaveCount(1);
+    await expect(rootList.locator('.editor__listItem').nth(1)).toContainText('Enfant');
   });
 
   test('Typing --- then space inserts horizontal rule (markdown shortcut)', async ({page}) => {
