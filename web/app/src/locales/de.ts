@@ -137,6 +137,7 @@ export default {
   timerEditCancel: 'Abbrechen',
   timerEditStopNote: 'Speichern stoppt den Timer und übernimmt die oben eingegebene Gesamtzeit.',
   editorPlaceholder: 'Frei schreiben…',
+  datePickerAriaLabel: 'Fälligkeitsdatum wählen',
   untitledTask: 'Unbenannte Aufgabe',
   checklistProgress: '{{done}} von {{total}} Unteraufgaben',
   openTask: 'Aufgabe öffnen',
@@ -176,5 +177,6 @@ export default {
     deleteTable: 'Tabelle löschen',
     deleteTableConfirm: 'Diese Tabelle entfernen? Das kann nicht rückgängig gemacht werden.',
     codeLanguage: 'Sprache des Codeblocks',
+    richTextAriaLabel: 'Aufgabenbeschreibung und Notizen',
   },
 };

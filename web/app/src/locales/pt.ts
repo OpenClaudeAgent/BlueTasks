@@ -135,6 +135,7 @@ export default {
   timerEditCancel: 'Cancelar',
   timerEditStopNote: 'Ao guardar, o cronómetro para e aplica o total indicado acima.',
   editorPlaceholder: 'Escreva à vontade…',
+  datePickerAriaLabel: 'Escolher data de vencimento',
   untitledTask: 'Tarefa sem título',
   checklistProgress: '{{done}} de {{total}} subtarefas',
   openTask: 'Abrir tarefa',
@@ -174,5 +175,6 @@ export default {
     deleteTable: 'Eliminar tabela',
     deleteTableConfirm: 'Remover esta tabela? Não pode ser anulado.',
     codeLanguage: 'Idioma do bloco de código',
+    richTextAriaLabel: 'Descrição e notas da tarefa',
   },
 };

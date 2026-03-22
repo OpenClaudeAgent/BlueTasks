@@ -136,6 +136,7 @@ export default {
   timerEditCancel: 'Annuleren',
   timerEditStopNote: 'Opslaan stopt de timer en gebruikt het hierboven ingevoerde totaal.',
   editorPlaceholder: 'Schrijf vrij…',
+  datePickerAriaLabel: 'Kies vervaldatum',
   untitledTask: 'Taak zonder titel',
   checklistProgress: '{{done}} van {{total}} subtaken',
   openTask: 'Taak openen',
@@ -175,5 +176,6 @@ export default {
     deleteTable: 'Tabel verwijderen',
     deleteTableConfirm: 'Deze tabel verwijderen? Dit kan niet ongedaan worden gemaakt.',
     codeLanguage: 'Taal van codeblok',
+    richTextAriaLabel: 'Taakbeschrijving en notities',
   },
 };

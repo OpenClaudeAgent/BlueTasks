@@ -136,6 +136,7 @@ export default {
   timerEditCancel: 'キャンセル',
   timerEditStopNote: '保存するとタイマーが停止し、上記の合計が適用されます。',
   editorPlaceholder: '自由に入力…',
+  datePickerAriaLabel: '期限日を選択',
   untitledTask: '無題のタスク',
   checklistProgress: 'サブタスク {{done}} / {{total}}',
   openTask: 'タスクを開く',
@@ -175,5 +176,6 @@ export default {
     deleteTable: '表を削除',
     deleteTableConfirm: 'この表を削除しますか？元に戻せません。',
     codeLanguage: 'コードブロックの言語',
+    richTextAriaLabel: 'タスクの説明とメモ',
   },
 };

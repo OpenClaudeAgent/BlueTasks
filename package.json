@@ -29,6 +29,7 @@
     "test:coverage": "npm run test:coverage --workspace @bluetasks/app && npm run test:coverage --workspace @bluetasks/server",
     "test:coverage:gate": "npm run test:coverage:gate --workspace @bluetasks/app && npm run test:coverage:gate --workspace @bluetasks/server",
     "test:scenario": "playwright test",
+    "test:a11y": "playwright test e2e/a11y-axe.spec.ts",
     "duplicates": "jscpd web/app/src server/src e2e contract scripts desktop/src-tauri/src",
     "semgrep:docker": "docker run --rm -v \"$PWD:/src\" -w /src semgrep/semgrep sh -c 'semgrep scan --config p/typescript --config p/react --error web/app && semgrep scan --config p/typescript --config p/security-audit --error server && semgrep scan --config p/typescript --error contract e2e scripts playwright.config.ts eslint.tooling.config.mjs eslint.e2e.config.mjs'",
     "ci": "npm run lint && npm run duplicates && npm run test:coverage:gate && npm run build && npm run test:scenario",
@@ -41,8 +42,10 @@
     "desktop:prep": "npm run build && npm run desktop:assemble-runtime && npm run desktop:fetch-node"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.1",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.58.2",
+    "axe-core": "^4.11.1",
     "concurrently": "^9.2.1",
     "esbuild": "^0.27.4",
     "eslint": "^10.1.0",

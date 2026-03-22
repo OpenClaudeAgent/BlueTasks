@@ -107,6 +107,7 @@ type Props = {
     deleteTable: string;
     deleteTableConfirm: string;
     codeLanguage: string;
+    richTextAriaLabel: string;
   };
 };
 
@@ -184,7 +185,9 @@ export function LexicalTaskEditor({value, placeholder, onChange, labels}: Props)
         <ToolbarPlugin labels={labels} />
         <div className="editor__surface">
           <RichTextPlugin
-            contentEditable={<ContentEditable className="editor__input" />}
+            contentEditable={
+              <ContentEditable aria-label={labels.richTextAriaLabel} className="editor__input" />
+            }
             placeholder={<div className="editor__placeholder">{placeholder}</div>}
             ErrorBoundary={LexicalErrorBoundary}
           />

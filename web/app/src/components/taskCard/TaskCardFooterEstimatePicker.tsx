@@ -37,7 +37,12 @@ export function TaskCardFooterEstimatePicker({
         </button>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content align="start" className="footerPopover" sideOffset={8}>
+        <Popover.Content
+          align="start"
+          aria-label={t('footerEstimate')}
+          className="footerPopover"
+          sideOffset={8}
+        >
           <div className="footerPopover__title">{t('footerEstimate')}</div>
           <div className="footerPopover__options">
             {ESTIMATE_PRESETS.map((minutes) => (

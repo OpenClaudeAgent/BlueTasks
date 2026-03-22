@@ -15,6 +15,7 @@ export type LexicalEditorLabels = {
   deleteTable: string;
   deleteTableConfirm: string;
   codeLanguage: string;
+  richTextAriaLabel: string;
 };
 
 export function buildLexicalEditorLabels(t: TFunction): LexicalEditorLabels {
@@ -33,5 +34,6 @@ export function buildLexicalEditorLabels(t: TFunction): LexicalEditorLabels {
     deleteTable: t('editor.deleteTable'),
     deleteTableConfirm: t('editor.deleteTableConfirm'),
     codeLanguage: t('editor.codeLanguage'),
+    richTextAriaLabel: t('editor.richTextAriaLabel'),
   };
 }

@@ -213,6 +213,7 @@ export function SettingsDialog({
                     <p className="settingsDialog__panelHint">{t('settingsImportDbHelp')}</p>
                     <input
                       accept=".sqlite,application/vnd.sqlite3,application/octet-stream"
+                      aria-label={t('settingsImportDb')}
                       className="visuallyHidden"
                       data-testid="settings-sqlite-import-input"
                       onChange={(e) => void handleImportFileChange(e)}

@@ -135,6 +135,7 @@ export default {
   timerEditCancel: 'Cancel',
   timerEditStopNote: 'Saving stops the timer and uses the total entered above.',
   editorPlaceholder: 'Write freely...',
+  datePickerAriaLabel: 'Choose due date',
   untitledTask: 'Untitled task',
   checklistProgress: '{{done}} of {{total}} subtasks',
   openTask: 'Open task',
@@ -174,5 +175,6 @@ export default {
     deleteTable: 'Delete table',
     deleteTableConfirm: 'Remove this table? This cannot be undone.',
     codeLanguage: 'Code block language',
+    richTextAriaLabel: 'Task description and notes',
   },
 };

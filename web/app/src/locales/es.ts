@@ -136,6 +136,7 @@ export default {
   timerEditCancel: 'Cancelar',
   timerEditStopNote: 'Al guardar se detiene el temporizador y se aplica el total indicado arriba.',
   editorPlaceholder: 'Escribe con libertad…',
+  datePickerAriaLabel: 'Elegir fecha de vencimiento',
   untitledTask: 'Tarea sin título',
   checklistProgress: '{{done}} de {{total}} subtareas',
   openTask: 'Abrir tarea',
@@ -175,5 +176,6 @@ export default {
     deleteTable: 'Eliminar tabla',
     deleteTableConfirm: '¿Quitar esta tabla? No se puede deshacer.',
     codeLanguage: 'Lenguaje del bloque de código',
+    richTextAriaLabel: 'Descripción y notas de la tarea',
   },
 };

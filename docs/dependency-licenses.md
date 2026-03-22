@@ -34,7 +34,7 @@ Approximate counts (dev + prod transitive tree, **2025-03** snapshot):
 
 - **MIT** — majority of packages
 - **ISC**, **Apache-2.0**, **BSD-2/3-Clause**, **0BSD**, **MIT-0**, **CC0-1.0**, **BlueOak-1.0.0** — permissive
-- **MPL-2.0** — `axe-core` (pulled in by the **a11y lint** stack, not the browser runtime bundle)
+- **MPL-2.0** — `axe-core` (via **`@axe-core/playwright`** in e2e tests and the **a11y** tooling tree; not shipped in the browser app bundle)
 - **CC-BY-4.0** — `caniuse-lite` (build-time / Browserslist data)
 - **Python-2.0** — `argparse` (transitive; permissive PSF-style license on npm)
 - **UNLICENSED** — `license-checker` often labels **`private: true` workspace packages** as `UNLICENSED` even when `"license": "MIT"` is set (it still prefers a LICENSE file). BlueTasks declares **MIT** in the root, `web/app`, and `server` `package.json` files; the canonical text remains [LICENSE](../LICENSE) at the repo root.

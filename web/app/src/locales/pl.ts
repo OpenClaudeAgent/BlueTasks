@@ -136,6 +136,7 @@ export default {
   timerEditCancel: 'Anuluj',
   timerEditStopNote: 'Zapis zatrzymuje timer i ustawia sumę wpisaną powyżej.',
   editorPlaceholder: 'Pisz swobodnie…',
+  datePickerAriaLabel: 'Wybierz termin',
   untitledTask: 'Zadanie bez tytułu',
   checklistProgress: '{{done}} z {{total}} podzadań',
   openTask: 'Otwórz zadanie',
@@ -175,5 +176,6 @@ export default {
     deleteTable: 'Usuń tabelę',
     deleteTableConfirm: 'Usunąć tę tabelę? Tej operacji nie można cofnąć.',
     codeLanguage: 'Język bloku kodu',
+    richTextAriaLabel: 'Opis zadania i notatki',
   },
 };

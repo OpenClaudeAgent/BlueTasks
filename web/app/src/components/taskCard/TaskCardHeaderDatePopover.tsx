@@ -62,7 +62,12 @@ export function TaskCardHeaderDatePopover({
         </button>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content align="end" className="datePopover" sideOffset={8}>
+        <Popover.Content
+          align="end"
+          aria-label={t('datePickerAriaLabel')}
+          className="datePopover"
+          sideOffset={8}
+        >
           <div className="datePopover__quickActions">
             <button onClick={() => onSelectDate(todayKey())} type="button">
               {t('today')}

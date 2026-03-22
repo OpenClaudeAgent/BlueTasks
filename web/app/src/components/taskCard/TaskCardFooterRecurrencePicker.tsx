@@ -46,7 +46,12 @@ export function TaskCardFooterRecurrencePicker({
         </button>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content align="end" className="footerPopover" sideOffset={8}>
+        <Popover.Content
+          align="end"
+          aria-label={t('recurrence')}
+          className="footerPopover"
+          sideOffset={8}
+        >
           <div className="footerPopover__title">{t('recurrence')}</div>
           <div className="footerPopover__options">
             {RECURRENCE_OPTIONS.map(({kind, labelKey}) => (

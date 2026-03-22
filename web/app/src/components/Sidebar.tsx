@@ -1,3 +1,4 @@
+import type {PointerEventHandler} from 'react';
 import {
   Calendar,
   CalendarClock,
@@ -42,6 +43,10 @@ type SidebarProps = {
   onAreaFilterChange: (filter: AreaFilter) => void;
   areaRowCounts: AreaSidebarCounts;
   onOpenSettings: () => void;
+  sidebarWidth: number;
+  minSidebarWidth: number;
+  maxSidebarWidth: number;
+  onResizePointerDown: PointerEventHandler<HTMLDivElement>;
 };
 
 export function Sidebar({
@@ -53,6 +58,10 @@ export function Sidebar({
   onAreaFilterChange,
   areaRowCounts,
   onOpenSettings,
+  sidebarWidth,
+  minSidebarWidth,
+  maxSidebarWidth,
+  onResizePointerDown,
 }: SidebarProps) {
   const {t} = useTranslation();
 
@@ -141,6 +150,17 @@ export function Sidebar({
           <span>{t('settingsOpen')}</span>
         </button>
       </div>
+
+      <div
+        aria-orientation="vertical"
+        aria-label={t('sidebarResizeHandle')}
+        aria-valuemax={maxSidebarWidth}
+        aria-valuemin={minSidebarWidth}
+        aria-valuenow={Math.round(sidebarWidth)}
+        className="appShell__resizeHandle"
+        onPointerDown={onResizePointerDown}
+        role="separator"
+      />
     </aside>
   );
 }

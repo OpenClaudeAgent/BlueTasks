@@ -38,7 +38,12 @@ export function TaskCardFooterAreaPicker({
         </button>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content align="start" className="footerPopover" sideOffset={8}>
+        <Popover.Content
+          align="start"
+          aria-label={t('areaLabel')}
+          className="footerPopover"
+          sideOffset={8}
+        >
           <div className="footerPopover__title">{t('areaLabel')}</div>
           <div className="footerPopover__options">
             <button

@@ -9,6 +9,13 @@ import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from '../types';
 
 const baseCounts = {all: 3, today: 1, upcoming: 0, anytime: 2, done: 0};
 
+const resizeProps = {
+  sidebarWidth: 248,
+  minSidebarWidth: 200,
+  maxSidebarWidth: 480,
+  onResizePointerDown: vi.fn(),
+} as const;
+
 describe('Feature: Sidebar', () => {
   it('Scenario: User switches section — calls onSelect with section id', async () => {
     const user = userEvent.setup();
@@ -16,6 +23,7 @@ describe('Feature: Sidebar', () => {
     render(
       <I18nextProvider i18n={i18n}>
         <Sidebar
+          {...resizeProps}
           areaFilter={AREA_FILTER_ALL}
           areaRowCounts={{all: 3, uncategorized: 1, byId: {}}}
           areas={[]}
@@ -39,6 +47,7 @@ describe('Feature: Sidebar', () => {
     render(
       <I18nextProvider i18n={i18n}>
         <Sidebar
+          {...resizeProps}
           areaFilter={AREA_FILTER_ALL}
           areaRowCounts={{all: 3, uncategorized: 1, byId: {}}}
           areas={[]}
@@ -71,6 +80,7 @@ describe('Feature: Sidebar', () => {
     render(
       <I18nextProvider i18n={i18n}>
         <Sidebar
+          {...resizeProps}
           areaFilter={AREA_FILTER_ALL}
           areaRowCounts={{all: 1, uncategorized: 0, byId: {z1: 1}}}
           areas={areas}
@@ -94,6 +104,7 @@ describe('Feature: Sidebar', () => {
     render(
       <I18nextProvider i18n={i18n}>
         <Sidebar
+          {...resizeProps}
           areaFilter={AREA_FILTER_UNCATEGORIZED}
           areaRowCounts={{all: 2, uncategorized: 1, byId: {}}}
           areas={[]}
@@ -116,6 +127,7 @@ describe('Feature: Sidebar', () => {
     render(
       <I18nextProvider i18n={i18n}>
         <Sidebar
+          {...resizeProps}
           areaFilter={AREA_FILTER_ALL}
           areaRowCounts={{all: 2, uncategorized: 1, byId: {}}}
           areas={[]}
@@ -138,6 +150,7 @@ describe('Feature: Sidebar', () => {
     render(
       <I18nextProvider i18n={i18n}>
         <Sidebar
+          {...resizeProps}
           areaFilter={AREA_FILTER_ALL}
           areaRowCounts={{all: 0, uncategorized: 0, byId: {}}}
           areas={[]}

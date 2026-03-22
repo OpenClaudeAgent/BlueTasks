@@ -138,6 +138,7 @@ export default {
   timerEditCancel: 'Annuler',
   timerEditStopNote: 'Enregistrer arrête le minuteur et applique le total saisi ci-dessus.',
   editorPlaceholder: 'Écris librement...',
+  datePickerAriaLabel: 'Choisir la date d’échéance',
   untitledTask: 'Tâche sans titre',
   checklistProgress: '{{done}} sur {{total}} sous-tâches',
   openTask: 'Ouvrir la tâche',
@@ -178,5 +179,6 @@ export default {
     deleteTable: 'Supprimer le tableau',
     deleteTableConfirm: 'Supprimer ce tableau ? Cette action est définitive.',
     codeLanguage: 'Langage du bloc code',
+    richTextAriaLabel: 'Description et notes de la tâche',
   },
 };

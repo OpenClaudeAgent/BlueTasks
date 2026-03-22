@@ -101,6 +101,7 @@ export function TaskCardFooterTimerButton({
         <Popover.Portal>
           <Popover.Content
             align="end"
+            aria-label={t('timerEditTitle')}
             className="footerPopover footerPopover--timerEdit"
             collisionPadding={12}
             onClick={(event) => event.stopPropagation()}

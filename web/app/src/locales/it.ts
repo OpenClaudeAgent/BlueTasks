@@ -136,6 +136,7 @@ export default {
   timerEditCancel: 'Annulla',
   timerEditStopNote: 'Salvare ferma il timer e applica il totale inserito sopra.',
   editorPlaceholder: 'Scrivi liberamente…',
+  datePickerAriaLabel: 'Scegli data di scadenza',
   untitledTask: 'Attività senza titolo',
   checklistProgress: '{{done}} di {{total}} sotto-attività',
   openTask: 'Apri attività',
@@ -175,5 +176,6 @@ export default {
     deleteTable: 'Elimina tabella',
     deleteTableConfirm: 'Rimuovere questa tabella? Non si può annullare.',
     codeLanguage: 'Linguaggio del blocco codice',
+    richTextAriaLabel: 'Descrizione e note dell’attività',
   },
 };

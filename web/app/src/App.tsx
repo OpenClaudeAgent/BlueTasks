@@ -40,20 +40,14 @@ function App() {
           areaRowCounts={board.areaSidebarCounts}
           areas={board.areas}
           counts={board.counts}
+          maxSidebarWidth={maxWidth}
+          minSidebarWidth={minWidth}
           onAreaFilterChange={board.setAreaFilter}
           onOpenSettings={() => setSettingsOpen(true)}
+          onResizePointerDown={onResizePointerDown}
           onSelect={board.setSelectedSection}
           selectedSection={board.selectedSection}
-        />
-        <div
-          aria-orientation="vertical"
-          aria-label={t('sidebarResizeHandle')}
-          aria-valuemax={maxWidth}
-          aria-valuemin={minWidth}
-          aria-valuenow={Math.round(sidebarWidth)}
-          className="appShell__resizeHandle"
-          onPointerDown={onResizePointerDown}
-          role="separator"
+          sidebarWidth={sidebarWidth}
         />
       </div>
       {settingsOpen ? (

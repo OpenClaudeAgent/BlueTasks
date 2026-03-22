@@ -22,6 +22,8 @@
   --text: rgba(255, 255, 255, 0.94);
   --text-secondary: rgba(255, 255, 255, 0.62);
   --text-muted: rgba(255, 255, 255, 0.38);
+  /* WCAG AA (~4.5:1) on --sidebar-bg / --canvas / --canvas-elevated for small UI copy */
+  --text-soft: rgba(255, 255, 255, 0.72);
   --accent: #7eb8ff;
   --accent-soft: rgba(126, 184, 255, 0.12);
   --date-pill: #ff5722;
@@ -154,6 +156,7 @@ button,
 }
 
 .sidebar {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 28px;
@@ -191,7 +194,7 @@ button,
 
 .sidebar__brandSubtitle {
   margin-top: 2px;
-  color: var(--text-muted);
+  color: var(--text-soft);
   font-size: 11px;
 }
 
@@ -273,7 +276,7 @@ button,
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-muted);
+  color: var(--text-soft);
 }
 
 .sidebar__areasNav {
@@ -339,7 +342,7 @@ button,
 
 .mainHeader__eyebrow,
 .taskBoard__eyebrow {
-  color: var(--text-muted);
+  color: var(--text-soft);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -425,7 +428,7 @@ button,
   border-radius: 999px;
   font-size: 11px;
   font-weight: 650;
-  color: var(--text-muted);
+  color: var(--text-soft);
   white-space: nowrap;
 }
 
@@ -1157,7 +1160,7 @@ button,
   align-items: center;
   gap: 6px;
   font-size: 11px;
-  color: var(--text-muted);
+  color: var(--text-soft);
 }
 
 .taskCard__saveState.is-saving {
@@ -1332,7 +1335,7 @@ button,
   position: absolute;
   top: var(--space-3);
   left: var(--space-4);
-  color: var(--text-muted);
+  color: var(--text-soft);
   pointer-events: none;
   font-size: 14px;
 }
@@ -1644,7 +1647,7 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-soft);
   margin-bottom: 10px;
 }
 
@@ -1721,7 +1724,7 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-soft);
 }
 
 .footerPopover__timerInput {
@@ -1829,6 +1832,11 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   margin: 0;
 }
 
+.datePopover .rdp-caption_label,
+.datePopover .rdp-weekday {
+  color: rgba(255, 255, 255, 0.84);
+}
+
 .rdp-root {
   --rdp-accent-color: var(--accent);
   --rdp-accent-background-color: rgba(126, 184, 255, 0.15);
@@ -1850,7 +1858,7 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   justify-content: center;
   gap: 12px;
   min-height: 200px;
-  color: var(--text-muted);
+  color: var(--text-soft);
   font-size: 14px;
 }
 
@@ -1962,7 +1970,7 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   margin: 0 0 16px;
   font-size: 13px;
   line-height: 1.55;
-  color: var(--text-muted);
+  color: var(--text-soft);
 }
 
 .settingsDialog__panelIntro--solo {
@@ -1981,8 +1989,7 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   margin: 10px 0 0;
   font-size: 12px;
   line-height: 1.45;
-  color: var(--text-muted);
-  opacity: 0.92;
+  color: var(--text-soft);
 }
 
 .settingsDialog__languageBlock {
@@ -2217,7 +2224,7 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   padding: 16px 12px;
   text-align: center;
   font-size: 13px;
-  color: var(--text-muted);
+  color: var(--text-soft);
   border-radius: 10px;
   border: 1px dashed var(--border);
 }
@@ -2270,15 +2277,14 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   font-weight: 650;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-muted);
+  color: var(--text-soft);
 }
 
 .settingsDialog__fieldHint {
   margin: 6px 0 10px;
   font-size: 12px;
   line-height: 1.45;
-  color: var(--text-muted);
-  opacity: 0.9;
+  color: var(--text-soft);
 }
 
 .areaIconPicker {
@@ -2337,7 +2343,7 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
 
 .settingsDialog__areaMeta {
   font-size: 12px;
-  color: var(--text-muted);
+  color: var(--text-soft);
   white-space: nowrap;
 }
 
