@@ -28,7 +28,7 @@
     "@types/node": "^25.5.0",
     "@types/supertest": "^7.2.0",
     "@vitest/coverage-v8": "^4.1.0",
-    "@vitest/eslint-plugin": "^1.6.12",
+    "@vitest/eslint-plugin": "^1.6.13",
     "eslint": "^10.1.0",
     "eslint-plugin-security": "^4.0.0",
     "globals": "^17.4.0",

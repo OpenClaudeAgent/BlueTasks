@@ -1,5 +1,5 @@
 {
-  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignore": [
     "contract/**",
     "desktop/src/main.js",
@@ -13,7 +13,6 @@
     "exports": "error",
     "types": "off",
     "nsExports": "off",
-    "nsTypes": "off",
-    "classMembers": "error"
+    "nsTypes": "off"
   }
 }
