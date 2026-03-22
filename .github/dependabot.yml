@@ -1,5 +1,6 @@
 # Dependabot: dependency update PRs (npm, Cargo/Tauri, GitHub Actions, Docker).
 # Groups batch updates into one PR per ecosystem + directory (fewer noisy PRs).
+# Config edits trigger a fresh version-update pass on push.
 # https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 version: 2
 updates:
