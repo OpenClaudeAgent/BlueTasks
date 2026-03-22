@@ -1642,6 +1642,97 @@ html:lang(fr) .editor__codeBlock[data-highlight-language='']::before {
   z-index: 50;
 }
 
+/* Task delete & other small confirms (above footer popovers z-index 50) */
+.confirmDialog__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  background: rgba(0, 0, 0, 0.52);
+  animation: confirmDialogOverlayIn 0.15s ease;
+}
+
+@keyframes confirmDialogOverlayIn {
+  from {
+    opacity: 0;
+  }
+}
+
+.confirmDialog__content {
+  position: fixed;
+  z-index: 71;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(340px, calc(100vw - 28px));
+  padding: 18px 18px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--panel-bg, var(--sidebar-bg));
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5);
+  animation: confirmDialogContentIn 0.18s ease;
+}
+
+@keyframes confirmDialogContentIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+}
+
+.confirmDialog__title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.confirmDialog__description {
+  margin: 0 0 18px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.confirmDialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.confirmDialog__btn {
+  margin: 0;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.confirmDialog__btn--secondary {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.confirmDialog__btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+
+.confirmDialog__btn--danger {
+  background: rgba(255, 122, 122, 0.18);
+  color: var(--danger);
+  border-color: rgba(255, 122, 122, 0.35);
+}
+
+.confirmDialog__btn--danger:hover {
+  background: rgba(255, 122, 122, 0.28);
+}
+
 .footerPopover__title {
   font-size: 10px;
   font-weight: 700;

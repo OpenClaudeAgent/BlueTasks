@@ -143,6 +143,8 @@ export default {
   completedTask: '完了',
   pendingTask: '未完了',
   language: '言語',
+  cancel: 'キャンセル',
+  deleteTaskDialogTitle: 'このタスクを削除しますか？',
   delete: '削除',
   deleteTaskConfirm: '「{{title}}」を完全に削除しますか？',
   notesReady: 'メモの準備完了',

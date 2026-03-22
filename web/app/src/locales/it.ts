@@ -143,6 +143,8 @@ export default {
   completedTask: 'Completata',
   pendingTask: 'Aperta',
   language: 'Lingua',
+  cancel: 'Annulla',
+  deleteTaskDialogTitle: 'Eliminare questa attività?',
   delete: 'Elimina',
   deleteTaskConfirm: 'Eliminare definitivamente «{{title}}»?',
   notesReady: 'Note pronte',

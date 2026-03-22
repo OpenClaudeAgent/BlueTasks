@@ -502,7 +502,6 @@ describe('Feature: Task card (expanded)', () => {
     it('given expanded card, when user confirms delete, then onDelete is called', async () => {
       const user = userEvent.setup();
       const onDelete = vi.fn();
-      vi.spyOn(window, 'confirm').mockReturnValue(true);
       const task = createTask('Remove me');
       render(
         <I18nextProvider i18n={i18n}>
@@ -520,7 +519,9 @@ describe('Feature: Task card (expanded)', () => {
       );
       const card = screen.getByRole('article');
       const footer = within(card).getByRole('contentinfo');
-      await user.click(within(footer).getByTitle('Delete'));
+      await user.click(within(footer).getByRole('button', {name: 'Delete'}));
+      const dialog = await screen.findByRole('alertdialog');
+      await user.click(within(dialog).getByRole('button', {name: 'Delete'}));
       expect(onDelete).toHaveBeenCalledWith(task.id);
     });
 

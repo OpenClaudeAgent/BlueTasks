@@ -143,6 +143,8 @@ export default {
   completedTask: 'Afgerond',
   pendingTask: 'Open',
   language: 'Taal',
+  cancel: 'Annuleren',
+  deleteTaskDialogTitle: 'Deze taak verwijderen?',
   delete: 'Verwijderen',
   deleteTaskConfirm: '„{{title}}” definitief verwijderen?',
   notesReady: 'Notities klaar',

@@ -206,19 +206,16 @@ test.describe('End-to-end: task lifecycle', () => {
 
     await addTaskWithTitle(page, title);
 
-    page.once('dialog', (dialog) => {
-      expect(dialog.type()).toBe('confirm');
-      expect(dialog.message()).toContain(title);
-      void dialog.accept();
-    });
+    const card = page.locator('article.taskCard');
+    await card.getByRole('button', {name: 'Delete', exact: true}).click();
+    const confirmDialog = page.getByRole('alertdialog');
+    await expect(confirmDialog).toBeVisible();
+    await expect(confirmDialog).toContainText(title);
 
     const del = page.waitForResponse(
       (r) => r.request().method() === 'DELETE' && r.url().includes('/api/tasks/') && r.ok(),
     );
-    await page
-      .locator('article.taskCard')
-      .getByRole('button', {name: 'Delete', exact: true})
-      .click();
+    await confirmDialog.getByRole('button', {name: 'Delete', exact: true}).click();
     await del;
 
     await page

@@ -1,4 +1,6 @@
+import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import {CalendarDays, Pin, Trash2} from 'lucide-react';
+import {useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import type {RecurrenceKind, TaskDraftUpdate} from '../../types';
 import {TaskCardFooterRecurrencePicker} from './TaskCardFooterRecurrencePicker';
@@ -32,6 +34,7 @@ export function TaskCardFooterRight({
   onOpenHeaderDatePopover,
 }: TaskCardFooterRightProps) {
   const {t} = useTranslation();
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   return (
     <div className="taskCard__footerRight">
@@ -70,20 +73,49 @@ export function TaskCardFooterRight({
         timerStartedAt={timerStartedAt}
         trackedSeconds={trackedSeconds}
       />
-      <button
-        aria-label={t('delete')}
-        className="taskCard__iconBtn taskCard__iconBtn--danger"
-        onClick={(event) => {
-          event.stopPropagation();
-          if (window.confirm(t('deleteTaskConfirm', {title: taskTitle || t('untitledTask')}))) {
-            onDelete(taskId);
-          }
-        }}
-        title={t('delete')}
-        type="button"
-      >
-        <Trash2 size={16} />
-      </button>
+      <AlertDialog.Root onOpenChange={setDeleteOpen} open={deleteOpen}>
+        <AlertDialog.Trigger asChild>
+          <button
+            aria-label={t('delete')}
+            className="taskCard__iconBtn taskCard__iconBtn--danger"
+            onClick={(event) => event.stopPropagation()}
+            title={t('delete')}
+            type="button"
+          >
+            <Trash2 size={16} />
+          </button>
+        </AlertDialog.Trigger>
+        <AlertDialog.Portal>
+          <AlertDialog.Overlay className="confirmDialog__overlay" />
+          <AlertDialog.Content
+            className="confirmDialog__content"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <AlertDialog.Title className="confirmDialog__title">
+              {t('deleteTaskDialogTitle')}
+            </AlertDialog.Title>
+            <AlertDialog.Description className="confirmDialog__description">
+              {t('deleteTaskConfirm', {title: taskTitle || t('untitledTask')})}
+            </AlertDialog.Description>
+            <div className="confirmDialog__actions">
+              <AlertDialog.Cancel asChild>
+                <button className="confirmDialog__btn confirmDialog__btn--secondary" type="button">
+                  {t('cancel')}
+                </button>
+              </AlertDialog.Cancel>
+              <AlertDialog.Action asChild>
+                <button
+                  className="confirmDialog__btn confirmDialog__btn--danger"
+                  onClick={() => onDelete(taskId)}
+                  type="button"
+                >
+                  {t('delete')}
+                </button>
+              </AlertDialog.Action>
+            </div>
+          </AlertDialog.Content>
+        </AlertDialog.Portal>
+      </AlertDialog.Root>
     </div>
   );
 }

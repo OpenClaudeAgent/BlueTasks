@@ -26,14 +26,13 @@ test.describe('Task delete', () => {
     await card.getByRole('button', {name: 'Expand task'}).click();
     await expect(card.getByRole('button', {name: 'Delete', exact: true})).toBeVisible();
 
-    page.once('dialog', (dialog) => {
-      expect(dialog.type()).toBe('confirm');
-      void dialog.accept();
-    });
+    await card.getByRole('button', {name: 'Delete', exact: true}).click();
+    const confirmDialog = page.getByRole('alertdialog');
+    await expect(confirmDialog).toBeVisible();
     const del = page.waitForResponse(
       (r) => r.request().method() === 'DELETE' && r.url().includes('/api/tasks/') && r.ok(),
     );
-    await card.getByRole('button', {name: 'Delete', exact: true}).click();
+    await confirmDialog.getByRole('button', {name: 'Delete', exact: true}).click();
     await del;
 
     await expect
@@ -56,10 +55,9 @@ test.describe('Task delete', () => {
     const title = `E2E delete cancel ${Date.now()}`;
     await addTaskWithTitle(page, title);
 
-    page.once('dialog', (dialog) => void dialog.dismiss());
-
     const card = taskCardByTitle(page, title);
     await card.getByRole('button', {name: 'Delete', exact: true}).click();
+    await page.getByRole('alertdialog').getByRole('button', {name: 'Cancel'}).click();
 
     await expect(card.getByRole('textbox', {name: 'Task title'})).toBeVisible();
     const res = await page.request.get('/api/tasks');
