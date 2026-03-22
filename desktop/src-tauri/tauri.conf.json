@@ -34,9 +34,6 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": [
-      "resources/bluetasks-runtime/**/*",
-      "resources/node/**/*"
-    ]
+    "resources": ["resources/bluetasks-runtime/**/*", "resources/node/**/*"]
   }
 }

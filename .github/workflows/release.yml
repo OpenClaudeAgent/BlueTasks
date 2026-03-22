@@ -92,6 +92,9 @@ jobs:
       - name: Refresh Cargo.lock (Tauri)
         run: cargo metadata --manifest-path desktop/src-tauri/Cargo.toml --format-version 1 > /dev/null
 
+      - name: Format Tauri config (Prettier)
+        run: npx prettier --write desktop/src-tauri/tauri.conf.json
+
       - name: Commit and push tag
         env:
           V: ${{ inputs.version }}
