@@ -121,7 +121,7 @@ export async function expandTaskCardIfCollapsed(page: Page, title: string): Prom
   }
 }
 
-export function waitForTaskPutOk(page: Page) {
+function waitForTaskPutOk(page: Page) {
   return page.waitForResponse(
     (r) => /\/api\/tasks\/[^/]+$/.test(r.url()) && r.request().method() === 'PUT' && r.ok(),
   );
@@ -172,10 +172,7 @@ export async function pollTaskChecklistTotalAtLeast(
 export async function setCardDueDateTomorrow(page: Page, card: Locator): Promise<void> {
   await card.locator('.taskCard__datePill').click();
   const put = waitForTaskPutOk(page);
-  await page
-    .locator('.datePopover__quickActions')
-    .getByRole('button', {name: 'Tomorrow'})
-    .click();
+  await page.locator('.datePopover__quickActions').getByRole('button', {name: 'Tomorrow'}).click();
   await put;
 }
 
