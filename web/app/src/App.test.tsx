@@ -6,7 +6,7 @@ import {I18nextProvider} from 'react-i18next';
 import i18n from './i18n';
 import App from './App';
 import {useBlueTasksBoard} from './hooks/useBlueTasksBoard';
-import {AREA_FILTER_ALL} from './types';
+import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from './types';
 import type {Task} from './types';
 import {createTask} from './lib/tasks';
 
@@ -203,6 +203,91 @@ describe('Feature: App shell', () => {
       </I18nextProvider>,
     );
     expect(screen.getByText('Nothing urgent is waiting right now.')).toBeVisible();
+  });
+
+  it('Scenario: User focuses a single project area — sidebar asks the board to filter by that area', async () => {
+    const user = userEvent.setup();
+    const setAreaFilter = vi.fn();
+    const workArea = {
+      id: 'area-work',
+      name: 'Work',
+      icon: 'folder' as const,
+      sortIndex: 0,
+      createdAt: '2025-01-01T00:00:00.000Z',
+    };
+    vi.mocked(useBlueTasksBoard).mockReturnValue({
+      ...baseBoard(),
+      areas: [workArea],
+      areaFilter: AREA_FILTER_ALL,
+      setAreaFilter,
+      areaSidebarCounts: {all: 3, uncategorized: 0, byId: {'area-work': 2}},
+    });
+    render(
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>,
+    );
+    const areasGroup = screen.getByRole('group', {name: /^areas$/i});
+    await user.click(within(areasGroup).getByRole('button', {name: /^work/i}));
+    expect(setAreaFilter).toHaveBeenCalledWith('area-work');
+  });
+
+  it('Scenario: User isolates tasks without a project — sidebar filters to Unassigned', async () => {
+    const user = userEvent.setup();
+    const setAreaFilter = vi.fn();
+    vi.mocked(useBlueTasksBoard).mockReturnValue({
+      ...baseBoard(),
+      areaFilter: AREA_FILTER_ALL,
+      setAreaFilter,
+      areaSidebarCounts: {all: 10, uncategorized: 3, byId: {}},
+    });
+    render(
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>,
+    );
+    const areasGroup = screen.getByRole('group', {name: /^areas$/i});
+    await user.click(within(areasGroup).getByRole('button', {name: /unassigned/i}));
+    expect(setAreaFilter).toHaveBeenCalledWith(AREA_FILTER_UNCATEGORIZED);
+  });
+
+  it('Scenario: User reviews future due dates — primary nav switches to Upcoming', async () => {
+    const user = userEvent.setup();
+    const setSelectedSection = vi.fn();
+    vi.mocked(useBlueTasksBoard).mockReturnValue({
+      ...baseBoard(),
+      selectedSection: 'today' as const,
+      setSelectedSection,
+      counts: {all: 12, today: 2, upcoming: 5, anytime: 3, done: 2},
+    });
+    render(
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>,
+    );
+    const mainNav = screen.getByRole('navigation', {name: /primary navigation/i});
+    await user.click(within(mainNav).getByRole('button', {name: /upcoming/i}));
+    expect(setSelectedSection).toHaveBeenCalledWith('upcoming');
+  });
+
+  it('Scenario: User returns to all areas — sidebar selects the combined view', async () => {
+    const user = userEvent.setup();
+    const setAreaFilter = vi.fn();
+    vi.mocked(useBlueTasksBoard).mockReturnValue({
+      ...baseBoard(),
+      areas: [],
+      areaFilter: AREA_FILTER_UNCATEGORIZED,
+      setAreaFilter,
+      areaSidebarCounts: {all: 5, uncategorized: 1, byId: {}},
+    });
+    render(
+      <I18nextProvider i18n={i18n}>
+        <App />
+      </I18nextProvider>,
+    );
+    const areasGroup = screen.getByRole('group', {name: /^areas$/i});
+    await user.click(within(areasGroup).getByRole('button', {name: /all areas/i}));
+    expect(setAreaFilter).toHaveBeenCalledWith(AREA_FILTER_ALL);
   });
 
   it('Scenario: One visible task — renders TaskCard', () => {

@@ -9,11 +9,7 @@ import ja from './locales/ja';
 import nl from './locales/nl';
 import pl from './locales/pl';
 import pt from './locales/pt';
-import {
-  detectBrowserUiLanguage,
-  isUiLanguageCode,
-  type UiLanguageCode,
-} from './locales/uiLanguages';
+import {isUiLanguageCode, type UiLanguageCode} from './locales/uiLanguages';
 
 const LANG_STORAGE_KEY = 'bluetasks.language';
 
@@ -29,7 +25,8 @@ function readStoredLanguage(): UiLanguageCode | undefined {
   return undefined;
 }
 
-const initialLanguage = readStoredLanguage() ?? detectBrowserUiLanguage();
+/** No stored preference → English (do not infer UI language from the browser locale). */
+const initialLanguage = readStoredLanguage() ?? 'en';
 
 void i18n
   .use(initReactI18next)

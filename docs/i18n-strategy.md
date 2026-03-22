@@ -14,6 +14,8 @@
 
 All user-visible strings live in `web/app/src/locales/`. The list of selectable languages (labels + codes) is centralized in [`web/app/src/locales/uiLanguages.ts`](../web/app/src/locales/uiLanguages.ts).
 
+**Default on first visit** (no `bluetasks.language` in `localStorage`): **English** (`en`). Users pick another language in Settings → General.
+
 ## Principles
 
 - Every UI string goes through **i18next** — no hard-coded copy in components.

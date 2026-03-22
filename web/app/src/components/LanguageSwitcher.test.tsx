@@ -21,7 +21,7 @@ describe('Feature: Language switcher', () => {
 
     it('given English active, when rendered, then English button has active class', () => {
       render(
-        <LanguageSwitcher label="Langue" language="en" onChange={vi.fn()} />,
+        <LanguageSwitcher label="Language" language="en" onChange={vi.fn()} />,
       );
       const en = screen.getByRole('button', {name: 'English'});
       expect(en).toHaveClass('is-active');

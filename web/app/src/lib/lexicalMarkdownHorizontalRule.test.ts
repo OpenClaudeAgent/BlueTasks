@@ -1,44 +1,57 @@
 /** @vitest-environment jsdom */
 import {describe, expect, it} from 'vitest';
-import {$createParagraphNode, createEditor, ParagraphNode, TextNode} from 'lexical';
+import {$createParagraphNode, $createTextNode, $getRoot, createEditor, ParagraphNode, TextNode} from 'lexical';
 import {$createHorizontalRuleNode, HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {MARKDOWN_HORIZONTAL_RULE} from './lexicalMarkdownHorizontalRule';
 
-const noopTraverse = (): string => '';
-
 describe('MARKDOWN_HORIZONTAL_RULE', () => {
-  const {regExp: re} = MARKDOWN_HORIZONTAL_RULE;
-
-  it('matches --- with trailing space (markdown shortcut)', () => {
-    expect(re.test('--- ')).toBe(true);
-  });
-
-  it('matches --- alone (markdown import line)', () => {
-    expect(re.test('---')).toBe(true);
-  });
-
-  it('matches *** and ___ variants', () => {
-    expect(re.test('***')).toBe(true);
-    expect(re.test('___ ')).toBe(true);
-    expect(re.test('----')).toBe(true);
-  });
-
-  it('does not match list or heading lines', () => {
-    expect(re.test('- item')).toBe(false);
-    expect(re.test('## hi')).toBe(false);
-  });
-
-  it('export maps horizontal rule to --- and skips other nodes', () => {
+  it('Given horizontal rule node When export Then returns thematic break markdown', () => {
     const editor = createEditor({
-      namespace: 'test-hr-export',
+      namespace: 'md-hr-export',
       nodes: [ParagraphNode, TextNode, HorizontalRuleNode],
+      onError: console.error,
     });
     editor.update(() => {
       const hr = $createHorizontalRuleNode();
-      const p = $createParagraphNode();
-      expect(MARKDOWN_HORIZONTAL_RULE.export(hr, noopTraverse)).toBe('---');
-      expect(MARKDOWN_HORIZONTAL_RULE.export(p, noopTraverse)).toBe(null);
+      expect(MARKDOWN_HORIZONTAL_RULE.export(hr)).toBe('---');
     });
   });
 
+  it('Given paragraph When export Then returns null', () => {
+    const editor = createEditor({
+      namespace: 'md-hr-export-p',
+      nodes: [ParagraphNode, TextNode, HorizontalRuleNode],
+      onError: console.error,
+    });
+    editor.update(() => {
+      const p = $createParagraphNode();
+      expect(MARKDOWN_HORIZONTAL_RULE.export(p)).toBeNull();
+    });
+  });
+
+  it('Given regExp When thematic break line Then matches', () => {
+    expect(MARKDOWN_HORIZONTAL_RULE.regExp.test('---')).toBe(true);
+    expect(MARKDOWN_HORIZONTAL_RULE.regExp.test('--- ')).toBe(true);
+    expect(MARKDOWN_HORIZONTAL_RULE.regExp.test('***')).toBe(true);
+    expect(MARKDOWN_HORIZONTAL_RULE.regExp.test('___')).toBe(true);
+    expect(MARKDOWN_HORIZONTAL_RULE.regExp.test('--')).toBe(false);
+  });
+
+  it('Given replace When isImport Then replaces paragraph with horizontal rule', () => {
+    const editor = createEditor({
+      namespace: 'md-hr-replace',
+      nodes: [ParagraphNode, TextNode, HorizontalRuleNode],
+      onError: console.error,
+    });
+    editor.update(() => {
+      const root = $getRoot();
+      root.clear();
+      const p = $createParagraphNode();
+      const t = $createTextNode('---');
+      p.append(t);
+      root.append(p);
+      MARKDOWN_HORIZONTAL_RULE.replace(p, [t], ['---'], true);
+      expect($getRoot().getChildren().some((n) => n.getType() === 'horizontalrule')).toBe(true);
+    });
+  });
 });

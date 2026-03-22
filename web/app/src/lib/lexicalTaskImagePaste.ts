@@ -41,9 +41,9 @@ function readFileAsDataUrl(file: File): Promise<string> {
 }
 
 /**
- * Insère des images via la commande {@link DRAG_DROP_PASTE} de `@lexical/rich-text` (collage « fichiers seuls »
- * et glisser-déposer) et complète le collage Cmd/Ctrl+V lorsque le navigateur expose aussi du texte/HTML
- * en parallèle du fichier image (handler {@link PASTE_COMMAND} en priorité haute).
+ * Inserts images via {@link DRAG_DROP_PASTE} from `@lexical/rich-text` (file-only paste and drag-and-drop),
+ * and handles Cmd/Ctrl+V when the clipboard also exposes text/HTML alongside image files
+ * ({@link PASTE_COMMAND} registered at high priority).
  */
 export function registerTaskImagePaste(editor: LexicalEditor): () => void {
   const insertFromImageFiles = (files: File[]) => {

@@ -21,13 +21,3 @@ export function normalizeUiLanguageCode(i18nLng: string): UiLanguageCode {
   const base = i18nLng.split('-')[0].toLowerCase();
   return isUiLanguageCode(base) ? base : 'en';
 }
-
-export function detectBrowserUiLanguage(): UiLanguageCode {
-  const nav = navigator.language.toLowerCase();
-  for (const {code} of UI_LANGUAGE_OPTIONS) {
-    if (nav === code || nav.startsWith(`${code}-`)) {
-      return code;
-    }
-  }
-  return 'en';
-}

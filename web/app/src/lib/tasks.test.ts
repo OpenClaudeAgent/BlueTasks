@@ -20,7 +20,7 @@ import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from '../types';
 
 describe('createTask', () => {
   it('creates a task with valid non-empty contentJson', () => {
-    const task = createTask('Ma tâche');
+    const task = createTask('My task');
     expect(task.contentJson.trim().length).toBeGreaterThan(0);
     const parsed = JSON.parse(task.contentJson) as {root: unknown};
     expect(parsed).toMatchObject({
