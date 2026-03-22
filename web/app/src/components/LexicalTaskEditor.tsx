@@ -75,6 +75,8 @@ import {registerCheckListAtomicCatchUp} from '../lib/lexicalCheckListAtomicCatch
 import {registerChecklistEmptyEnterNewItem} from '../lib/lexicalChecklistEmptyEnterNewItem';
 import {registerParagraphLeadingTabCoalesce} from '../lib/lexicalParagraphLeadingTabCoalesce';
 import {registerTaskEditorTabCommands} from '../lib/lexicalTaskEditorTabCommands';
+import {TaskImageNode} from '../lib/lexicalTaskImageNode';
+import {registerTaskImagePaste} from '../lib/lexicalTaskImagePaste';
 
 const MARKDOWN_TRANSFORMERS = [CHECK_LIST, MARKDOWN_HORIZONTAL_RULE, ...TRANSFORMERS];
 
@@ -129,6 +131,7 @@ const theme = {
   code: 'editor__codeBlock',
   hr: 'editor__horizontalRule',
   hrSelected: 'editor__horizontalRule--selected',
+  image: 'editor__imageWrap',
   table: 'editor__table',
   tableCell: 'editor__tableCell',
   tableCellHeader: 'editor__tableCellHeader',
@@ -151,6 +154,7 @@ export function LexicalTaskEditor({value, placeholder, onChange, labels}: Props)
         AutoLinkNode,
         CodeNode,
         HorizontalRuleNode,
+        TaskImageNode,
         TableNode,
         TableRowNode,
         TableCellNode,
@@ -172,6 +176,7 @@ export function LexicalTaskEditor({value, placeholder, onChange, labels}: Props)
             placeholder={<div className="editor__placeholder">{placeholder}</div>}
             ErrorBoundary={LexicalErrorBoundary}
           />
+          <TaskImagePastePlugin />
           <HistoryPlugin />
           <ListPlugin />
           <CheckListPlugin />
@@ -198,6 +203,14 @@ function CoalesceLeadingTabInParagraphPlugin() {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => registerParagraphLeadingTabCoalesce(editor), [editor]);
+
+  return null;
+}
+
+function TaskImagePastePlugin() {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => registerTaskImagePaste(editor), [editor]);
 
   return null;
 }
