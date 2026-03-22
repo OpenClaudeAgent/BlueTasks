@@ -51,10 +51,10 @@ jobs:
       - run: npm ci
       - run: npm ci --prefix desktop
 
-      - name: Build Tauri
+      - name: Build Tauri (.app only)
         env:
           CI: false
-        run: npm run tauri:build --prefix desktop
+        run: npm run tauri:build --prefix desktop -- --bundles app
 
       - name: Ad-hoc sign .app (deep)
         run: |
@@ -68,18 +68,20 @@ jobs:
           APP="desktop/src-tauri/target/release/bundle/macos/BlueTasks.app"
           ditto -c -k --keepParent "$APP" "$GITHUB_WORKSPACE/BlueTasks_${VERSION}_macos_aarch64.app.zip"
 
-      - name: DMG from signed .app
+      - name: DMG (Tauri — app + Applications)
         run: |
           VERSION="${RELEASE_TAG#v}"
-          APP="desktop/src-tauri/target/release/bundle/macos/BlueTasks.app"
-          DMG="$GITHUB_WORKSPACE/BlueTasks_${VERSION}_aarch64.dmg"
-          rm -f "$DMG"
-          STAGE="$(mktemp -d "${TMPDIR:-/tmp}/bluetasks_dmg.XXXXXX")"
-          cleanup() { rm -rf "$STAGE"; }
-          trap cleanup EXIT
-          ditto "$APP" "$STAGE/BlueTasks.app"
-          ln -sf /Applications "$STAGE/Applications"
-          hdiutil create -volname "BlueTasks" -srcfolder "$STAGE" -ov -format UDZO -imagekey zlib-level=9 "$DMG"
+          DEST="$GITHUB_WORKSPACE/BlueTasks_${VERSION}_aarch64.dmg"
+          rm -f "$DEST"
+          npx --prefix desktop tauri bundle --bundles dmg --ci
+          shopt -s nullglob
+          dmgs=(desktop/src-tauri/target/release/bundle/dmg/*.dmg)
+          if [ ${#dmgs[@]} -ne 1 ]; then
+            echo "Expected exactly one DMG under bundle/dmg/, got ${#dmgs[@]}"
+            ls -la desktop/src-tauri/target/release/bundle/dmg 2>/dev/null || true
+            exit 1
+          fi
+          cp "${dmgs[0]}" "$DEST"
 
       - uses: actions/upload-artifact@v7
         with:
