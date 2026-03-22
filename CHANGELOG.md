@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.3.5] - 2026-03-22
+
+- Shipped via Actions Release: explicit Docker + Desktop dispatch and GitHub Release assets. README uses semver tag badge (see docs/releasing.md).
+
 ## [0.3.4] - 2026-03-22
 
 - A11y: sidebar resize lane in its own named region (axe complementary + region rules). README: badges at top (release, Node 22, GHCR, Tauri, Playwright, SQLite).
@@ -92,7 +96,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial published image tag `v0.1.0` (multi-arch GHCR workflow).
 
-[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.4...HEAD
+[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.5...HEAD
+[0.3.5]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.2...v0.3.3
 [0.3.2]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.1...v0.3.2
