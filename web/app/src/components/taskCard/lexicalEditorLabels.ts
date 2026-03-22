@@ -14,6 +14,7 @@ export type LexicalEditorLabels = {
   addTableRow: string;
   deleteTable: string;
   deleteTableConfirm: string;
+  codeLanguage: string;
 };
 
 export function buildLexicalEditorLabels(t: TFunction): LexicalEditorLabels {
@@ -31,5 +32,6 @@ export function buildLexicalEditorLabels(t: TFunction): LexicalEditorLabels {
     addTableRow: t('editor.addTableRow'),
     deleteTable: t('editor.deleteTable'),
     deleteTableConfirm: t('editor.deleteTableConfirm'),
+    codeLanguage: t('editor.codeLanguage'),
   };
 }

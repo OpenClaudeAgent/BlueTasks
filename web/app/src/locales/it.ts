@@ -174,5 +174,6 @@ export default {
     addTableRow: 'Aggiungi riga',
     deleteTable: 'Elimina tabella',
     deleteTableConfirm: 'Rimuovere questa tabella? Non si può annullare.',
+    codeLanguage: 'Linguaggio del blocco codice',
   },
 };

@@ -46,9 +46,14 @@ export const SIMPLE_LEXICAL_TOOLBAR_CASES: SimpleToolbarCase[] = [
   {
     name: 'Code block from toolbar',
     buttonName: 'Code',
-    typedText: 'const x = 1',
+    typedText: 'function foo() {}',
     assert: async (card) => {
-      await expect(card.locator('.editor__codeBlock')).toContainText('const x = 1');
+      const block = card.locator('.editor__codeBlock');
+      await expect(block).toContainText('function');
+      /* BDD: Shiki tokenizes asynchronously — wait for token spans inside the block */
+      await expect
+        .poll(async () => block.locator('span').count(), {timeout: 20_000})
+        .toBeGreaterThan(0);
     },
   },
   {

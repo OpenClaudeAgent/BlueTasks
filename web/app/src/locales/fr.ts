@@ -176,5 +176,6 @@ export default {
     addTableRow: 'Ajouter une ligne',
     deleteTable: 'Supprimer le tableau',
     deleteTableConfirm: 'Supprimer ce tableau ? Cette action est définitive.',
+    codeLanguage: 'Langage du bloc code',
   },
 };

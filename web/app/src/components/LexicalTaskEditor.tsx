@@ -1,4 +1,4 @@
-import {useEffect, useLayoutEffect, useMemo, useRef} from 'react';
+import {useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import type {MutableRefObject, ReactNode} from 'react';
 import {
   $createParagraphNode,
@@ -36,7 +36,7 @@ import {
   ListNode,
 } from '@lexical/list';
 import {AutoLinkNode, LinkNode} from '@lexical/link';
-import {CodeNode, $createCodeNode} from '@lexical/code';
+import {CodeHighlightNode, CodeNode, $createCodeNode, DEFAULT_CODE_LANGUAGE} from '@lexical/code';
 import {$setBlocksType} from '@lexical/selection';
 import {TRANSFORMERS} from '@lexical/markdown';
 import {LEXICAL_AUTO_LINK_MATCHERS} from '../lib/lexicalAutoLinkMatchers';
@@ -78,6 +78,13 @@ import {CHECK_LIST_FLAT_TABS} from '../lib/lexicalMarkdownCheckListFlatTabs';
 import {registerTaskEditorTabCommands} from '../lib/lexicalTaskEditorTabCommands';
 import {TaskImageNode} from '../lib/lexicalTaskImageNode';
 import {registerTaskImagePaste} from '../lib/lexicalTaskImagePaste';
+import {
+  getTaskEditorCodeLanguageOptions,
+  normalizeCodeLanguage,
+  registerTaskEditorCodeHighlighting,
+  resolveTaskEditorCodeLanguageValue,
+} from '../lib/lexicalCodeShiki';
+import {$getCodeNodeFromSelection} from '../lib/lexicalTaskEditorCodeLanguage';
 
 const MARKDOWN_TRANSFORMERS = [CHECK_LIST_FLAT_TABS, MARKDOWN_HORIZONTAL_RULE, ...TRANSFORMERS];
 
@@ -99,8 +106,11 @@ type Props = {
     addTableRow: string;
     deleteTable: string;
     deleteTableConfirm: string;
+    codeLanguage: string;
   };
 };
+
+const TASK_EDITOR_CODE_LANGUAGE_OPTIONS = getTaskEditorCodeLanguageOptions();
 
 const theme = {
   paragraph: 'editor__paragraph',
@@ -154,6 +164,7 @@ export function LexicalTaskEditor({value, placeholder, onChange, labels}: Props)
         LinkNode,
         AutoLinkNode,
         CodeNode,
+        CodeHighlightNode,
         HorizontalRuleNode,
         TaskImageNode,
         TableNode,
@@ -178,6 +189,7 @@ export function LexicalTaskEditor({value, placeholder, onChange, labels}: Props)
             ErrorBoundary={LexicalErrorBoundary}
           />
           <TaskImagePastePlugin />
+          <CodeHighlightShikiPlugin />
           <HistoryPlugin />
           <ListPlugin />
           <CheckListPlugin />
@@ -216,6 +228,14 @@ function TaskImagePastePlugin() {
   return null;
 }
 
+function CodeHighlightShikiPlugin() {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => registerTaskEditorCodeHighlighting(editor), [editor]);
+
+  return null;
+}
+
 function CheckListAtomicCatchUpPlugin() {
   const [editor] = useLexicalComposerContext();
 
@@ -249,6 +269,32 @@ function runToolbarAction(editor: LexicalEditor, fn: () => void) {
 
 function ToolbarPlugin({labels}: Pick<Props, 'labels'>) {
   const [editor] = useLexicalComposerContext();
+  const [codeLangUi, setCodeLangUi] = useState<{show: boolean; value: string}>({
+    show: false,
+    value: DEFAULT_CODE_LANGUAGE,
+  });
+
+  useEffect(() => {
+    return editor.registerUpdateListener(({editorState}) => {
+      editorState.read(() => {
+        const code = $getCodeNodeFromSelection();
+        if (code === null) {
+          setCodeLangUi((prev) => (prev.show ? {...prev, show: false} : prev));
+          return;
+        }
+        const value = resolveTaskEditorCodeLanguageValue(code.getLanguage());
+        setCodeLangUi((prev) => {
+          if (prev.show && prev.value === value) {
+            return prev;
+          }
+          return {show: true, value};
+        });
+      });
+    });
+  }, [editor]);
+
+  const optionIds = TASK_EDITOR_CODE_LANGUAGE_OPTIONS.map((o) => o.id);
+  const valueInList = optionIds.includes(codeLangUi.value);
 
   return (
     <div className="editor__toolbar">
@@ -321,6 +367,35 @@ function ToolbarPlugin({labels}: Pick<Props, 'labels'>) {
       >
         <Code2 size={14} />
       </ToolbarButton>
+      {codeLangUi.show ? (
+        <select
+          aria-label={labels.codeLanguage}
+          className="editor__toolbarSelect"
+          value={codeLangUi.value}
+          onChange={(e) => {
+            const next = e.target.value;
+            runToolbarAction(editor, () => {
+              editor.update(() => {
+                const code = $getCodeNodeFromSelection();
+                if (code !== null) {
+                  code.setLanguage(normalizeCodeLanguage(next));
+                }
+              });
+            });
+          }}
+        >
+          {!valueInList ? (
+            <option key={codeLangUi.value} value={codeLangUi.value}>
+              {codeLangUi.value}
+            </option>
+          ) : null}
+          {TASK_EDITOR_CODE_LANGUAGE_OPTIONS.map(({id, label}) => (
+            <option key={id} value={id}>
+              {label}
+            </option>
+          ))}
+        </select>
+      ) : null}
       <ToolbarButton
         label={labels.horizontalRule}
         onClick={() => runToolbarAction(editor, () => editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, undefined))}

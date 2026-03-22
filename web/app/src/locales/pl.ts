@@ -174,5 +174,6 @@ export default {
     addTableRow: 'Dodaj wiersz',
     deleteTable: 'Usuń tabelę',
     deleteTableConfirm: 'Usunąć tę tabelę? Tej operacji nie można cofnąć.',
+    codeLanguage: 'Język bloku kodu',
   },
 };

@@ -17,6 +17,30 @@ test.describe('End-to-end: Lexical toolbar', () => {
     });
   }
 
+  test('Code block: toolbar language selector updates Shiki grammar', async ({page}) => {
+    const title = `E2E code lang ${Date.now()}`;
+    await addTaskWithTitle(page, title);
+
+    const card = firstCard(page);
+    const editor = card.locator('.editor__input');
+
+    await editor.click();
+    await card.getByRole('button', {name: 'Code'}).click();
+    await editor.pressSequentially('def x(): return 1');
+
+    const block = card.locator('.editor__codeBlock');
+    await expect
+      .poll(async () => block.locator('span').count(), {timeout: 20_000})
+      .toBeGreaterThan(0);
+
+    const langSelect = card.getByLabel('Code block language');
+    await expect(langSelect).toBeVisible();
+    await langSelect.selectOption('python');
+    await expect
+      .poll(async () => block.getAttribute('data-highlight-language'), {timeout: 20_000})
+      .toBe('python');
+  });
+
   test('Bullet list from toolbar', async ({page}) => {
     const title = `E2E editor bullets ${Date.now()}`;
     await addTaskWithTitle(page, title);

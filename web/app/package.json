@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "@lexical/code": "^0.42.0",
+    "@lexical/code-shiki": "^0.42.0",
     "@lexical/link": "^0.42.0",
     "@lexical/list": "^0.42.0",
     "@lexical/markdown": "^0.42.0",

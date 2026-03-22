@@ -172,5 +172,6 @@ export default {
     addTableRow: 'Add row',
     deleteTable: 'Delete table',
     deleteTableConfirm: 'Remove this table? This cannot be undone.',
+    codeLanguage: 'Code block language',
   },
 };

@@ -174,5 +174,6 @@ export default {
     addTableRow: 'Añadir fila',
     deleteTable: 'Eliminar tabla',
     deleteTableConfirm: '¿Quitar esta tabla? No se puede deshacer.',
+    codeLanguage: 'Lenguaje del bloque de código',
   },
 };

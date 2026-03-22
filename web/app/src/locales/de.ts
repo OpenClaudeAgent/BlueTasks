@@ -174,5 +174,6 @@ export default {
     addTableRow: 'Zeile hinzufügen',
     deleteTable: 'Tabelle löschen',
     deleteTableConfirm: 'Diese Tabelle entfernen? Das kann nicht rückgängig gemacht werden.',
+    codeLanguage: 'Sprache des Codeblocks',
   },
 };

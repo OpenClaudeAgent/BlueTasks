@@ -174,5 +174,6 @@ export default {
     addTableRow: '行を追加',
     deleteTable: '表を削除',
     deleteTableConfirm: 'この表を削除しますか？元に戻せません。',
+    codeLanguage: 'コードブロックの言語',
   },
 };

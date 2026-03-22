@@ -174,5 +174,6 @@ export default {
     addTableRow: 'Rij toevoegen',
     deleteTable: 'Tabel verwijderen',
     deleteTableConfirm: 'Deze tabel verwijderen? Dit kan niet ongedaan worden gemaakt.',
+    codeLanguage: 'Taal van codeblok',
   },
 };
