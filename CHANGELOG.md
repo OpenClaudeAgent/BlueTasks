@@ -28,6 +28,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - CI: optional manual runs (`workflow_dispatch`) for [CI](.github/workflows/ci.yml) and [Docker image](.github/workflows/docker-publish.yml).
 - CI: removed standalone **Docker build check** workflow; the image is built and pushed only via [Docker image](.github/workflows/docker-publish.yml) (tag or dispatch).
 
+## [0.2.3] - 2026-03-22
+
+- Checklist Lexical (Entrée, Tab, markdown) ; couverture Vitest et e2e Playwright alignés.
+
 ## [0.2.2] - 2026-03-22
 
 - ESLint 10, Vite 8, Vitest 4, Zod 4, better-sqlite3 12; expanded web tests and coverage gate; Dependabot grouping and CI fixes.
@@ -81,7 +85,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial published image tag `v0.1.0` (multi-arch GHCR workflow).
 
-[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.1.9...v0.2.0
