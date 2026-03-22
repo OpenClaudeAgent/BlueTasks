@@ -6,7 +6,7 @@ import {LanguageSwitcher} from './LanguageSwitcher';
 
 describe('Feature: Language switcher', () => {
   describe('Scenario: User picks UI language', () => {
-    it('given French active, when user clicks EN, then onChange is called with en', async () => {
+    it('given French active, when user clicks English, then onChange is called with en', async () => {
       const user = userEvent.setup();
       const onChange = vi.fn();
       render(
@@ -14,18 +14,18 @@ describe('Feature: Language switcher', () => {
       );
 
       const group = screen.getByRole('group', {name: 'Language'});
-      await user.click(within(group).getByRole('button', {name: 'EN'}));
+      await user.click(within(group).getByRole('button', {name: 'English'}));
       expect(onChange).toHaveBeenCalledTimes(1);
       expect(onChange).toHaveBeenCalledWith('en');
     });
 
-    it('given English active, when rendered, then EN button has active class', () => {
+    it('given English active, when rendered, then English button has active class', () => {
       render(
         <LanguageSwitcher label="Langue" language="en" onChange={vi.fn()} />,
       );
-      const en = screen.getByRole('button', {name: 'EN'});
+      const en = screen.getByRole('button', {name: 'English'});
       expect(en).toHaveClass('is-active');
-      expect(screen.getByRole('button', {name: 'FR'})).not.toHaveClass('is-active');
+      expect(screen.getByRole('button', {name: 'Français'})).not.toHaveClass('is-active');
     });
   });
 });

@@ -94,9 +94,13 @@ export function TaskCardHeaderRow({
           </span>
         ) : null}
         {pinned ? (
-          <span className="taskCard__chip taskCard__chip--pin" title={t('pin')}>
+          <span
+            aria-label={t('pin')}
+            className="taskCard__chip taskCard__chip--pin taskCard__chip--iconOnly"
+            role="img"
+            title={t('pin')}
+          >
             <Pin aria-hidden size={11} strokeWidth={2.5} />
-            {t('pinnedBadge')}
           </span>
         ) : null}
         {recurrence ? (

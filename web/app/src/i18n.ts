@@ -1,14 +1,26 @@
 import i18n from 'i18next';
 import {initReactI18next} from 'react-i18next';
+import de from './locales/de';
 import en from './locales/en';
+import es from './locales/es';
 import fr from './locales/fr';
+import it from './locales/it';
+import ja from './locales/ja';
+import nl from './locales/nl';
+import pl from './locales/pl';
+import pt from './locales/pt';
+import {
+  detectBrowserUiLanguage,
+  isUiLanguageCode,
+  type UiLanguageCode,
+} from './locales/uiLanguages';
 
 const LANG_STORAGE_KEY = 'bluetasks.language';
 
-function readStoredLanguage(): 'fr' | 'en' | undefined {
+function readStoredLanguage(): UiLanguageCode | undefined {
   try {
     const v = localStorage.getItem(LANG_STORAGE_KEY);
-    if (v === 'fr' || v === 'en') {
+    if (v && isUiLanguageCode(v)) {
       return v;
     }
   } catch {
@@ -17,8 +29,7 @@ function readStoredLanguage(): 'fr' | 'en' | undefined {
   return undefined;
 }
 
-const browserLanguage = navigator.language.toLowerCase().startsWith('fr') ? 'fr' : 'en';
-const initialLanguage = readStoredLanguage() ?? browserLanguage;
+const initialLanguage = readStoredLanguage() ?? detectBrowserUiLanguage();
 
 void i18n
   .use(initReactI18next)
@@ -29,12 +40,15 @@ void i18n
       escapeValue: false,
     },
     resources: {
-      en: {
-        translation: en,
-      },
-      fr: {
-        translation: fr,
-      },
+      en: {translation: en},
+      fr: {translation: fr},
+      de: {translation: de},
+      es: {translation: es},
+      it: {translation: it},
+      nl: {translation: nl},
+      pl: {translation: pl},
+      pt: {translation: pt},
+      ja: {translation: ja},
     },
   })
   .then(() => {
@@ -44,8 +58,9 @@ void i18n
 void i18n.on('languageChanged', (lng) => {
   document.documentElement.lang = lng;
   try {
-    if (lng === 'fr' || lng === 'en') {
-      localStorage.setItem(LANG_STORAGE_KEY, lng);
+    const base = lng.split('-')[0].toLowerCase();
+    if (isUiLanguageCode(base)) {
+      localStorage.setItem(LANG_STORAGE_KEY, base);
     }
   } catch {
     /* ignore */

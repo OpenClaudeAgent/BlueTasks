@@ -1,13 +1,13 @@
 import {
+  Calendar,
+  CalendarClock,
+  CalendarOff,
   CheckCheck,
-  CircleDashed,
   Folder,
-  Inbox,
   Layers,
-  LayoutGrid,
+  ListChecks,
   ListTodo,
   Settings,
-  SunMedium,
 } from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {getAreaIconComponent} from '../lib/areaIcons';
@@ -16,10 +16,14 @@ import {AREA_FILTER_ALL, AREA_FILTER_UNCATEGORIZED} from '../types';
 import type {Area, AreaFilter, SectionId, TaskCounts} from '../types';
 
 const sectionIcons = {
-  all: LayoutGrid,
-  today: SunMedium,
-  upcoming: CircleDashed,
-  anytime: Inbox,
+  /** Full task list across sections */
+  all: ListChecks,
+  /** Focus on this calendar day */
+  today: Calendar,
+  /** Due dates ahead */
+  upcoming: CalendarClock,
+  /** Backlog without a scheduled date */
+  anytime: CalendarOff,
   done: CheckCheck,
 } as const;
 

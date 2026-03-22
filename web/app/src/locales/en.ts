@@ -2,6 +2,7 @@ export default {
   appName: 'BlueTasks',
   brandSubtitle: 'Local-first, clean, fast.',
   primaryNavigation: 'Primary navigation',
+  sidebarResizeHandle: 'Resize sidebar',
   areasNavLabel: 'Areas',
   areasAll: 'All areas',
   areasUncategorized: 'Unassigned',

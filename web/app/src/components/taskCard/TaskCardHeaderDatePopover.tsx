@@ -1,4 +1,5 @@
 import * as Popover from '@radix-ui/react-popover';
+import {useState} from 'react';
 import {DayPicker} from 'react-day-picker';
 import type {Locale} from 'date-fns';
 import {RotateCw} from 'lucide-react';
@@ -28,9 +29,21 @@ export function TaskCardHeaderDatePopover({
   onSelectDate,
 }: TaskCardHeaderDatePopoverProps) {
   const {t} = useTranslation();
+  const [month, setMonth] = useState(() =>
+    taskDate ? parseTaskDate(taskDate) : new Date(),
+  );
+
+  const handleOpenChange = (next: boolean) => {
+    if (next) {
+      setMonth(taskDate ? parseTaskDate(taskDate) : new Date());
+    }
+    onOpenChange(next);
+  };
+
+  const selectedDate = taskDate ? parseTaskDate(taskDate) : undefined;
 
   return (
-    <Popover.Root onOpenChange={onOpenChange} open={open}>
+    <Popover.Root onOpenChange={handleOpenChange} open={open}>
       <Popover.Trigger asChild>
         <button
           className={`taskCard__datePill ${taskDate ? `taskCard__datePill--${dateTone}` : 'taskCard__datePill--empty'} ${recurrence ? 'taskCard__datePill--recurring' : ''}`}
@@ -63,8 +76,10 @@ export function TaskCardHeaderDatePopover({
           <DayPicker
             locale={dayPickerLocale}
             mode="single"
+            month={month}
+            onMonthChange={setMonth}
             onSelect={(date) => onSelectDate(date ? formatDateKey(date) : null)}
-            selected={taskDate ? parseTaskDate(taskDate) : undefined}
+            selected={selectedDate}
           />
         </Popover.Content>
       </Popover.Portal>

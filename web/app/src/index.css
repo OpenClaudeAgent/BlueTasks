@@ -107,8 +107,42 @@ button,
 
 .appShell {
   display: grid;
+  /* Default until inline style from JS (matches useResizableSidebarWidth default) */
   grid-template-columns: 248px minmax(0, 1fr);
   min-height: 100vh;
+}
+
+.appShell__sidebarColumn {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.appShell__sidebarColumn .sidebar {
+  flex: 1;
+  min-height: 0;
+}
+
+.appShell__resizeHandle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  z-index: 3;
+  cursor: col-resize;
+  touch-action: none;
+  background: transparent;
+}
+
+.appShell__resizeHandle:hover {
+  background: rgba(126, 184, 255, 0.12);
+}
+
+.appShell__resizeHandle:active {
+  background: rgba(126, 184, 255, 0.2);
 }
 
 .sidebar {
@@ -366,12 +400,14 @@ button,
 }
 
 .languageSwitcher {
-  display: inline-flex;
-  gap: 2px;
-  padding: 3px;
-  border-radius: 999px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: rgba(0, 0, 0, 0.2);
+  max-width: 100%;
 }
 
 .languageSwitcher button {
@@ -380,6 +416,7 @@ button,
   font-size: 11px;
   font-weight: 650;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .languageSwitcher button.is-active {
@@ -684,6 +721,13 @@ button,
   color: var(--accent);
   border-color: rgba(126, 184, 255, 0.4);
   background: rgba(126, 184, 255, 0.08);
+}
+
+.taskCard__chip--iconOnly {
+  text-transform: none;
+  letter-spacing: normal;
+  padding-inline: 6px;
+  justify-content: center;
 }
 
 .taskCard__chip--recurring {
@@ -1486,10 +1530,16 @@ html:lang(fr) .editor__codeBlock::before {
   border-color: var(--border-strong);
 }
 
-.rdp {
+/* react-day-picker v9: default styles + theme inside popover */
+.datePopover .rdp-root {
+  --rdp-accent-color: var(--accent);
+  --rdp-accent-background-color: rgba(126, 184, 255, 0.22);
+  margin: 0;
+}
+
+.rdp-root {
   --rdp-accent-color: var(--accent);
   --rdp-accent-background-color: rgba(126, 184, 255, 0.15);
-  margin: 0;
 }
 
 .rdp-caption_label,

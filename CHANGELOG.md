@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+- UI: **resizable left sidebar** (drag the right edge); width persisted in `localStorage` (`bluetasks.sidebarWidthPx`), clamped 200–480px.
+- UI: pinned header chip shows icon only (accessible name via `aria-label`); task date popover imports **react-day-picker** default CSS, syncs visible **month** when opening, and keeps **selected** day styling; sidebar section icons (All / Today / Upcoming / Anytime) use clearer Lucide metaphors.
+- i18n: **de, es, it, nl, pl, pt, ja** plus `en`/`fr`; registry in [`web/app/src/locales/uiLanguages.ts`](web/app/src/locales/uiLanguages.ts); language switcher uses native labels; **date-fns** locales for calendar + DayPicker in [`dayPickerLocale.ts`](web/app/src/lib/dayPickerLocale.ts); E2E language tests updated.
 - Area icons: canonical list moved to [`server/data/area-icon-ids.json`](server/data/area-icon-ids.json) (validated by `areaIconIds.ts`); web app imports it via `@bluetasks/server-data`; Docker / desktop runtime copy `server/data/` alongside the bundle.
 - Repo: Playwright specs live under [`e2e/`](e2e/) (renamed from `scenario/`); root ESLint [`eslint.e2e.config.mjs`](eslint.e2e.config.mjs); `npm run lint:eslint-e2e`; CI jobs **ESLint (Playwright e2e)** and **E2E tests**; README and docs updated.
 - Server: split Express wiring — [`createApp.ts`](server/src/createApp.ts) mounts [`routes/tasksRoutes.ts`](server/src/routes/tasksRoutes.ts), [`routes/areasRoutes.ts`](server/src/routes/areasRoutes.ts), [`routes/importExportRoutes.ts`](server/src/routes/importExportRoutes.ts); shared types [`appTypes.ts`](server/src/appTypes.ts), upload middleware [`importUpload.ts`](server/src/importUpload.ts).

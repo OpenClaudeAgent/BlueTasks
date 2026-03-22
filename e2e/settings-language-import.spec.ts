@@ -10,7 +10,7 @@ test.describe('Language', () => {
     await page.getByRole('button', {name: 'Settings'}).click();
     const dialog = page.getByRole('dialog', {name: 'Settings'});
     await dialog.getByRole('button', {name: 'General'}).click();
-    await dialog.getByRole('group', {name: 'Language'}).getByRole('button', {name: 'FR'}).click();
+    await dialog.getByRole('group', {name: 'Language'}).getByRole('button', {name: 'Français'}).click();
     await page.keyboard.press('Escape');
 
     await expect(page.getByRole('heading', {level: 1, name: "Aujourd'hui"})).toBeVisible();
@@ -21,13 +21,13 @@ test.describe('Language', () => {
     await page.getByRole('button', {name: 'Settings'}).click();
     const dialog = page.getByRole('dialog', {name: 'Settings'});
     await dialog.getByRole('button', {name: 'General'}).click();
-    await dialog.getByRole('group', {name: 'Language'}).getByRole('button', {name: 'FR'}).click();
+    await dialog.getByRole('group', {name: 'Language'}).getByRole('button', {name: 'Français'}).click();
     await page.keyboard.press('Escape');
 
     await page.getByRole('button', {name: 'Paramètres'}).click();
     const frDialog = page.getByRole('dialog', {name: 'Paramètres'});
     await frDialog.getByRole('button', {name: 'Général'}).click();
-    await frDialog.getByRole('group', {name: 'Langue'}).getByRole('button', {name: 'EN'}).click();
+    await frDialog.getByRole('group', {name: 'Langue'}).getByRole('button', {name: 'English'}).click();
     await page.keyboard.press('Escape');
 
     await expect(page.getByRole('heading', {level: 1, name: 'Today'})).toBeVisible();

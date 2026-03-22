@@ -1,20 +1,25 @@
+import {
+  UI_LANGUAGE_OPTIONS,
+  type UiLanguageCode,
+} from '../locales/uiLanguages';
+
 type LanguageSwitcherProps = {
-  language: string;
+  language: UiLanguageCode;
   label: string;
-  onChange: (language: 'fr' | 'en') => void;
+  onChange: (language: UiLanguageCode) => void;
 };
 
 export function LanguageSwitcher({language, label, onChange}: LanguageSwitcherProps) {
   return (
     <div className="languageSwitcher" role="group" aria-label={label}>
-      {(['fr', 'en'] as const).map((entry) => (
+      {UI_LANGUAGE_OPTIONS.map(({code, label: langLabel}) => (
         <button
-          key={entry}
-          className={language === entry ? 'is-active' : ''}
-          onClick={() => onChange(entry)}
+          key={code}
+          className={language === code ? 'is-active' : ''}
+          onClick={() => onChange(code)}
           type="button"
         >
-          {entry.toUpperCase()}
+          {langLabel}
         </button>
       ))}
     </div>

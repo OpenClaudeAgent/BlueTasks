@@ -1,4 +1,3 @@
-import {enUS, fr as frLocale} from 'date-fns/locale';
 import type {Locale} from 'date-fns';
 import type {Dispatch, SetStateAction} from 'react';
 import {useCallback, useMemo} from 'react';
@@ -6,6 +5,7 @@ import type {LucideIcon} from 'lucide-react';
 import {getAreaIconComponent} from '../../lib/areaIcons';
 import {formatTaskDatePill, getDateTone} from '../../lib/dateFormat';
 import {formatTrackedSeconds} from '../../lib/taskCardFormat';
+import {dayPickerLocaleFor} from '../../lib/dayPickerLocale';
 import {coercePinned, coerceRecurrence} from '../../lib/taskPropertyValidation';
 import type {Area, Task, TaskDraftUpdate} from '../../types';
 import {areaNameByIdMap, checklistCompletionRatio} from './taskCardModel';
@@ -134,7 +134,7 @@ export function useTaskCardChrome(
     ],
   );
 
-  const dayPickerLocale = language === 'fr' ? frLocale : enUS;
+  const dayPickerLocale: Locale = dayPickerLocaleFor(language);
 
   return {
     dateOpen,

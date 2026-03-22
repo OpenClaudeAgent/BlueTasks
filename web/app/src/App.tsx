@@ -5,12 +5,14 @@ import {SettingsDialog} from './components/SettingsDialog';
 import {Sidebar} from './components/Sidebar';
 import {TaskCard} from './components/TaskCard';
 import {useBlueTasksBoard} from './hooks/useBlueTasksBoard';
+import {useResizableSidebarWidth} from './hooks/useResizableSidebarWidth';
 
 function App() {
   const {t} = useTranslation();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [quickCaptureValue, setQuickCaptureValue] = useState('');
   const board = useBlueTasksBoard();
+  const {sidebarWidth, onResizePointerDown, minWidth, maxWidth} = useResizableSidebarWidth();
 
   const taskCardBoardChrome = useMemo(
     () => ({
@@ -22,17 +24,34 @@ function App() {
   );
 
   return (
-    <div className="appShell">
-      <Sidebar
-        areaFilter={board.areaFilter}
-        areaRowCounts={board.areaSidebarCounts}
-        areas={board.areas}
-        counts={board.counts}
-        onAreaFilterChange={board.setAreaFilter}
-        onOpenSettings={() => setSettingsOpen(true)}
-        onSelect={board.setSelectedSection}
-        selectedSection={board.selectedSection}
-      />
+    <div
+      className="appShell"
+      style={{
+        gridTemplateColumns: `${sidebarWidth}px minmax(0, 1fr)`,
+      }}
+    >
+      <div className="appShell__sidebarColumn">
+        <Sidebar
+          areaFilter={board.areaFilter}
+          areaRowCounts={board.areaSidebarCounts}
+          areas={board.areas}
+          counts={board.counts}
+          onAreaFilterChange={board.setAreaFilter}
+          onOpenSettings={() => setSettingsOpen(true)}
+          onSelect={board.setSelectedSection}
+          selectedSection={board.selectedSection}
+        />
+        <div
+          aria-orientation="vertical"
+          aria-label={t('sidebarResizeHandle')}
+          aria-valuemax={maxWidth}
+          aria-valuemin={minWidth}
+          aria-valuenow={Math.round(sidebarWidth)}
+          className="appShell__resizeHandle"
+          onPointerDown={onResizePointerDown}
+          role="separator"
+        />
+      </div>
       <SettingsDialog
         areas={board.areas}
         onAreasUpdated={board.refreshTasksAndAreas}

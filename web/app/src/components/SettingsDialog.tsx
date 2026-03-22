@@ -6,6 +6,7 @@ import {areasApi, downloadDatabaseExport, uploadDatabaseImport} from '../api';
 import {DEFAULT_AREA_ICON, type AreaIconId, getAreaIconComponent} from '../lib/areaIcons';
 import type {Area} from '../types';
 import {AreaIconPicker} from './AreaIconPicker';
+import {normalizeUiLanguageCode} from '../locales/uiLanguages';
 import {LanguageSwitcher} from './LanguageSwitcher';
 
 type SettingsSection = 'general' | 'areas';
@@ -198,9 +199,9 @@ export function SettingsDialog({
                   <div className="settingsDialog__languageBlock">
                     <LanguageSwitcher
                       label={t('language')}
-                      language={i18n.language.startsWith('fr') ? 'fr' : 'en'}
-                      onChange={(language) => {
-                        void i18n.changeLanguage(language);
+                      language={normalizeUiLanguageCode(i18n.language)}
+                      onChange={(code) => {
+                        void i18n.changeLanguage(code);
                       }}
                     />
                   </div>
