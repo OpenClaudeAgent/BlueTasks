@@ -377,9 +377,10 @@ public class BlueTasksAppViewModel(
     public fun toggleTimer(task: ApiTaskRow) {
         val now = Clock.System.now()
         val nowStr = now.toString()
+        val startedAt = task.timerStartedAt
         val updated =
-            if (task.timerStartedAt != null) {
-                val start = Instant.parse(task.timerStartedAt)
+            if (startedAt != null) {
+                val start = Instant.parse(startedAt)
                 val deltaSec = (now - start).inWholeSeconds.toInt().coerceAtLeast(0)
                 task.copy(
                     timerStartedAt = null,

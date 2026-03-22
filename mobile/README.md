@@ -13,7 +13,8 @@ Compose Multiplatform client for the existing BlueTasks HTTP API. Point the app 
 From this directory:
 
 ```bash
-export JAVA_HOME=/path/to/jdk-21   # macOS: /usr/libexec/java_home -v 21
+# macOS (Homebrew): JDK 21 is often here even when `java_home -v 21` does not list it:
+export JAVA_HOME="$(/usr/libexec/java_home -v 21 2>/dev/null || echo /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home)"
 
 ./gradlew :shared:test
 ./gradlew :composeApp:assembleDebug
