@@ -11,7 +11,8 @@ import {
   ParagraphNode,
   TextNode,
 } from 'lexical';
-import {registerMarkdownShortcuts} from '@lexical/markdown';
+import {CHECK_LIST, registerMarkdownShortcuts} from '@lexical/markdown';
+import {extractChecklistStats} from './editorState';
 import {
   $isListNode,
   ListItemNode,
@@ -22,7 +23,7 @@ import {
 import {CHECK_LIST_FLAT_TABS} from './lexicalMarkdownCheckListFlatTabs';
 
 describe('CHECK_LIST_FLAT_TABS', () => {
-  it('does not apply listItem indent from leading tab characters before [] ', async () => {
+  it('does not apply listItem indent from leading tab characters before []', async () => {
     const onError = vi.fn();
     const editor = createEditor({
       namespace: 'test-check-flat-tabs',
@@ -104,5 +105,86 @@ describe('CHECK_LIST_FLAT_TABS', () => {
       expect(item.getChecked()).toBe(true);
       expect(item.getIndent()).toBe(0);
     });
+  });
+
+  it('four leading spaces before [] create markdown nesting (two counted rows); tabs in prefix would inflate stock CHECK_LIST more', async () => {
+    const editor = createEditor({
+      namespace: 'test-check-flat-tabs-spaces',
+      nodes: [ParagraphNode, TextNode, ListNode, ListItemNode],
+      onError: vi.fn(),
+    });
+    registerList(editor);
+    registerCheckList(editor);
+    registerMarkdownShortcuts(editor, [CHECK_LIST_FLAT_TABS]);
+
+    editor.update(() => {
+      const root = $getRoot();
+      root.clear();
+      const p = $createParagraphNode();
+      const text = $createTextNode('');
+      p.append(text);
+      root.append(p);
+      text.select(0, 0);
+    });
+
+    for (const character of '    [] ') {
+      editor.update(
+        () => {
+          const selection = $getSelection();
+          if ($isRangeSelection(selection)) {
+            selection.insertText(character);
+          }
+        },
+        {discrete: true},
+      );
+      await setImmediatePromise();
+    }
+
+    const json = JSON.parse(JSON.stringify(editor.getEditorState().toJSON()));
+    expect(extractChecklistStats(json).checklistTotal).toBe(2);
+  });
+
+  it('regression: stock CHECK_LIST counts more checklist rows than FLAT_TABS after leading tabs + []', async () => {
+    async function typeShortcut(transformer: typeof CHECK_LIST_FLAT_TABS) {
+      const editor = createEditor({
+        namespace: `test-check-stock-vs-flat-${transformer === CHECK_LIST_FLAT_TABS ? 'flat' : 'stock'}`,
+        nodes: [ParagraphNode, TextNode, ListNode, ListItemNode],
+        onError: vi.fn(),
+      });
+      registerList(editor);
+      registerCheckList(editor);
+      registerMarkdownShortcuts(editor, [transformer]);
+
+      editor.update(() => {
+        const root = $getRoot();
+        root.clear();
+        const p = $createParagraphNode();
+        const text = $createTextNode('');
+        p.append(text);
+        root.append(p);
+        text.select(0, 0);
+      });
+
+      for (const character of '\t\t\t[] ') {
+        editor.update(
+          () => {
+            const selection = $getSelection();
+            if ($isRangeSelection(selection)) {
+              selection.insertText(character);
+            }
+          },
+          {discrete: true},
+        );
+        await setImmediatePromise();
+      }
+
+      return extractChecklistStats(JSON.parse(JSON.stringify(editor.getEditorState().toJSON())))
+        .checklistTotal;
+    }
+
+    const flatTotal = await typeShortcut(CHECK_LIST_FLAT_TABS);
+    const stockTotal = await typeShortcut(CHECK_LIST);
+    expect(flatTotal).toBe(1);
+    expect(stockTotal).toBeGreaterThan(flatTotal);
   });
 });
