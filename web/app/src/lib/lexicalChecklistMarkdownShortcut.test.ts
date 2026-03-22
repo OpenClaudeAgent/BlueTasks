@@ -11,7 +11,8 @@ import {
   ParagraphNode,
   TextNode,
 } from 'lexical';
-import {CHECK_LIST, registerMarkdownShortcuts} from '@lexical/markdown';
+import {registerMarkdownShortcuts} from '@lexical/markdown';
+import {CHECK_LIST_FLAT_TABS} from './lexicalMarkdownCheckListFlatTabs';
 import {$isListNode, ListItemNode, ListNode, registerCheckList, registerList} from '@lexical/list';
 
 /**
@@ -29,7 +30,7 @@ describe('Checklist markdown shortcut `[] `', () => {
 
     registerList(editor);
     registerCheckList(editor);
-    registerMarkdownShortcuts(editor, [CHECK_LIST]);
+    registerMarkdownShortcuts(editor, [CHECK_LIST_FLAT_TABS]);
 
     editor.update(() => {
       const root = $getRoot();

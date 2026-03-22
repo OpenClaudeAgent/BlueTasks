@@ -1,4 +1,4 @@
-import {CHECK_LIST} from '@lexical/markdown';
+import {CHECK_LIST_FLAT_TABS} from './lexicalMarkdownCheckListFlatTabs';
 import {
   $getSelection,
   $isParagraphNode,
@@ -22,7 +22,7 @@ type CheckListElementTransformer = {
   ) => void;
 };
 
-const CHECK = CHECK_LIST as unknown as CheckListElementTransformer;
+const CHECK = CHECK_LIST_FLAT_TABS as unknown as CheckListElementTransformer;
 
 /**
  * Lexical's `registerMarkdownShortcuts` skips element transformers when the caret jumps by more

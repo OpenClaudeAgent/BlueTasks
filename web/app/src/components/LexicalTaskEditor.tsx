@@ -38,7 +38,7 @@ import {
 import {AutoLinkNode, LinkNode} from '@lexical/link';
 import {CodeNode, $createCodeNode} from '@lexical/code';
 import {$setBlocksType} from '@lexical/selection';
-import {CHECK_LIST, TRANSFORMERS} from '@lexical/markdown';
+import {TRANSFORMERS} from '@lexical/markdown';
 import {LEXICAL_AUTO_LINK_MATCHERS} from '../lib/lexicalAutoLinkMatchers';
 import {MARKDOWN_HORIZONTAL_RULE} from '../lib/lexicalMarkdownHorizontalRule';
 import {
@@ -72,13 +72,14 @@ import {
   type EditorChangePayload,
 } from '../lib/editorState';
 import {registerCheckListAtomicCatchUp} from '../lib/lexicalCheckListAtomicCatchUp';
-import {registerChecklistEmptyEnterNewItem} from '../lib/lexicalChecklistEmptyEnterNewItem';
+import {registerCheckListRichEmptyParagraphExit} from '../lib/lexicalCheckListRichEmptyParagraphExit';
 import {registerParagraphLeadingTabCoalesce} from '../lib/lexicalParagraphLeadingTabCoalesce';
+import {CHECK_LIST_FLAT_TABS} from '../lib/lexicalMarkdownCheckListFlatTabs';
 import {registerTaskEditorTabCommands} from '../lib/lexicalTaskEditorTabCommands';
 import {TaskImageNode} from '../lib/lexicalTaskImageNode';
 import {registerTaskImagePaste} from '../lib/lexicalTaskImagePaste';
 
-const MARKDOWN_TRANSFORMERS = [CHECK_LIST, MARKDOWN_HORIZONTAL_RULE, ...TRANSFORMERS];
+const MARKDOWN_TRANSFORMERS = [CHECK_LIST_FLAT_TABS, MARKDOWN_HORIZONTAL_RULE, ...TRANSFORMERS];
 
 type Props = {
   value: string;
@@ -182,7 +183,7 @@ export function LexicalTaskEditor({value, placeholder, onChange, labels}: Props)
           <CheckListPlugin />
           <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} />
           <CheckListAtomicCatchUpPlugin />
-          <ChecklistEmptyEnterNewItemPlugin />
+          <CheckListRichEmptyParagraphExitPlugin />
           <LinkPlugin />
           <ClickableLinkPlugin newTab />
           <AutoLinkPlugin matchers={LEXICAL_AUTO_LINK_MATCHERS} />
@@ -223,18 +224,18 @@ function CheckListAtomicCatchUpPlugin() {
   return null;
 }
 
-function InsertTabAsTextPlugin() {
+function CheckListRichEmptyParagraphExitPlugin() {
   const [editor] = useLexicalComposerContext();
 
-  useLayoutEffect(() => registerTaskEditorTabCommands(editor), [editor]);
+  useEffect(() => registerCheckListRichEmptyParagraphExit(editor), [editor]);
 
   return null;
 }
 
-function ChecklistEmptyEnterNewItemPlugin() {
+function InsertTabAsTextPlugin() {
   const [editor] = useLexicalComposerContext();
 
-  useEffect(() => registerChecklistEmptyEnterNewItem(editor), [editor]);
+  useLayoutEffect(() => registerTaskEditorTabCommands(editor), [editor]);
 
   return null;
 }

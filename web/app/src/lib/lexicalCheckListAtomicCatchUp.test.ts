@@ -12,7 +12,8 @@ import {
   ParagraphNode,
   TextNode,
 } from 'lexical';
-import {CHECK_LIST, registerMarkdownShortcuts} from '@lexical/markdown';
+import {registerMarkdownShortcuts} from '@lexical/markdown';
+import {CHECK_LIST_FLAT_TABS} from './lexicalMarkdownCheckListFlatTabs';
 import {
   $isListNode,
   ListItemNode,
@@ -21,7 +22,6 @@ import {
   registerList,
 } from '@lexical/list';
 import {registerCheckListAtomicCatchUp} from './lexicalCheckListAtomicCatchUp';
-import {registerChecklistEmptyEnterNewItem} from './lexicalChecklistEmptyEnterNewItem';
 
 describe('registerCheckListAtomicCatchUp', () => {
   it('turns `[] ` into a check list when the trigger is inserted in a single update', async () => {
@@ -34,7 +34,7 @@ describe('registerCheckListAtomicCatchUp', () => {
 
     registerList(editor);
     registerCheckList(editor);
-    registerMarkdownShortcuts(editor, [CHECK_LIST]);
+    registerMarkdownShortcuts(editor, [CHECK_LIST_FLAT_TABS]);
     registerCheckListAtomicCatchUp(editor);
 
     editor.update(() => {
@@ -70,7 +70,7 @@ describe('registerCheckListAtomicCatchUp', () => {
 
     registerList(editor);
     registerCheckList(editor);
-    registerMarkdownShortcuts(editor, [CHECK_LIST]);
+    registerMarkdownShortcuts(editor, [CHECK_LIST_FLAT_TABS]);
     registerCheckListAtomicCatchUp(editor);
 
     editor.update(() => {
@@ -105,7 +105,7 @@ describe('registerCheckListAtomicCatchUp', () => {
     });
   });
 
-  it('turns `[] ` on a new checklist row after Enter (discrete typing)', async () => {
+  it('after `[] ` and Enter on empty checklist row, discrete `[] ` still becomes a checklist (new list)', async () => {
     const onError = vi.fn();
     const editor = createEditor({
       namespace: 'test-checklist-atomic-enter',
@@ -115,9 +115,8 @@ describe('registerCheckListAtomicCatchUp', () => {
 
     registerList(editor);
     registerCheckList(editor);
-    registerMarkdownShortcuts(editor, [CHECK_LIST]);
+    registerMarkdownShortcuts(editor, [CHECK_LIST_FLAT_TABS]);
     registerCheckListAtomicCatchUp(editor);
-    registerChecklistEmptyEnterNewItem(editor);
 
     editor.update(() => {
       const root = $getRoot();
@@ -168,7 +167,7 @@ describe('registerCheckListAtomicCatchUp', () => {
       expect($isListNode(list)).toBe(true);
       const checkList = list as ListNode;
       expect(checkList.getListType()).toBe('check');
-      expect(checkList.getChildrenSize()).toBe(2);
+      expect(checkList.getChildrenSize()).toBe(1);
     });
   });
 });

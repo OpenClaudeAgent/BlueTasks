@@ -21,19 +21,21 @@ import {
   registerCheckList,
   registerList,
 } from '@lexical/list';
-import {registerChecklistEmptyEnterNewItem} from './lexicalChecklistEmptyEnterNewItem';
 
-describe('registerChecklistEmptyEnterNewItem', () => {
-  it('Given empty checklist row When INSERT_PARAGRAPH Then inserts a second checkbox item in the same list', async () => {
+/**
+ * Checklists use the same ListPlugin INSERT_PARAGRAPH path as bullets: Enter on an empty row
+ * exits the list into a paragraph (no custom handler that forces another checkbox row).
+ */
+describe('checklist empty row + Enter exits list (Lexical ListPlugin)', () => {
+  it('Given empty checklist row When INSERT_PARAGRAPH Then creates a paragraph after the list (list removed if it was the only empty item)', async () => {
     const onError = vi.fn();
     const editor = createEditor({
-      namespace: 'test-check-empty-enter',
+      namespace: 'test-check-empty-enter-exit',
       nodes: [ParagraphNode, TextNode, ListNode, ListItemNode],
       onError,
     });
     registerList(editor);
     registerCheckList(editor);
-    const unregister = registerChecklistEmptyEnterNewItem(editor);
 
     editor.update(() => {
       const root = $getRoot();
@@ -54,17 +56,13 @@ describe('registerChecklistEmptyEnterNewItem', () => {
 
     editor.getEditorState().read(() => {
       const root = $getRoot();
-      const list = root.getFirstChildOrThrow();
-      expect($isListNode(list)).toBe(true);
-      const checkList = list as ListNode;
-      expect(checkList.getListType()).toBe('check');
-      expect(checkList.getChildrenSize()).toBe(2);
+      const first = root.getFirstChildOrThrow();
+      expect($isListNode(first)).toBe(false);
+      expect(first.getType()).toBe('paragraph');
     });
-
-    unregister();
   });
 
-  it('Given bullet list When empty item Then checklist handler leaves list plugin to handle paragraph', async () => {
+  it('Given bullet list When empty item Then INSERT_PARAGRAPH still exits to paragraph', async () => {
     const editor = createEditor({
       namespace: 'test-check-empty-enter-bullet',
       nodes: [ParagraphNode, TextNode, ListNode, ListItemNode],
@@ -72,7 +70,6 @@ describe('registerChecklistEmptyEnterNewItem', () => {
     });
     registerList(editor);
     registerCheckList(editor);
-    registerChecklistEmptyEnterNewItem(editor);
 
     editor.update(() => {
       const root = $getRoot();
@@ -106,7 +103,6 @@ describe('registerChecklistEmptyEnterNewItem', () => {
     });
     registerList(editor);
     registerCheckList(editor);
-    registerChecklistEmptyEnterNewItem(editor);
 
     editor.update(() => {
       const root = $getRoot();
@@ -126,7 +122,7 @@ describe('registerChecklistEmptyEnterNewItem', () => {
     await setImmediatePromise();
   });
 
-  it('Given empty listitem with element selection When INSERT_PARAGRAPH Then adds a sibling row', async () => {
+  it('Given empty listitem with element selection When INSERT_PARAGRAPH Then exits list', async () => {
     const editor = createEditor({
       namespace: 'test-check-empty-enter-element',
       nodes: [ParagraphNode, TextNode, ListNode, ListItemNode],
@@ -134,7 +130,6 @@ describe('registerChecklistEmptyEnterNewItem', () => {
     });
     registerList(editor);
     registerCheckList(editor);
-    registerChecklistEmptyEnterNewItem(editor);
 
     editor.update(() => {
       const root = $getRoot();
@@ -154,13 +149,13 @@ describe('registerChecklistEmptyEnterNewItem', () => {
     await setImmediatePromise();
 
     editor.getEditorState().read(() => {
-      const list = $getRoot().getFirstChildOrThrow() as ListNode;
-      expect($isListNode(list)).toBe(true);
-      expect((list as ListNode).getChildrenSize()).toBe(2);
+      const first = $getRoot().getFirstChildOrThrow();
+      expect($isListNode(first)).toBe(false);
+      expect(first.getType()).toBe('paragraph');
     });
   });
 
-  it('Given checklist row with non-empty text When INSERT_PARAGRAPH Then checklist handler returns false', async () => {
+  it('Given checklist row with non-empty text When INSERT_PARAGRAPH Then list handler returns false', async () => {
     const editor = createEditor({
       namespace: 'test-check-empty-enter-text',
       nodes: [ParagraphNode, TextNode, ListNode, ListItemNode],
@@ -168,7 +163,6 @@ describe('registerChecklistEmptyEnterNewItem', () => {
     });
     registerList(editor);
     registerCheckList(editor);
-    registerChecklistEmptyEnterNewItem(editor);
 
     editor.update(() => {
       const root = $getRoot();

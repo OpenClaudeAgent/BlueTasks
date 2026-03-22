@@ -12,11 +12,10 @@ import {
   type LexicalNode,
 } from 'lexical';
 import {$isHeadingNode, $isQuoteNode} from '@lexical/rich-text';
-import {$isListItemNode} from '@lexical/list';
+import {$isListItemNode, $isListNode} from '@lexical/list';
 import {$isCodeNode} from '@lexical/code';
 import {$isTableCellNode} from '@lexical/table';
 import {$findMatchingParent, $getNearestBlockElementAncestorOrThrow} from '@lexical/utils';
-import {$tryIndentChecklistItemFromTab} from './lexicalChecklistTabIndent';
 
 /**
  * Lexical's TabIndentation extension maps Tab to INDENT_CONTENT_COMMAND at block start when
@@ -24,8 +23,8 @@ import {$tryIndentChecklistItemFromTab} from './lexicalChecklistTabIndent';
  * that need a literal `\t` (e.g. `[] ` → checklist) break. We force INSERT_TAB for paragraph /
  * heading / quote (KEY_TAB at CRITICAL) when not inside a list row.
  *
- * Checklist rows use ListItemNode.setIndent via `$tryIndentChecklistItemFromTab` (before TabIndentation
- * can turn Tab into INDENT on an inner Paragraph inside a list item).
+ * Inside a checklist row, Tab must not reach TabIndentationPlugin (INDENT on inner Paragraph).
+ * We route Tab to INSERT_TAB (literal U+0009 in text) instead.
  *
  * Default INSERT_TAB inserts a TabNode; we insert U+0009 into the TextNode instead.
  */
@@ -83,9 +82,13 @@ export function registerTaskEditorTabCommands(editor: LexicalEditor): () => void
         if (block !== null && $isCodeNode(block)) {
           return false;
         }
-        if ($tryIndentChecklistItemFromTab()) {
-          event.preventDefault();
-          return true;
+        const checklistItem = $findMatchingParent(anchorNode, $isListItemNode);
+        if (checklistItem !== null) {
+          const listNode = checklistItem.getParent();
+          if ($isListNode(listNode) && listNode.getListType() === 'check') {
+            event.preventDefault();
+            return editor.dispatchCommand(INSERT_TAB_COMMAND, undefined);
+          }
         }
         if (!$shouldForceLiteralTabForMarkdownShortcuts(selection)) {
           return false;
@@ -108,19 +111,12 @@ export function registerTaskEditorTabCommands(editor: LexicalEditor): () => void
         }
 
         if ($isListItemNode(anchorNode)) {
-          if ($tryIndentChecklistItemFromTab()) {
-            return true;
-          }
           return false;
         }
 
         const textBlock = $findMatchingParent(anchorNode, (n) => $isElementNode(n) && !n.isInline());
         if (textBlock !== null && $isCodeNode(textBlock)) {
           return false;
-        }
-
-        if ($tryIndentChecklistItemFromTab()) {
-          return true;
         }
 
         if ($isTextNode(anchorNode)) {

@@ -34,9 +34,8 @@ function tabKeyEvent(): KeyboardEvent {
   return {preventDefault: vi.fn(), shiftKey: false} as unknown as KeyboardEvent;
 }
 
-/** Regression suite for task editor Tab: KEY_TAB runs checklist indent before Lexical TabIndentation. */
 describe('registerTaskEditorTabCommands', () => {
-  it('Given second checklist row When KEY_TAB Then nests under the first row', async () => {
+  it('Given second checklist row When KEY_TAB Then inserts literal tab (no TabIndentation nest)', async () => {
     const onError = vi.fn();
     const editor = createEditor({
       namespace: 'task-tab-key-check',
@@ -73,10 +72,11 @@ describe('registerTaskEditorTabCommands', () => {
       expect($isListNode(topList)).toBe(true);
       expect(topList.getChildrenSize()).toBe(2);
       const secondLi = topList.getChildAtIndex(1);
-      const nested = secondLi?.getFirstChild();
-      expect(nested).not.toBeNull();
-      expect($isListNode(nested)).toBe(true);
-      expect((nested as ListNode).getListType()).toBe('check');
+      expect(secondLi).not.toBeNull();
+      expect(secondLi!.getTextContent()).toContain('\t');
+      for (const child of secondLi!.getChildren()) {
+        expect($isListNode(child)).toBe(false);
+      }
     });
   });
 
@@ -109,7 +109,7 @@ describe('registerTaskEditorTabCommands', () => {
     });
   });
 
-  it('Given second checklist row When INSERT_TAB only Then nests (TabIndentation-style path)', async () => {
+  it('Given second checklist row When INSERT_TAB on TextNode Then inserts literal tab (no nesting)', async () => {
     const editor = createEditor({
       namespace: 'task-tab-insert-check',
       nodes: [ParagraphNode, TextNode, ListNode, ListItemNode],
@@ -137,11 +137,12 @@ describe('registerTaskEditorTabCommands', () => {
 
     editor.getEditorState().read(() => {
       const secondLi = ($getRoot().getFirstChildOrThrow() as ListNode).getChildAtIndex(1);
-      expect($isListNode(secondLi?.getFirstChild())).toBe(true);
+      expect(secondLi?.getTextContent()).toBe('\t');
+      expect($isListNode(secondLi?.getFirstChild())).toBe(false);
     });
   });
 
-  it('Given empty checklist row with element selection When KEY_TAB Then nests', async () => {
+  it('Given empty checklist row with element selection When KEY_TAB Then returns false (no nesting)', async () => {
     const editor = createEditor({
       namespace: 'task-tab-key-element',
       nodes: [ParagraphNode, TextNode, ListNode, ListItemNode],
@@ -164,14 +165,14 @@ describe('registerTaskEditorTabCommands', () => {
       range.anchor.set(b.getKey(), 0, 'element');
       range.focus.set(b.getKey(), 0, 'element');
       $setSelection(range);
-      expect(editor.dispatchCommand(KEY_TAB_COMMAND, tabKeyEvent())).toBe(true);
+      expect(editor.dispatchCommand(KEY_TAB_COMMAND, tabKeyEvent())).toBe(false);
     });
 
     await setImmediatePromise();
 
     editor.getEditorState().read(() => {
       const secondLi = ($getRoot().getFirstChildOrThrow() as ListNode).getChildAtIndex(1);
-      expect($isListNode(secondLi?.getFirstChild())).toBe(true);
+      expect(secondLi?.getChildrenSize()).toBe(0);
     });
   });
 
