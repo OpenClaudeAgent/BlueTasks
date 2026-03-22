@@ -126,7 +126,9 @@ test.describe('API (production server)', () => {
     });
   }
 
-  test('POST /api/categories returns 201; row appears on GET; DELETE returns 204', async ({request}) => {
+  test('POST /api/categories returns 201; row appears on GET; DELETE returns 204', async ({
+    request,
+  }) => {
     const post = await request.post('/api/categories', {
       data: {name: '  API category  ', icon: 'folder'},
     });

@@ -19,9 +19,9 @@ describe('contract task-board-filter', () => {
     it('matches uncategorized', () => {
       const task = {categoryId: null, status: 'pending' as const, taskDate: null};
       expect(taskMatchesCategoryFilterRow(task, FILTER_CATEGORY_UNCATEGORIZED)).toBe(true);
-      expect(taskMatchesCategoryFilterRow({...task, categoryId: 'z'}, FILTER_CATEGORY_UNCATEGORIZED)).toBe(
-        false,
-      );
+      expect(
+        taskMatchesCategoryFilterRow({...task, categoryId: 'z'}, FILTER_CATEGORY_UNCATEGORIZED),
+      ).toBe(false);
     });
 
     it('matches specific category id', () => {
@@ -60,12 +60,12 @@ describe('contract task-board-filter', () => {
       expect(
         getTaskSectionBucket({status: 'completed', taskDate: today, categoryId: null}, today),
       ).toBe('done');
-      expect(getTaskSectionBucket({status: 'pending', taskDate: null, categoryId: null}, today)).toBe(
-        'anytime',
-      );
-      expect(getTaskSectionBucket({status: 'pending', taskDate: today, categoryId: null}, today)).toBe(
-        'today',
-      );
+      expect(
+        getTaskSectionBucket({status: 'pending', taskDate: null, categoryId: null}, today),
+      ).toBe('anytime');
+      expect(
+        getTaskSectionBucket({status: 'pending', taskDate: today, categoryId: null}, today),
+      ).toBe('today');
       expect(
         getTaskSectionBucket({status: 'pending', taskDate: '2099-01-01', categoryId: null}, today),
       ).toBe('upcoming');

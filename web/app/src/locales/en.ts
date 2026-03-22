@@ -20,7 +20,8 @@ export default {
   settingsNoCategoriesYet: 'No categories yet — add one above.',
   settingsCategoryTaskCount: '{{count}} tasks',
   settingsDeleteCategoryConfirm: 'Delete category "{{name}}"?',
-  settingsDeleteCategoryWithTasks: 'Delete category "{{name}}"? {{count}} task(s) will become unassigned.',
+  settingsDeleteCategoryWithTasks:
+    'Delete category "{{name}}"? {{count}} task(s) will become unassigned.',
   settingsRenameCategory: 'Rename category',
   settingsNavLabel: 'Settings sections',
   settingsSectionGeneral: 'General',

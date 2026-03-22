@@ -1,4 +1,8 @@
-import {CATEGORY_ICON_IDS, type CategoryIconId, getCategoryIconComponent} from '../lib/categoryIcons';
+import {
+  CATEGORY_ICON_IDS,
+  type CategoryIconId,
+  getCategoryIconComponent,
+} from '../lib/categoryIcons';
 
 type CategoryIconPickerProps = {
   value: CategoryIconId;
@@ -7,7 +11,12 @@ type CategoryIconPickerProps = {
   labelledBy: string;
 };
 
-export function CategoryIconPicker({value, onChange, disabled, labelledBy}: CategoryIconPickerProps) {
+export function CategoryIconPicker({
+  value,
+  onChange,
+  disabled,
+  labelledBy,
+}: CategoryIconPickerProps) {
   return (
     <div aria-labelledby={labelledBy} className="categoryIconPicker" role="group">
       {CATEGORY_ICON_IDS.map((id) => {

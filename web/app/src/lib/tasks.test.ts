@@ -269,7 +269,9 @@ describe('filterTasks', () => {
       {...createTask('Sans zone'), id: 'b', taskDate: today, categoryId: null},
     ];
     expect(filterTasks(tasks, 'today', z1).map((t) => t.id)).toEqual(['a']);
-    expect(filterTasks(tasks, 'today', CATEGORY_FILTER_UNCATEGORIZED).map((t) => t.id)).toEqual(['b']);
+    expect(filterTasks(tasks, 'today', CATEGORY_FILTER_UNCATEGORIZED).map((t) => t.id)).toEqual([
+      'b',
+    ]);
   });
 
   it('all section lists every task in category including completed, sorted', () => {
@@ -277,7 +279,13 @@ describe('filterTasks', () => {
     const z = 'zone-all';
     const tasks = [
       {...createTask('Open'), id: 'o', taskDate: today, categoryId: z, status: 'pending' as const},
-      {...createTask('Closed'), id: 'c', taskDate: today, categoryId: z, status: 'completed' as const},
+      {
+        ...createTask('Closed'),
+        id: 'c',
+        taskDate: today,
+        categoryId: z,
+        status: 'completed' as const,
+      },
       {
         ...createTask('Other zone'),
         id: 'x',
@@ -305,7 +313,9 @@ describe('getCategorySidebarCounts', () => {
     const section = 'today' as const;
     const got = getCategorySidebarCounts(tasks, section, categories);
     expect(got.all).toBe(filterTasks(tasks, section, CATEGORY_FILTER_ALL).length);
-    expect(got.uncategorized).toBe(filterTasks(tasks, section, CATEGORY_FILTER_UNCATEGORIZED).length);
+    expect(got.uncategorized).toBe(
+      filterTasks(tasks, section, CATEGORY_FILTER_UNCATEGORIZED).length,
+    );
     expect(got.byId[z1]).toBe(filterTasks(tasks, section, z1).length);
   });
 });

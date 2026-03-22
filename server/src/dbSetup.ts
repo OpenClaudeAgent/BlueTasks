@@ -79,9 +79,9 @@ function migrationV1(database: Database.Database) {
 
 /** Bases encore sur le schéma SQLite v1 : renommage physique vers catégories. */
 function migrationV2LegacyRename(database: Database.Database) {
-  const tables = database
-    .prepare(`SELECT name FROM sqlite_master WHERE type = 'table'`)
-    .all() as {name: string}[];
+  const tables = database.prepare(`SELECT name FROM sqlite_master WHERE type = 'table'`).all() as {
+    name: string;
+  }[];
   const tableNames = new Set(tables.map((t) => t.name));
   if (tableNames.has(SQLITE_V1_CATEGORY_TABLE) && !tableNames.has('categories')) {
     database.exec(`ALTER TABLE ${SQLITE_V1_CATEGORY_TABLE} RENAME TO categories`);
@@ -143,7 +143,9 @@ export function removeSqliteSidecars(dbPath: string): void {
 /** Vérifie que les tables BlueTasks existent (après migrations). */
 export function assertBluetasksDatabase(database: Database.Database): void {
   const rows = database
-    .prepare(`SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('tasks', 'categories')`)
+    .prepare(
+      `SELECT name FROM sqlite_master WHERE type = 'table' AND name IN ('tasks', 'categories')`,
+    )
     .all() as {name: string}[];
   const names = new Set(rows.map((r) => r.name));
   if (!names.has('tasks') || !names.has('categories')) {

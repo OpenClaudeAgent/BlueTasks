@@ -14,7 +14,8 @@ export default {
   settingsCategoriesIntro:
     'Maak categorieën (projecten, levensdomeinen, enz.) en wijs taken toe. Filter via de zijbalk.',
   settingsCategoryIconLabel: 'Pictogram',
-  settingsCategoryIconHint: 'Kies een pictogram. Je kunt het wijzigen bij het bewerken van de categorie.',
+  settingsCategoryIconHint:
+    'Kies een pictogram. Je kunt het wijzigen bij het bewerken van de categorie.',
   settingsNewCategoryPlaceholder: 'Naam nieuwe categorie',
   settingsAddCategory: 'Toevoegen',
   settingsNoCategoriesYet: 'Nog geen categorieën — voeg er hierboven een toe.',

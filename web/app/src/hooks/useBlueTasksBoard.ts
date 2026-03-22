@@ -97,7 +97,10 @@ export function useBlueTasksBoard() {
   }, [setTitleFocusTaskId]);
 
   useEffect(() => {
-    if (categoryFilter === CATEGORY_FILTER_ALL || categoryFilter === CATEGORY_FILTER_UNCATEGORIZED) {
+    if (
+      categoryFilter === CATEGORY_FILTER_ALL ||
+      categoryFilter === CATEGORY_FILTER_UNCATEGORIZED
+    ) {
       return;
     }
     if (!categories.some((c) => c.id === categoryFilter)) {

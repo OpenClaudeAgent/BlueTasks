@@ -32,7 +32,11 @@ export function TaskCardFooterCategoryPicker({
   return (
     <Popover.Root onOpenChange={setOpen} open={open}>
       <Popover.Trigger asChild>
-        <button className="taskCard__footerCategoryTrigger" title={t('categoryLabel')} type="button">
+        <button
+          className="taskCard__footerCategoryTrigger"
+          title={t('categoryLabel')}
+          type="button"
+        >
           <CategoryGlyph aria-hidden size={14} strokeWidth={2} />
           <span className="taskCard__footerCategoryTriggerText">{footerLabel}</span>
         </button>

@@ -63,7 +63,10 @@ test.describe('Accessibility (axe)', () => {
     await expectNoAxeViolations(page);
   });
 
-  test('Settings dialog (Categories, empty list) has no axe violations', async ({page, request}) => {
+  test('Settings dialog (Categories, empty list) has no axe violations', async ({
+    page,
+    request,
+  }) => {
     await resetBoard(page, request);
     await page.getByRole('button', {name: 'Settings'}).click();
     const dialog = page.getByRole('dialog', {name: 'Settings'});
@@ -83,7 +86,9 @@ test.describe('Accessibility (axe)', () => {
     const categoryName = `A11y category ${Date.now()}`;
     const postCategory = page.waitForResponse(
       (r) =>
-        r.url().includes('/api/categories') && r.request().method() === 'POST' && r.status() === 201,
+        r.url().includes('/api/categories') &&
+        r.request().method() === 'POST' &&
+        r.status() === 201,
     );
     await dialog.getByPlaceholder('New category name').fill(categoryName);
     await dialog.getByRole('button', {name: 'Add'}).click();

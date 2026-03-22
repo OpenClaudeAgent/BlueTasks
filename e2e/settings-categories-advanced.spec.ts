@@ -76,7 +76,9 @@ test.describe('Settings: categories CRUD', () => {
     page,
     request,
   }) => {
-    const categoryRes = await request.post('/api/categories', {data: {name: 'WithTasks', icon: 'folder'}});
+    const categoryRes = await request.post('/api/categories', {
+      data: {name: 'WithTasks', icon: 'folder'},
+    });
     const category = (await categoryRes.json()) as {id: string};
     await request.post('/api/tasks', {data: {title: 'Linked', categoryId: category.id}});
 

@@ -18,7 +18,9 @@ test.describe('Category filters', () => {
     page,
     request,
   }) => {
-    const categoryRes = await request.post('/api/categories', {data: {name: 'Work Zone', icon: 'folder'}});
+    const categoryRes = await request.post('/api/categories', {
+      data: {name: 'Work Zone', icon: 'folder'},
+    });
     expect(categoryRes.ok()).toBe(true);
     const category = (await categoryRes.json()) as {id: string};
     await reloadPageAfterApiSeed(page);
@@ -39,7 +41,10 @@ test.describe('Category filters', () => {
     await request.delete(`/api/categories/${category.id}`);
   });
 
-  test('user selects a named category and only tasks in that category appear', async ({page, request}) => {
+  test('user selects a named category and only tasks in that category appear', async ({
+    page,
+    request,
+  }) => {
     const categoryRes = await request.post('/api/categories', {
       data: {name: 'Project X', icon: 'briefcase'},
     });
@@ -62,7 +67,10 @@ test.describe('Category filters', () => {
     await request.delete(`/api/categories/${category.id}`);
   });
 
-  test('user returns to All categories and sees full section list again', async ({page, request}) => {
+  test('user returns to All categories and sees full section list again', async ({
+    page,
+    request,
+  }) => {
     const categoryRes = await request.post('/api/categories', {data: {name: 'Z', icon: 'folder'}});
     const category = (await categoryRes.json()) as {id: string};
     await reloadPageAfterApiSeed(page);

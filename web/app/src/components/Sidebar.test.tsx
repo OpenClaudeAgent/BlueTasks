@@ -117,7 +117,9 @@ describe('Feature: Sidebar', () => {
       </I18nextProvider>,
     );
     const group = screen.getByRole('group', {name: /categories/i});
-    await user.click(within(group).getByRole('button', {name: (n) => n.startsWith('All categories')}));
+    await user.click(
+      within(group).getByRole('button', {name: (n) => n.startsWith('All categories')}),
+    );
     expect(onCategoryFilterChange).toHaveBeenCalledWith(CATEGORY_FILTER_ALL);
   });
 

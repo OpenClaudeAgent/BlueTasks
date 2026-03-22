@@ -20,7 +20,8 @@ export default {
   settingsNoCategoriesYet: 'Ainda não há categorias — adicione uma acima.',
   settingsCategoryTaskCount: '{{count}} tarefas',
   settingsDeleteCategoryConfirm: 'Eliminar a categoria «{{name}}»?',
-  settingsDeleteCategoryWithTasks: 'Eliminar a categoria «{{name}}»? {{count}} tarefa(s) ficarão sem categoria.',
+  settingsDeleteCategoryWithTasks:
+    'Eliminar a categoria «{{name}}»? {{count}} tarefa(s) ficarão sem categoria.',
   settingsRenameCategory: 'Renomear categoria',
   settingsNavLabel: 'Secções das definições',
   settingsSectionGeneral: 'Geral',

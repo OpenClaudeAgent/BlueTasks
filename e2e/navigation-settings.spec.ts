@@ -48,7 +48,9 @@ test.describe('End-to-end: navigation and settings', () => {
 
     const postCategory = page.waitForResponse(
       (r) =>
-        r.url().includes('/api/categories') && r.request().method() === 'POST' && r.status() === 201,
+        r.url().includes('/api/categories') &&
+        r.request().method() === 'POST' &&
+        r.status() === 201,
     );
     await dialog.getByPlaceholder('New category name').fill(categoryName);
     await dialog.getByRole('button', {name: 'Add'}).click();

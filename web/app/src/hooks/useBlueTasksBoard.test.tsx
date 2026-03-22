@@ -27,7 +27,13 @@ const taskToday = {...createTask('T'), id: 't1', taskDate: todayKey()};
 
 const mockCore = {
   tasks: [taskToday],
-  categories: [] as {id: string; name: string; icon: 'folder'; sortIndex: number; createdAt: string}[],
+  categories: [] as {
+    id: string;
+    name: string;
+    icon: 'folder';
+    sortIndex: number;
+    createdAt: string;
+  }[],
   savingIds: {} as Record<string, boolean>,
   refreshTasksAndCategories: vi.fn(),
   handleAddTask: vi.fn(),

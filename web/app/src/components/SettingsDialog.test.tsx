@@ -188,7 +188,10 @@ describe('SettingsDialog', () => {
     await user.clear(nameInput);
     await user.type(nameInput, 'Renamed');
     await user.click(screen.getByRole('button', {name: /^Save$/i}));
-    expect(categoriesUpdateMock).toHaveBeenCalledWith(sampleCategory.id, {name: 'Renamed', icon: 'folder'});
+    expect(categoriesUpdateMock).toHaveBeenCalledWith(sampleCategory.id, {
+      name: 'Renamed',
+      icon: 'folder',
+    });
   });
 
   it('Scenario: Categories — user deletes empty category after confirm', async () => {

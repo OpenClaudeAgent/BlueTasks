@@ -93,7 +93,8 @@ export async function createCategoryViaSettingsUi(page: Page, name: string): Pro
   await dialog.getByRole('button', {name: 'Categories'}).click();
 
   const postCategory = page.waitForResponse(
-    (r) => r.url().includes('/api/categories') && r.request().method() === 'POST' && r.status() === 201,
+    (r) =>
+      r.url().includes('/api/categories') && r.request().method() === 'POST' && r.status() === 201,
   );
   await dialog.getByPlaceholder('New category name').fill(name);
   await dialog.getByRole('button', {name: 'Add'}).click();
@@ -113,7 +114,10 @@ export async function createCategoryViaSettingsUi(page: Page, name: string): Pro
 export async function expandTaskCardIfCollapsed(page: Page, title: string): Promise<void> {
   const card = taskCardByTitle(page, title);
   const categoryTrigger = card.locator('.taskCard__footerCategoryTrigger');
-  if ((await categoryTrigger.count()) === 0 || !(await categoryTrigger.isVisible().catch(() => false))) {
+  if (
+    (await categoryTrigger.count()) === 0 ||
+    !(await categoryTrigger.isVisible().catch(() => false))
+  ) {
     const collapsedTitle = card.getByRole('button', {name: title, exact: true});
     if ((await collapsedTitle.count()) > 0) {
       await collapsedTitle.click();

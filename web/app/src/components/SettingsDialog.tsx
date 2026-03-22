@@ -3,7 +3,11 @@ import * as Dialog from '@radix-ui/react-dialog';
 import {Database, FolderOpen, Globe, Pencil, Plus, Settings, Trash2, X} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {categoriesApi, downloadDatabaseExport, uploadDatabaseImport} from '../api';
-import {DEFAULT_CATEGORY_ICON, type CategoryIconId, getCategoryIconComponent} from '../lib/categoryIcons';
+import {
+  DEFAULT_CATEGORY_ICON,
+  type CategoryIconId,
+  getCategoryIconComponent,
+} from '../lib/categoryIcons';
 import type {Category} from '../types';
 import {CategoryIconPicker} from './CategoryIconPicker';
 import {normalizeUiLanguageCode} from '../locales/uiLanguages';

@@ -34,13 +34,13 @@ This document matches the current SQLite schema and API task shape. See [`server
 
 ## `categories` table
 
-| Field        | Type    | Notes                                                  |
-| ------------ | ------- | ------------------------------------------------------ |
-| `id`         | string  | Primary key                                            |
-| `name`       | string  | Required                                               |
-| `sort_index` | integer | Sidebar order                                          |
+| Field        | Type    | Notes                                                   |
+| ------------ | ------- | ------------------------------------------------------- |
+| `id`         | string  | Primary key                                             |
+| `name`       | string  | Required                                                |
+| `sort_index` | integer | Sidebar order                                           |
 | `icon`       | string  | Must be an id from `server/data/category-icon-ids.json` |
-| `created_at` | string  | ISO                                                    |
+| `created_at` | string  | ISO                                                     |
 
 Categories group tasks for filtering in the sidebar (**All categories**, **Unassigned**, or a specific category). Persisted in the `categories` table; tasks reference `categoryId`.
 

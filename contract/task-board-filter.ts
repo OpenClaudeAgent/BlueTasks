@@ -18,7 +18,10 @@ export type BoardFilterTask = {
   categoryId: string | null;
 };
 
-export function taskMatchesCategoryFilterRow(task: BoardFilterTask, categoryFilter: string): boolean {
+export function taskMatchesCategoryFilterRow(
+  task: BoardFilterTask,
+  categoryFilter: string,
+): boolean {
   if (categoryFilter === FILTER_CATEGORY_ALL) {
     return true;
   }

@@ -19,7 +19,9 @@ test.describe('Assign task to category', () => {
     page,
     request,
   }) => {
-    const categoryRes = await request.post('/api/categories', {data: {name: 'My Category', icon: 'heart'}});
+    const categoryRes = await request.post('/api/categories', {
+      data: {name: 'My Category', icon: 'heart'},
+    });
     expect(categoryRes.ok()).toBe(true);
     const {id: categoryId} = (await categoryRes.json()) as {id: string};
     await reloadPageAfterApiSeed(page);
@@ -37,7 +39,9 @@ test.describe('Assign task to category', () => {
   });
 
   test('user moves task back to “No category”', async ({page, request}) => {
-    const categoryRes = await request.post('/api/categories', {data: {name: 'Temp', icon: 'folder'}});
+    const categoryRes = await request.post('/api/categories', {
+      data: {name: 'Temp', icon: 'folder'},
+    });
     expect(categoryRes.ok()).toBe(true);
     await reloadPageAfterApiSeed(page);
 

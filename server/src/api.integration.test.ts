@@ -254,7 +254,9 @@ describe('API HTTP', () => {
   it('PUT /api/categories/:id accepts explicit icon', async () => {
     const created = await request(app).post('/api/categories').send({name: 'Gamma'});
     const id = created.body.id as string;
-    const put = await request(app).put(`/api/categories/${id}`).send({name: 'Gamma2', icon: 'folder'});
+    const put = await request(app)
+      .put(`/api/categories/${id}`)
+      .send({name: 'Gamma2', icon: 'folder'});
     expect(put.status).toBe(200);
     expect(put.body).toEqual(
       expect.objectContaining({
@@ -289,7 +291,9 @@ describe('API HTTP', () => {
 
     const tasks = await request(app).get('/api/tasks');
     const row = tasks.body.find((t: {id: string}) => t.id === task.body.id);
-    expect(row).toEqual(expect.objectContaining({id: task.body.id, categoryId: null, title: 'Linked'}));
+    expect(row).toEqual(
+      expect.objectContaining({id: task.body.id, categoryId: null, title: 'Linked'}),
+    );
     expectApiTaskRow(row);
   });
 
