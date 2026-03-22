@@ -8,7 +8,7 @@
     "scripts/docker-prune-native-deps.mjs"
   ],
   "ignoreDependencies": ["esbuild"],
-  "ignoreBinaries": ["shellcheck"],
+  "ignoreBinaries": ["shellcheck", "tauri"],
   "rules": {
     "exports": "error",
     "types": "off",

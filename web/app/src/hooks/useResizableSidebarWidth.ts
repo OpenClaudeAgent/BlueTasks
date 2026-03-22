@@ -1,34 +1,67 @@
-import {useCallback, useState, type PointerEvent as ReactPointerEvent} from 'react';
-
-const STORAGE_KEY = 'bluetasks.sidebarWidthPx';
-const DEFAULT_WIDTH = 248;
-const MIN_WIDTH = 200;
-const MAX_WIDTH = 480;
-
-function clamp(n: number, min: number, max: number): number {
-  return Math.min(max, Math.max(min, n));
-}
+import {useCallback, useEffect, useState, type PointerEvent as ReactPointerEvent} from 'react';
+import {
+  clampSidebarWidthPx,
+  SIDEBAR_DEFAULT_WIDTH_PX,
+  SIDEBAR_MAX_WIDTH_PX,
+  SIDEBAR_MIN_WIDTH_PX,
+  SIDEBAR_WIDTH_STORAGE_KEY,
+} from '../lib/sidebarLayout';
 
 function readStoredWidth(): number {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(SIDEBAR_WIDTH_STORAGE_KEY);
     if (raw) {
       const n = Number.parseInt(raw, 10);
       if (Number.isFinite(n)) {
-        return clamp(n, MIN_WIDTH, MAX_WIDTH);
+        return clampSidebarWidthPx(n);
       }
     }
   } catch {
     /* private mode */
   }
-  return DEFAULT_WIDTH;
+  return SIDEBAR_DEFAULT_WIDTH_PX;
+}
+
+/** Optional `?sidebarWidthPx=200` one-shot width override (e.g. demos, environments without localStorage). */
+function readQueryWidthOverride(): number | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  try {
+    const raw = new URLSearchParams(window.location.search).get('sidebarWidthPx');
+    if (!raw) {
+      return null;
+    }
+    const n = Number.parseInt(raw, 10);
+    if (!Number.isFinite(n)) {
+      return null;
+    }
+    return clampSidebarWidthPx(n);
+  } catch {
+    return null;
+  }
+}
+
+function readInitialWidth(): number {
+  return readQueryWidthOverride() ?? readStoredWidth();
 }
 
 /**
  * Persisted width (px) for the left sidebar + pointer-drag resize between sidebar and main.
  */
 export function useResizableSidebarWidth() {
-  const [width, setWidth] = useState(readStoredWidth);
+  const [width, setWidth] = useState(readInitialWidth);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('sidebarWidthPx')) {
+      return;
+    }
+    params.delete('sidebarWidthPx');
+    const qs = params.toString();
+    const next = `${window.location.pathname}${qs ? `?${qs}` : ''}${window.location.hash}`;
+    window.history.replaceState(null, '', next);
+  }, []);
 
   const onResizePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -39,7 +72,7 @@ export function useResizableSidebarWidth() {
       let ended = false;
 
       const onMove = (e: PointerEvent) => {
-        lastW = clamp(startW + (e.clientX - startX), MIN_WIDTH, MAX_WIDTH);
+        lastW = clampSidebarWidthPx(startW + (e.clientX - startX));
         setWidth(lastW);
       };
 
@@ -54,7 +87,7 @@ export function useResizableSidebarWidth() {
         document.body.style.removeProperty('cursor');
         document.body.style.removeProperty('user-select');
         try {
-          localStorage.setItem(STORAGE_KEY, String(lastW));
+          localStorage.setItem(SIDEBAR_WIDTH_STORAGE_KEY, String(lastW));
         } catch {
           /* ignore */
         }
@@ -69,5 +102,10 @@ export function useResizableSidebarWidth() {
     [width],
   );
 
-  return {sidebarWidth: width, onResizePointerDown, minWidth: MIN_WIDTH, maxWidth: MAX_WIDTH};
+  return {
+    sidebarWidth: width,
+    onResizePointerDown,
+    minWidth: SIDEBAR_MIN_WIDTH_PX,
+    maxWidth: SIDEBAR_MAX_WIDTH_PX,
+  };
 }

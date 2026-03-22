@@ -1,4 +1,3 @@
-import type {PointerEventHandler} from 'react';
 import {
   Calendar,
   CalendarClock,
@@ -12,6 +11,7 @@ import {
 } from 'lucide-react';
 import {useTranslation} from 'react-i18next';
 import {getCategoryIconComponent} from '../lib/categoryIcons';
+import {SIDEBAR_COMPACT_MAX_WIDTH_PX} from '../lib/sidebarLayout';
 import {sectionOrder} from '../lib/tasks';
 import {CATEGORY_FILTER_ALL, CATEGORY_FILTER_UNCATEGORIZED} from '../types';
 import type {Category, CategoryFilter, SectionId, TaskCounts} from '../types';
@@ -44,9 +44,6 @@ type SidebarProps = {
   categoryRowCounts: CategorySidebarCounts;
   onOpenSettings: () => void;
   sidebarWidth: number;
-  minSidebarWidth: number;
-  maxSidebarWidth: number;
-  onResizePointerDown: PointerEventHandler<HTMLDivElement>;
 };
 
 export function Sidebar({
@@ -59,17 +56,15 @@ export function Sidebar({
   categoryRowCounts,
   onOpenSettings,
   sidebarWidth,
-  minSidebarWidth,
-  maxSidebarWidth,
-  onResizePointerDown,
 }: SidebarProps) {
   const {t} = useTranslation();
+  const sidebarCompact = sidebarWidth <= SIDEBAR_COMPACT_MAX_WIDTH_PX;
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${sidebarCompact ? ' sidebar--compact' : ''}`}>
       <div className="sidebar__brand">
         <div className="sidebar__brandMark" aria-hidden="true">
-          <ListTodo size={22} strokeWidth={2.1} />
+          <ListTodo size={26} strokeWidth={2.1} />
         </div>
         <div>
           <div className="sidebar__brandName">{t('appName')}</div>
@@ -83,12 +78,15 @@ export function Sidebar({
           return (
             <button
               key={section}
+              aria-label={
+                sidebarCompact ? `${t(`sections.${section}`)}, ${counts[section]}` : undefined
+              }
               className={`sidebar__item ${selectedSection === section ? 'is-active' : ''}`}
               onClick={() => onSelect(section)}
               type="button"
             >
               <span className="sidebar__itemIcon">
-                <Icon size={18} />
+                <Icon size={22} />
               </span>
               <span className="sidebar__itemLabel">{t(`sections.${section}`)}</span>
               <span className="sidebar__itemCount">{counts[section]}</span>
@@ -102,28 +100,37 @@ export function Sidebar({
           {t('categoriesNavLabel')}
         </div>
         <div
+          aria-label={sidebarCompact ? t('categoriesNavLabel') : undefined}
+          aria-labelledby={sidebarCompact ? undefined : 'sidebar-categories-heading'}
           className="sidebar__categoriesNav"
           role="group"
-          aria-labelledby="sidebar-categories-heading"
         >
           <button
+            aria-label={
+              sidebarCompact ? `${t('categoriesAll')}, ${categoryRowCounts.all}` : undefined
+            }
             className={`sidebar__item ${categoryFilter === CATEGORY_FILTER_ALL ? 'is-active' : ''}`}
             onClick={() => onCategoryFilterChange(CATEGORY_FILTER_ALL)}
             type="button"
           >
             <span className="sidebar__itemIcon">
-              <Layers size={18} />
+              <Layers size={22} />
             </span>
             <span className="sidebar__itemLabel">{t('categoriesAll')}</span>
             <span className="sidebar__itemCount">{categoryRowCounts.all}</span>
           </button>
           <button
+            aria-label={
+              sidebarCompact
+                ? `${t('categoriesUncategorized')}, ${categoryRowCounts.uncategorized}`
+                : undefined
+            }
             className={`sidebar__item ${categoryFilter === CATEGORY_FILTER_UNCATEGORIZED ? 'is-active' : ''}`}
             onClick={() => onCategoryFilterChange(CATEGORY_FILTER_UNCATEGORIZED)}
             type="button"
           >
             <span className="sidebar__itemIcon">
-              <Folder size={18} />
+              <Folder size={22} />
             </span>
             <span className="sidebar__itemLabel">{t('categoriesUncategorized')}</span>
             <span className="sidebar__itemCount">{categoryRowCounts.uncategorized}</span>
@@ -133,12 +140,15 @@ export function Sidebar({
             return (
               <button
                 key={c.id}
+                aria-label={
+                  sidebarCompact ? `${c.name}, ${categoryRowCounts.byId[c.id] ?? 0}` : undefined
+                }
                 className={`sidebar__item ${categoryFilter === c.id ? 'is-active' : ''}`}
                 onClick={() => onCategoryFilterChange(c.id)}
                 type="button"
               >
                 <span className="sidebar__itemIcon">
-                  <CatIcon size={18} />
+                  <CatIcon size={22} />
                 </span>
                 <span className="sidebar__itemLabel">{c.name}</span>
                 <span className="sidebar__itemCount">{categoryRowCounts.byId[c.id] ?? 0}</span>
@@ -149,22 +159,16 @@ export function Sidebar({
       </div>
 
       <div className="sidebar__footer">
-        <button className="sidebar__settingsBtn" onClick={onOpenSettings} type="button">
-          <Settings aria-hidden size={18} />
+        <button
+          aria-label={sidebarCompact ? t('settingsOpen') : undefined}
+          className="sidebar__settingsBtn"
+          onClick={onOpenSettings}
+          type="button"
+        >
+          <Settings aria-hidden size={22} />
           <span>{t('settingsOpen')}</span>
         </button>
       </div>
-
-      <div
-        aria-orientation="vertical"
-        aria-label={t('sidebarResizeHandle')}
-        aria-valuemax={maxSidebarWidth}
-        aria-valuemin={minSidebarWidth}
-        aria-valuenow={Math.round(sidebarWidth)}
-        className="appShell__resizeHandle"
-        onPointerDown={onResizePointerDown}
-        role="separator"
-      />
     </aside>
   );
 }

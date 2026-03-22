@@ -117,8 +117,8 @@ button,
 
 .appShell {
   display: grid;
-  /* Default until inline style from JS (matches useResizableSidebarWidth default) */
-  grid-template-columns: 248px minmax(0, 1fr);
+  /* Default until inline style from JS (sidebar + resize lane + main; see sidebarLayout.ts) */
+  grid-template-columns: 248px 10px minmax(0, 1fr);
   min-height: 100vh;
 }
 
@@ -133,25 +133,23 @@ button,
 .appShell__sidebarColumn .sidebar {
   flex: 1;
   min-height: 0;
+  min-width: 0;
+  max-width: 100%;
 }
 
-.appShell__resizeHandle {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 6px;
-  height: 100%;
-  z-index: 3;
+.appShell__resizeLane {
+  min-width: 0;
+  min-height: 100vh;
   cursor: col-resize;
   touch-action: none;
   background: transparent;
 }
 
-.appShell__resizeHandle:hover {
+.appShell__resizeLane:hover {
   background: rgba(126, 184, 255, 0.12);
 }
 
-.appShell__resizeHandle:active {
+.appShell__resizeLane:active {
   background: rgba(126, 184, 255, 0.2);
 }
 
@@ -162,6 +160,10 @@ button,
   gap: 28px;
   padding: 24px 16px;
   min-height: 100vh;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
   background: var(--sidebar-bg);
   border-right: 1px solid var(--border);
 }
@@ -177,10 +179,10 @@ button,
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   flex-shrink: 0;
-  border-radius: 11px;
+  border-radius: 12px;
   background: var(--accent-soft);
   color: var(--accent);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
@@ -202,13 +204,17 @@ button,
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .sidebar__item {
   display: grid;
-  grid-template-columns: 32px minmax(0, 1fr) auto;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
+  min-width: 0;
+  max-width: 100%;
   padding: 10px 12px;
   border-radius: var(--radius-sm);
   text-align: left;
@@ -231,9 +237,9 @@ button,
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
   color: var(--text-secondary);
   background: rgba(255, 255, 255, 0.04);
 }
@@ -266,6 +272,8 @@ button,
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
+  max-width: 100%;
   padding-top: 4px;
   border-top: 1px solid var(--border);
 }
@@ -283,6 +291,8 @@ button,
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .sidebar__footer {
@@ -315,6 +325,170 @@ button,
   background: rgba(255, 255, 255, 0.04);
   color: var(--text);
   border-color: var(--border);
+}
+
+.sidebar.sidebar--compact {
+  gap: 8px;
+  padding: 10px 6px;
+  align-items: center;
+  overflow-x: hidden;
+  transition:
+    gap 0.2s ease,
+    padding 0.2s ease;
+}
+
+.sidebar.sidebar--compact .sidebar__brand {
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  width: auto;
+  max-width: 100%;
+  align-self: center;
+}
+
+.sidebar.sidebar--compact .sidebar__brandMark {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+.sidebar.sidebar--compact .sidebar__brandMark svg {
+  width: 21px;
+  height: 21px;
+}
+
+.sidebar.sidebar--compact .sidebar__brand > div:last-child {
+  display: none;
+}
+
+.sidebar.sidebar--compact .sidebar__nav,
+.sidebar.sidebar--compact .sidebar__categoriesNav {
+  width: auto;
+  max-width: 100%;
+  align-items: center;
+  align-self: center;
+  gap: 5px;
+}
+
+.sidebar.sidebar--compact .sidebar__categories {
+  align-items: center;
+  width: auto;
+  max-width: 100%;
+  align-self: center;
+  gap: 6px;
+  padding-top: 4px;
+}
+
+.sidebar.sidebar--compact .sidebar__categoriesLabel {
+  display: none;
+}
+
+/* Icon + count badge overlaid (saves vertical space vs stacked layout). */
+.sidebar.sidebar--compact .sidebar__item {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 0;
+  gap: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+}
+
+.sidebar.sidebar--compact .sidebar__item:hover {
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.sidebar.sidebar--compact .sidebar__item.is-active {
+  background: rgba(126, 184, 255, 0.09);
+  border: 1px solid rgba(126, 184, 255, 0.28);
+}
+
+.sidebar.sidebar--compact .sidebar__itemLabel {
+  display: none;
+}
+
+.sidebar.sidebar--compact .sidebar__itemIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  flex-shrink: 0;
+}
+
+.sidebar.sidebar--compact .sidebar__itemIcon svg {
+  width: 21px;
+  height: 21px;
+}
+
+.sidebar.sidebar--compact .sidebar__item.is-active .sidebar__itemIcon {
+  color: var(--accent);
+  background: rgba(126, 184, 255, 0.16);
+}
+
+.sidebar.sidebar--compact .sidebar__itemCount {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 4px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.92);
+  white-space: nowrap;
+  pointer-events: none;
+  background: linear-gradient(165deg, #3a455c 0%, #2a3142 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.sidebar.sidebar--compact .sidebar__item.is-active .sidebar__itemCount {
+  border-color: rgba(126, 184, 255, 0.45);
+  background: linear-gradient(165deg, #2f4a66 0%, #263548 100%);
+}
+
+.sidebar.sidebar--compact .sidebar__footer {
+  padding-top: 4px;
+  margin-top: auto;
+  width: auto;
+  align-self: center;
+}
+
+.sidebar.sidebar--compact .sidebar__settingsBtn {
+  justify-content: center;
+  align-items: center;
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 0;
+  border-radius: 12px;
+}
+
+.sidebar.sidebar--compact .sidebar__settingsBtn svg {
+  width: 21px;
+  height: 21px;
+}
+
+.sidebar.sidebar--compact .sidebar__settingsBtn > span {
+  display: none;
 }
 
 .mainPanel {

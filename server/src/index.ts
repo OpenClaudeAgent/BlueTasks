@@ -11,6 +11,8 @@ const appDistDir = path.join(rootDir, 'web', 'app', 'dist');
 
 if (!fs.existsSync(appDistDir)) {
   console.warn(`[server] App dist not found at ${appDistDir} — run "npm run build" first`);
+} else {
+  console.log(`[server] Serving SPA from ${path.resolve(appDistDir)}`);
 }
 
 const dbCtx = {current: openAndMigrateDatabase(dbPath)};
