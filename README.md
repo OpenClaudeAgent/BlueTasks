@@ -114,5 +114,4 @@ Optional: `web/app/.env` with `VITE_API_ORIGIN=https://your-api` (no trailing sl
 
 ---
 
-[CI](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml)
-[Docker image](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml)
+[![CI](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/ci.yml) [![Docker image](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/docker-publish.yml) [![Desktop app](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/desktop-publish.yml/badge.svg)](https://github.com/OpenClaudeAgent/BlueTasks/actions/workflows/desktop-publish.yml)
