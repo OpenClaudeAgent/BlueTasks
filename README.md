@@ -102,7 +102,7 @@ For contributors or custom builds: Rust + Node 22, `npm run desktop:prep`, then 
 
 ## Repository layout
 
-High level: `web/app` (React UI), `server` (API + SQLite), `contract` (shared types/schemas), `desktop` (Tauri), `e2e` (Playwright), `scripts` (build / Docker / desktop). See [docs/architecture.md](docs/architecture.md).
+High level: `web/app` (React UI), `server` (API + SQLite), `contract` (shared types/schemas), `desktop` (Tauri), `mobile` (Kotlin Multiplatform / Compose), `e2e` (Playwright), `scripts` (build / Docker / desktop). See [docs/architecture.md](docs/architecture.md) and [mobile/README.md](mobile/README.md).
 
 ## Documentation and development
 

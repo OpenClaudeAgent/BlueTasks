@@ -10,6 +10,7 @@ BlueTasks/
 ├── desktop/       Tauri shell (embedded Node + same server bundle as Docker)
 ├── docs/          Product, quality, Docker, releasing, this file
 ├── e2e/           Playwright specs (production-shaped server on 8787)
+├── mobile/        Kotlin Multiplatform + Compose Multiplatform app (Gradle, not npm)
 ├── scripts/       Docker context, desktop runtime assembly, embedded Node fetch
 ├── server/        Express API, SQLite, serves `web/app/dist` in production
 ├── shared/        JSON and assets shared without cross-workspace deps (e.g. category icon ids)
@@ -46,6 +47,7 @@ The root [README](../README.md) summarizes this tree in one paragraph for new co
 
 - **`web/app`** — React client (Vite), UI, i18n, HTTP calls to the API.
 - **`server`** — Express API, **SQLite** persistence (`better-sqlite3`), serves the static client build in production.
+- **`mobile/`** — **Kotlin Multiplatform** project (Gradle): `shared` (Ktor client, domain rules aligned with `contract/`) and `composeApp` (Material 3 UI for Android and iOS). The app is an **HTTP client** to the same REST API as the browser; configure the server base URL in-app (LAN / Docker / tunnel). See [mobile/README.md](../mobile/README.md).
 
 In development the front runs on the Vite port (e.g. 5173) and talks to the API on **8787** (same origin or `VITE_API_ORIGIN`). In production the server serves `web/app/dist` and exposes the API and static files on one host.
 
