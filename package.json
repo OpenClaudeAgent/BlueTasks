@@ -52,8 +52,8 @@
     "eslint-plugin-unicorn": "^63.0.0",
     "globals": "^17.4.0",
     "jscpd": "^4.0.8",
-    "knip": "^5.70.1",
-    "markdownlint-cli2": "^0.18.1",
+    "knip": "^6.0.1",
+    "markdownlint-cli2": "^0.22.0",
     "prettier": "^3.6.2",
     "typescript-eslint": "^8.57.1",
     "zod": "^4.3.6"
