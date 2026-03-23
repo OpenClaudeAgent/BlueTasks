@@ -250,7 +250,11 @@ jobs:
           api-level: 34
           arch: x86_64
           target: google_apis
-          script: cd mobile && ./gradlew :composeApp:connectedDebugAndroidTest --no-daemon
+          # Avoid "Can't find service: package" when pm is not up yet (flaky installs).
+          script: |
+            adb wait-for-device shell 'while [ -z "$(getprop sys.boot_completed | tr -d "\r")" ]; do sleep 2; done'
+            for i in $(seq 1 30); do adb shell pm list packages >/dev/null 2>&1 && break; sleep 3; done
+            cd mobile && ./gradlew :composeApp:connectedDebugAndroidTest --no-daemon
 
   mobile-ios:
     name: Mobile iOS (KMP iosSimulatorArm64 tests)
