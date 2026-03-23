@@ -13,6 +13,7 @@
     <string name="export_db">SQLite-database exporteren</string>
     <string name="import_db">SQLite-database importeren</string>
     <string name="notes_hint">Notities</string>
+    <string name="notes_done">Gereed</string>
     <string name="notes_preview_empty">Voeg een notitie, checklist of context toe.</string>
     <string name="notes_open_editor_desc">Taakbeschrijving en notities</string>
     <string name="notes_checklist_progress">Checklist %1$d/%2$d</string>

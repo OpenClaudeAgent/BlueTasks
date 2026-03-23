@@ -13,6 +13,7 @@
     <string name="export_db">Eksport bazy SQLite</string>
     <string name="import_db">Import bazy SQLite</string>
     <string name="notes_hint">Notatki</string>
+    <string name="notes_done">Gotowe</string>
     <string name="notes_preview_empty">Dodaj notatkę, listę kontrolną lub kontekst.</string>
     <string name="notes_open_editor_desc">Opis zadania i notatki</string>
     <string name="notes_checklist_progress">Lista %1$d/%2$d</string>

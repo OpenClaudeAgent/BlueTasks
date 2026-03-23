@@ -14,7 +14,6 @@
     "build": "npm run check:category-icon-parity && npm run build --workspace web/app && npm run build --workspace server",
     "build:mobile-lexical": "npm run build --workspace @bluetasks/mobile-lexical-shell && node scripts/copy-mobile-lexical-assets.mjs && node scripts/check-mobile-lexical-embed-html.mjs",
     "check:mobile-lexical-embed": "node scripts/check-mobile-lexical-embed-html.mjs",
-    "generate:mobile-i18n": "node scripts/generate-mobile-i18n-from-web.mjs",
     "start": "npm run start --workspace server",
     "lint:eslint-web": "npm run lint --workspace web/app",
     "lint:stylelint": "npm run lint:css --workspace web/app",
@@ -46,6 +45,11 @@
     "desktop:fetch-node": "node scripts/fetch-embedded-node.mjs",
     "desktop:prep": "npm run build && npm run desktop:assemble-runtime && npm run desktop:fetch-node",
     "mobile:quality": "cd mobile && ./gradlew qualityGate --no-daemon",
+    "mobile:android-unit-test": "cd mobile && ./gradlew androidUnitTestGate --no-daemon",
+    "mobile:android-connected": "cd mobile && ./gradlew androidConnectedTestGate --no-daemon",
+    "mobile:ios-test": "cd mobile && ./gradlew iosTestGate --no-daemon",
+    "mobile:kover": "cd mobile && ./gradlew koverHtmlReport koverXmlReport --no-daemon",
+    "mobile:kover-verify": "cd mobile && ./gradlew koverVerify --no-daemon",
     "mobile:ci": "cd mobile && ./gradlew qualityGate :composeApp:assembleDebug --no-daemon"
   },
   "devDependencies": {

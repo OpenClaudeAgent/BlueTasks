@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.bluetasks.mobile.generated.Res
 import com.bluetasks.mobile.generated.task_done
 import com.bluetasks.mobile.generated.task_open_content_desc
+import com.bluetasks.mobile.generated.task_pin
 import com.bluetasks.mobile.generated.task_time_spent
 import com.bluetasks.mobile.generated.task_undo
 import com.bluetasks.mobile.shared.api.ApiTaskRow
@@ -33,6 +34,7 @@ import com.bluetasks.mobile.shared.domain.totalDisplayedTimeSpentSeconds
 import com.bluetasks.mobile.ui.theme.BlueTasksColors
 import com.composables.icons.lucide.Check
 import com.composables.icons.lucide.Lucide
+import com.composables.icons.lucide.Pin
 import com.composables.icons.lucide.Undo2
 import kotlinx.datetime.Instant
 import org.jetbrains.compose.resources.stringResource
@@ -46,6 +48,13 @@ public fun TaskRowCard(
     modifier: Modifier = Modifier,
 ) {
     val openDesc = stringResource(Res.string.task_open_content_desc)
+    val pinDesc = stringResource(Res.string.task_pin)
+    val cardA11y =
+        if (task.pinned) {
+            "$openDesc. $pinDesc"
+        } else {
+            openDesc
+        }
     val totalSec = totalDisplayedTimeSpentSeconds(task.timeSpentSeconds, task.timerStartedAt, now)
     val timerLine =
         if (totalSec > 0 || task.timerStartedAt != null) {
@@ -58,7 +67,7 @@ public fun TaskRowCard(
         modifier =
             modifier
                 .fillMaxWidth()
-                .semantics { contentDescription = openDesc }
+                .semantics { contentDescription = cardA11y }
                 .clip(cardShape)
                 .clickable(onClick = onOpen),
         colors =
@@ -74,7 +83,25 @@ public fun TaskRowCard(
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Column(Modifier.weight(1f)) {
-                Text(task.title, style = MaterialTheme.typography.titleMedium)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    if (task.pinned) {
+                        Icon(
+                            imageVector = Lucide.Pin,
+                            contentDescription = null,
+                            modifier = Modifier.size(17.dp),
+                            tint = BlueTasksColors.Accent,
+                        )
+                    }
+                    Text(
+                        task.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                }
                 task.taskDate?.let {
                     Text(
                         it,

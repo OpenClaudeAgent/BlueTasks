@@ -13,6 +13,7 @@
     <string name="export_db">Exporter la base SQLite</string>
     <string name="import_db">Importer une base SQLite</string>
     <string name="notes_hint">Notes</string>
+    <string name="notes_done">Terminé</string>
     <string name="notes_preview_empty">Ajoutez une note, une checklist ou quelques lignes de contexte.</string>
     <string name="notes_open_editor_desc">Description et notes de la tâche</string>
     <string name="notes_checklist_progress">Checklist %1$d/%2$d</string>

@@ -33,6 +33,8 @@ import platform.UIKit.UIColor
 import platform.WebKit.WKScriptMessage
 import platform.WebKit.WKScriptMessageHandlerProtocol
 import platform.WebKit.WKUserContentController
+import platform.WebKit.WKUserScript
+import platform.WebKit.WKUserScriptInjectionTime
 import platform.WebKit.WKWebView
 import platform.WebKit.WKWebViewConfiguration
 import platform.darwin.NSObject
@@ -155,6 +157,13 @@ private fun LexicalWebViewHost(
     UIKitView(
         factory = {
             val config = WKWebViewConfiguration()
+            val shellMarker =
+                WKUserScript(
+                    source = """document.documentElement.classList.add('bt-shell--ios');""",
+                    injectionTime = WKUserScriptInjectionTime.WKUserScriptInjectionTimeAtDocumentStart,
+                    forMainFrameOnly = true,
+                )
+            config.userContentController.addUserScript(shellMarker)
             config.userContentController.addScriptMessageHandler(handler, "blueTasksLexical")
             WKWebView(
                 frame = CGRectMake(0.0, 0.0, 0.0, 0.0),

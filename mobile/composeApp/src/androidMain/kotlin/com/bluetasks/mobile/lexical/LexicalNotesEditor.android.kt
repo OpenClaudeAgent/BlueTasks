@@ -97,6 +97,10 @@ public actual fun LexicalNotesEditor(
                         ) {
                             super.onPageFinished(view, url)
                             if (view != null) {
+                                view.evaluateJavascript(
+                                    "document.documentElement.classList.add('bt-shell--android');",
+                                    null,
+                                )
                                 webViewHolder = view
                             }
                         }

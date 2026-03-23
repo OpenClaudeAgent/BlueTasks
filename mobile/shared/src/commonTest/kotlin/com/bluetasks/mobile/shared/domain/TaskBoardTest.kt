@@ -45,4 +45,31 @@ class TaskBoardTest {
         val sorted = sortTasks(tasks).map { it.id }
         assertEquals(listOf("y", "x"), sorted)
     }
+
+    @Test
+    fun sortPendingBeforeCompletedWhenSamePinAndDate() {
+        val tasks =
+            listOf(
+                task("done-later", status = TaskStatus.completed, taskDate = "2025-01-10"),
+                task("pending-first", status = TaskStatus.pending, taskDate = "2025-01-10"),
+            )
+        val sorted = sortTasks(tasks).map { it.id }
+        assertEquals(listOf("pending-first", "done-later"), sorted)
+    }
+
+    @Test
+    fun toWritePayload_preservesWritableFields() {
+        val t =
+            task("a550e840-e29b-41d4-a716-446655440001").copy(
+                title = "Hello",
+                pinned = true,
+                timeSpentSeconds = 99,
+            )
+        val p = toWritePayload(t)
+        assertEquals(t.id, p.id)
+        assertEquals(t.title, p.title)
+        assertEquals(t.pinned, p.pinned)
+        assertEquals(t.timeSpentSeconds, p.timeSpentSeconds)
+        assertEquals(t.contentJson, p.contentJson)
+    }
 }

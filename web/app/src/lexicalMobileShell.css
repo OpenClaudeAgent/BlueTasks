@@ -463,3 +463,66 @@ button,
 .editor__tableRow {
   background: transparent;
 }
+
+/*
+ * Injected on iOS WKWebView via WKUserScript (class on documentElement).
+ * Approximates iOS dark “grouped” surfaces + frosted toolbar (HIG-ish).
+ */
+html.bt-shell--ios {
+  --canvas: #000000;
+  --canvas-elevated: #1c1c1e;
+  --border: rgba(84, 84, 88, 0.36);
+  --border-strong: rgba(84, 84, 88, 0.65);
+  --editor-bg: #1c1c1e;
+  --editor-toolbar-btn-radius: 10px;
+  --radius-sm: 12px;
+  --checkbox-radius: 6px;
+}
+
+html.bt-shell--ios body {
+  background: var(--canvas);
+}
+
+html.bt-shell--ios .editor {
+  border-color: var(--border);
+  border-radius: 10px 10px 0 0;
+}
+
+html.bt-shell--ios .editor__toolbar {
+  gap: 6px;
+  padding: 8px 10px;
+  border-bottom: 0.5px solid var(--border-strong);
+  background: rgba(44, 44, 46, 0.92);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+html.bt-shell--ios .editor__toolbarButton {
+  border-radius: 10px;
+  background: rgba(118, 118, 128, 0.24);
+  border: none;
+}
+
+html.bt-shell--ios .editor__toolbarButton:hover {
+  background: rgba(118, 118, 128, 0.32);
+  border: none;
+}
+
+html.bt-shell--ios .editor__toolbarSelect {
+  border-radius: 10px;
+  border: none;
+  background: rgba(118, 118, 128, 0.24);
+}
+
+html.bt-shell--ios .editor__toolbarSelect:hover {
+  background: rgba(118, 118, 128, 0.32);
+}
+
+html.bt-shell--ios .editor__input {
+  font-size: 17px;
+  line-height: 1.35;
+}
+
+html.bt-shell--ios .editor__placeholder {
+  font-size: 17px;
+}

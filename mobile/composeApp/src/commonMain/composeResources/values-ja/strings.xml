@@ -13,6 +13,7 @@
     <string name="export_db">SQLite データベースをエクスポート</string>
     <string name="import_db">SQLite データベースをインポート</string>
     <string name="notes_hint">メモ</string>
+    <string name="notes_done">完了</string>
     <string name="notes_preview_empty">メモ、チェックリスト、文脈を追加してください。</string>
     <string name="notes_open_editor_desc">タスクの説明とメモ</string>
     <string name="notes_checklist_progress">チェックリスト %1$d/%2$d</string>

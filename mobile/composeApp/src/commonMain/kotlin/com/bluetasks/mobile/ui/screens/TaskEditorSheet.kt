@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,6 +29,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
@@ -54,6 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -65,6 +68,7 @@ import com.bluetasks.mobile.generated.estimate_hours
 import com.bluetasks.mobile.generated.estimate_minutes_short
 import com.bluetasks.mobile.generated.filter_none
 import com.bluetasks.mobile.generated.notes_checklist_progress
+import com.bluetasks.mobile.generated.notes_done
 import com.bluetasks.mobile.generated.notes_hint
 import com.bluetasks.mobile.generated.notes_open_editor_desc
 import com.bluetasks.mobile.generated.notes_preview_empty
@@ -104,6 +108,7 @@ import com.bluetasks.mobile.generated.task_time_spent
 import com.bluetasks.mobile.generated.task_timer_start
 import com.bluetasks.mobile.generated.task_timer_stop
 import com.bluetasks.mobile.lexical.LexicalNotesEditor
+import com.bluetasks.mobile.platform.isIosUi
 import com.bluetasks.mobile.shared.api.ApiCategoryRow
 import com.bluetasks.mobile.shared.api.ApiTaskRow
 import com.bluetasks.mobile.shared.api.Recurrence
@@ -702,23 +707,52 @@ public fun TaskEditorSheet(
                 color = BlueTasksColors.Canvas,
             ) {
                 Column(Modifier.fillMaxSize()) {
-                    TopAppBar(
-                        title = { Text(stringResource(Res.string.notes_hint)) },
-                        navigationIcon = {
-                            IconButton(onClick = { notesFullscreen = false }) {
-                                Icon(
-                                    Icons.Filled.Close,
-                                    contentDescription = stringResource(Res.string.cancel),
-                                )
+                    if (isIosUi()) {
+                        Row(
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .statusBarsPadding()
+                                    .padding(horizontal = 4.dp, vertical = 6.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                stringResource(Res.string.notes_hint),
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.weight(1f),
+                                textAlign = TextAlign.Center,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = MaterialTheme.colorScheme.onBackground,
+                            )
+                            TextButton(onClick = { notesFullscreen = false }) {
+                                Text(stringResource(Res.string.notes_done))
                             }
-                        },
-                        colors =
-                            TopAppBarDefaults.topAppBarColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                                titleContentColor = MaterialTheme.colorScheme.onBackground,
-                                navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
-                            ),
-                    )
+                        }
+                        HorizontalDivider(
+                            thickness = 1.dp,
+                            color = BlueTasksColors.BorderSubtle,
+                        )
+                    } else {
+                        TopAppBar(
+                            title = { Text(stringResource(Res.string.notes_hint)) },
+                            navigationIcon = {
+                                IconButton(onClick = { notesFullscreen = false }) {
+                                    Icon(
+                                        Icons.Filled.Close,
+                                        contentDescription = stringResource(Res.string.cancel),
+                                    )
+                                }
+                            },
+                            colors =
+                                TopAppBarDefaults.topAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground,
+                                ),
+                        )
+                    }
                     LexicalNotesEditor(
                         contentJson = contentJson,
                         placeholder = stringResource(Res.string.notes_hint),

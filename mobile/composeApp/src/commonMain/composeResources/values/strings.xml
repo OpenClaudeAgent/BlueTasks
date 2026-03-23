@@ -13,6 +13,7 @@
     <string name="export_db">Export SQLite</string>
     <string name="import_db">Import SQLite</string>
     <string name="notes_hint">Notes</string>
+    <string name="notes_done">Done</string>
     <string name="notes_preview_empty">Tap to add notes…</string>
     <string name="notes_open_editor_desc">Open note editor</string>
     <string name="notes_checklist_progress">Checklist %1$d/%2$d</string>

@@ -11,16 +11,8 @@ public class BlueTasksSettings(
             settings.putString(KEY_BASE_URL, value.trim())
         }
 
-    /** BCP-47 tags aligned with web app locales (client-only UI language). */
-    public var uiLanguageTag: String
-        get() = settings.getString(KEY_UI_LANG, "en")
-        set(value) {
-            settings.putString(KEY_UI_LANG, value)
-        }
-
     private companion object {
         const val KEY_BASE_URL = "api_base_url"
-        const val KEY_UI_LANG = "ui_language"
     }
 }
 
