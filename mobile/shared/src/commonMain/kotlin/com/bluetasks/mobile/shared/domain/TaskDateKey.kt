@@ -42,7 +42,10 @@ public fun tomorrowKeyUtc(): String {
  * Adds [days] to a valid UTC date key (same calendar rules as the web `addDaysToKey` helper).
  * @throws IllegalArgumentException if [dateKey] is not `YYYY-MM-DD`.
  */
-public fun addDaysToDateKeyUtc(dateKey: String, days: Int): String {
+public fun addDaysToDateKeyUtc(
+    dateKey: String,
+    days: Int,
+): String {
     require(isValidTaskDateKey(dateKey)) { "invalid date key: $dateKey" }
     return formatUtcDateKey(LocalDate.parse(dateKey).plus(DatePeriod(days = days)))
 }
@@ -51,7 +54,10 @@ public fun addDaysToDateKeyUtc(dateKey: String, days: Int): String {
  * Adds [months] to a valid UTC date key (same calendar rules as the web `addMonthsToKey` helper).
  * @throws IllegalArgumentException if [dateKey] is not `YYYY-MM-DD`.
  */
-public fun addMonthsToDateKeyUtc(dateKey: String, months: Int): String {
+public fun addMonthsToDateKeyUtc(
+    dateKey: String,
+    months: Int,
+): String {
     require(isValidTaskDateKey(dateKey)) { "invalid date key: $dateKey" }
     return formatUtcDateKey(LocalDate.parse(dateKey).plus(DatePeriod(months = months)))
 }

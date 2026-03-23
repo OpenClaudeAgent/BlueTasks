@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
 import com.bluetasks.mobile.generated.Res
 import com.bluetasks.mobile.shared.lexical.LexicalNativePayload
+import com.bluetasks.mobile.shared.lexical.dispatchLexicalBridgePayload
+import com.bluetasks.mobile.shared.lexical.lexicalEvaluateSetDocumentScript
 import com.bluetasks.mobile.ui.theme.BlueTasksColors
 import kotlinx.cinterop.BetaInteropApi
 import kotlinx.cinterop.ExperimentalForeignApi
@@ -159,16 +161,17 @@ private fun LexicalWebViewHost(
                 configuration = config,
             ).apply {
                 allowsBackForwardNavigationGestures = false
-                val canvas =
+                val canvas = BlueTasksColors.Canvas
+                val canvasUi =
                     UIColor.colorWithRed(
-                        red = 42.0 / 255.0,
-                        green = 38.0 / 255.0,
-                        blue = 52.0 / 255.0,
-                        alpha = 1.0,
+                        red = canvas.red.toDouble(),
+                        green = canvas.green.toDouble(),
+                        blue = canvas.blue.toDouble(),
+                        alpha = canvas.alpha.toDouble(),
                     )
-                backgroundColor = canvas
+                backgroundColor = canvasUi
                 opaque = true
-                scrollView.backgroundColor = canvas
+                scrollView.backgroundColor = canvasUi
                 scrollView.bounces = false
                 if (indexFile != null) {
                     loadFileURL(indexFile, allowingReadAccessToURL = bundleDir)
@@ -192,50 +195,12 @@ private fun LexicalWebViewHost(
         if (!editorReady) {
             return@LaunchedEffect
         }
-        val cmdJson = lexicalSetDocumentJson(contentJson, placeholder)
-        val arg = jsStringLiteral(cmdJson)
-        val js = "window.__BT_LEXICAL_RECEIVE__($arg)"
-        wv.evaluateJavaScript(javaScriptString = js, completionHandler = null)
+        wv.evaluateJavaScript(
+            javaScriptString = lexicalEvaluateSetDocumentScript(contentJson, placeholder),
+            completionHandler = null,
+        )
     }
 }
-
-private fun lexicalSetDocumentJson(
-    contentJson: String,
-    placeholder: String,
-): String =
-    buildString {
-        append("{\"type\":\"setDocument\",\"contentJson\":")
-        append(jsonString(contentJson))
-        append(",\"placeholder\":")
-        append(jsonString(placeholder))
-        append('}')
-    }
-
-private fun jsonString(s: String): String {
-    val sb = StringBuilder()
-    sb.append('"')
-    for (ch in s) {
-        when (ch) {
-            '\\' -> sb.append("\\\\")
-            '"' -> sb.append("\\\"")
-            '\n' -> sb.append("\\n")
-            '\r' -> sb.append("\\r")
-            '\t' -> sb.append("\\t")
-            else -> {
-                if (ch.code < 0x20) {
-                    val hex = ch.code.toString(16).padStart(4, '0')
-                    sb.append("\\u$hex")
-                } else {
-                    sb.append(ch)
-                }
-            }
-        }
-    }
-    sb.append('"')
-    return sb.toString()
-}
-
-private fun jsStringLiteral(s: String): String = jsonString(s)
 
 private class LexicalScriptHandler(
     private val onReady: () -> Unit,
@@ -250,13 +215,10 @@ private class LexicalScriptHandler(
                 is String -> body
                 else -> return
             }
-        when (val p = LexicalNativePayload.parse(raw)) {
-            LexicalNativePayload.Ready -> onReady()
-            is LexicalNativePayload.Change ->
-                if (p.json.isNotEmpty()) {
-                    onChange(p.json, p.plainText, p.checklistTotal, p.checklistCompleted)
-                }
-            null -> Unit
-        }
+        dispatchLexicalBridgePayload(
+            LexicalNativePayload.parse(raw),
+            onEditorReady = onReady,
+            onDocumentChange = onChange,
+        )
     }
 }

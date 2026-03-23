@@ -5,18 +5,26 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import {fileURLToPath} from 'node:url';
+import {checkEmbedHtmlInvariants, lexicalAndroidAssetsDir, lexicalComposeEmbedDir, lexicalDistDir} from './mobile-lexical-embed-paths.mjs';
 
-const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const dist = path.join(root, 'web/mobile-lexical-shell/dist');
-const androidDest = path.join(root, 'mobile/composeApp/src/androidMain/assets/bluetasks_lexical');
-const composeDest = path.join(
-  root,
-  'mobile/composeApp/src/commonMain/composeResources/files/bluetasks_lexical',
-);
+const dist = lexicalDistDir;
 
 if (!fs.existsSync(dist)) {
   console.error('Missing dist. Run: npm run build --workspace @bluetasks/mobile-lexical-shell');
+  process.exit(1);
+}
+
+const distHtml = path.join(dist, 'index.html');
+if (!fs.existsSync(distHtml)) {
+  console.error('Missing', distHtml);
+  process.exit(1);
+}
+const distFailures = checkEmbedHtmlInvariants(fs.readFileSync(distHtml, 'utf8'));
+if (distFailures.length) {
+  console.error('dist/index.html failed embed invariants (fix Vite plugin / build):');
+  for (const f of distFailures) {
+    console.error(' -', f);
+  }
   process.exit(1);
 }
 
@@ -28,6 +36,6 @@ function syncDir(to) {
   }
 }
 
-syncDir(androidDest);
-syncDir(composeDest);
-console.log('Lexical shell copied to:\n ', androidDest, '\n ', composeDest);
+syncDir(lexicalAndroidAssetsDir);
+syncDir(lexicalComposeEmbedDir);
+console.log('Lexical shell copied to:\n ', lexicalAndroidAssetsDir, '\n ', lexicalComposeEmbedDir);

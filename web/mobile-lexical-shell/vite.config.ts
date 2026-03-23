@@ -18,9 +18,13 @@ function lexicalShellEmbeddedWebViewPlugin(): Plugin {
     name: 'lexical-shell-embedded-webview',
     closeBundle() {
       const htmlPath = path.join(__dirname, 'dist/index.html');
+      if (!fs.existsSync(htmlPath)) {
+        throw new Error(`lexical-shell-embedded-webview: missing ${htmlPath}`);
+      }
       let html = fs.readFileSync(htmlPath, 'utf8');
-      html = html.replaceAll('<script type="module"', '<script defer');
+      // Order: strip crossorigin first (script + link), then classic script + defer for the bundle.
       html = html.replaceAll(' crossorigin', '');
+      html = html.replaceAll('<script type="module"', '<script defer');
       if (html.includes('<script src="./assets/index.js"') && !html.includes('<script defer')) {
         html = html.replace('<script src="./assets/index.js"', '<script defer src="./assets/index.js"');
       }

@@ -22,12 +22,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.webkit.WebViewAssetLoader
 import com.bluetasks.mobile.shared.lexical.LexicalNativePayload
-import org.json.JSONObject
+import com.bluetasks.mobile.shared.lexical.dispatchLexicalBridgePayload
+import com.bluetasks.mobile.shared.lexical.lexicalEvaluateSetDocumentScript
 
 private const val LEXICAL_ASSET_URL =
     "https://appassets.androidplatform.net/assets/bluetasks_lexical/index.html"
 
-@SuppressLint("SetJavaScriptEnabled")
+private class LexicalAndroidJsBridge(
+    private val mainHandler: Handler,
+    private val onPayload: (String) -> Unit,
+) {
+    @JavascriptInterface
+    fun postPayload(json: String) {
+        mainHandler.post { onPayload(json) }
+    }
+}
+
+@SuppressLint("SetJavaScriptEnabled", "JavascriptInterface")
 @Composable
 public actual fun LexicalNotesEditor(
     contentJson: String,
@@ -48,17 +59,12 @@ public actual fun LexicalNotesEditor(
 
     val bridge =
         remember(onChange) {
-            object {
-                @JavascriptInterface
-                fun postPayload(json: String) {
-                    mainHandler.post {
-                        handleLexicalBridgeMessage(json, onChange) { ready ->
-                            if (ready) {
-                                editorReady = true
-                            }
-                        }
-                    }
-                }
+            LexicalAndroidJsBridge(mainHandler) { json ->
+                dispatchLexicalBridgePayload(
+                    LexicalNativePayload.parse(json),
+                    onEditorReady = { editorReady = true },
+                    onDocumentChange = onChange,
+                )
             }
         }
 
@@ -109,29 +115,6 @@ public actual fun LexicalNotesEditor(
         if (!editorReady) {
             return@LaunchedEffect
         }
-        val cmd =
-            JSONObject().apply {
-                put("type", "setDocument")
-                put("contentJson", contentJson)
-                put("placeholder", placeholder)
-            }
-        val payload = cmd.toString()
-        val js = "window.__BT_LEXICAL_RECEIVE__(${JSONObject.quote(payload)})"
-        wv.evaluateJavascript(js, null)
-    }
-}
-
-private fun handleLexicalBridgeMessage(
-    json: String,
-    onChange: (contentJson: String, contentText: String, checklistTotal: Int, checklistCompleted: Int) -> Unit,
-    onReady: (Boolean) -> Unit,
-) {
-    when (val p = LexicalNativePayload.parse(json)) {
-        LexicalNativePayload.Ready -> onReady(true)
-        is LexicalNativePayload.Change ->
-            if (p.json.isNotEmpty()) {
-                onChange(p.json, p.plainText, p.checklistTotal, p.checklistCompleted)
-            }
-        null -> Unit
+        wv.evaluateJavascript(lexicalEvaluateSetDocumentScript(contentJson, placeholder), null)
     }
 }
