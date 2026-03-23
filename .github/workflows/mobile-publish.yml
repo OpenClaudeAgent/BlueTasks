@@ -89,13 +89,15 @@ jobs:
     name: iOS IPA (unsigned) — ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
     runs-on: macos-latest
     timeout-minutes: 90
-    env:
-      # xcodebuild runs the CocoaPods script that invokes Gradle linkPodReleaseFrameworkIosArm64; default heap OOMs on GHA macOS.
-      ORG_GRADLE_JVMARGS: '-Xmx6g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8'
     steps:
       - uses: actions/checkout@v6
         with:
           ref: ${{ env.RELEASE_TAG }}
+
+      # mobile/gradle.properties caps the daemon at 2g; Kotlin/Native linkPodReleaseFrameworkIosArm64 OOMs on GHA macOS.
+      - name: Raise Gradle heap for Kotlin/Native (this job only)
+        working-directory: mobile
+        run: perl -i -pe 's/^org\.gradle\.jvmargs=.*/org.gradle.jvmargs=-Xmx6g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8/' gradle.properties && grep '^org.gradle.jvmargs=' gradle.properties
 
       - uses: actions/setup-node@v6
         with:
