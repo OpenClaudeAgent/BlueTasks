@@ -1,0 +1,12 @@
+root = false
+
+[*.{kt,kts}]
+ktlint_function_naming_ignore_when_annotated_with = Composable,Preview
+
+# Compose Multiplatform resource codegen (under build/ but compiled as Kotlin sources).
+[composeApp/build/generated/**/*.{kt,kts}]
+ktlint_standard = disabled
+
+# API enums mirror JSON string values from the server (lowercase).
+[shared/src/commonMain/kotlin/com/bluetasks/mobile/shared/api/ApiModels.kt]
+ktlint_standard_enum-entry-name-case = disabled

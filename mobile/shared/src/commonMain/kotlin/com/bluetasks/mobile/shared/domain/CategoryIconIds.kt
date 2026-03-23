@@ -1,6 +1,6 @@
 package com.bluetasks.mobile.shared.domain
 
-/** Mirrors [server/data/category-icon-ids.json](server/data/category-icon-ids.json). */
+/** Same ids and order as server `category-icon-ids.json` and web `CATEGORY_ICON_IDS` (23 icons). */
 public val CATEGORY_ICON_IDS: List<String> =
     listOf(
         "folder",

@@ -8,6 +8,7 @@ import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.http.ContentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
@@ -22,7 +23,9 @@ public fun createBlueTasksHttpClient(
     return createPlatformHttpClient {
         expectSuccess = false
         install(ContentNegotiation) {
-            json(json)
+            // Explicit content type so request/response JSON is registered without relying on reflection
+            // (needed on Kotlin/Native — see Ktor “Kotlin reflection is not available” for typed setBody).
+            json(json, contentType = ContentType.Application.Json)
         }
         install(HttpTimeout) {
             requestTimeoutMillis = 60_000
@@ -30,11 +33,12 @@ public fun createBlueTasksHttpClient(
         }
         if (debugLogging) {
             install(Logging) {
-                logger = object : Logger {
-                    override fun log(message: String) {
-                        println(message)
+                logger =
+                    object : Logger {
+                        override fun log(message: String) {
+                            println(message)
+                        }
                     }
-                }
                 level = LogLevel.INFO
             }
         }

@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>BlueTasks Lexical</title>
+    <!-- Paint canvas before JS/CSS bundles load (avoids white flash in embedded WebView). Matches :root --canvas in lexicalMobileShell.css. -->
+    <style>
+      html,
+      body,
+      #root {
+        margin: 0;
+        min-height: 100%;
+        background-color: #2a2634;
+        color-scheme: dark;
+      }
+    </style>
+    <script defer src="./assets/index.js"></script>
+    <link rel="stylesheet" href="./assets/index.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

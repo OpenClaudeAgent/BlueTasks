@@ -24,7 +24,10 @@ public class AndroidFileBridge(
             cb(bytes)
         }
 
-    override fun shareSqlite(bytes: ByteArray, filename: String) {
+    override fun shareSqlite(
+        bytes: ByteArray,
+        filename: String,
+    ) {
         val cacheFile = File(activity.cacheDir, filename)
         cacheFile.writeBytes(bytes)
         val uri =

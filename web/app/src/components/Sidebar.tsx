@@ -72,7 +72,8 @@ export function Sidebar({
         </div>
       </div>
 
-      <nav className="sidebar__nav" aria-label={t('primaryNavigation')}>
+      <div className="sidebar__scrollRegion">
+        <nav className="sidebar__nav" aria-label={t('primaryNavigation')}>
         {sectionOrder.map((section) => {
           const Icon = sectionIcons[section];
           return (
@@ -156,6 +157,7 @@ export function Sidebar({
             );
           })}
         </div>
+      </div>
       </div>
 
       <div className="sidebar__footer">

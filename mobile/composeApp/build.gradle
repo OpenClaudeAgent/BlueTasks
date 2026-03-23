@@ -3,11 +3,15 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
+    alias(libs.plugins.kotlinCocoapods)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
 }
+
+group = 'com.bluetasks.mobile'
+version = '0.1.0'
 
 kotlin {
     jvmToolchain(21)
@@ -19,6 +23,18 @@ kotlin {
     iosArm64()
     iosSimulatorArm64()
 
+    cocoapods {
+        summary = 'BlueTasks Compose Multiplatform shell'
+        homepage = 'https://local.bluetasks'
+        version = project.version.toString()
+        podfile = project.file('../iosApp/Podfile')
+        ios.deploymentTarget = '16.0'
+        framework {
+            baseName = 'ComposeApp'
+            isStatic = true
+        }
+    }
+
     applyDefaultHierarchyTemplate()
 
     sourceSets {
@@ -27,6 +43,7 @@ kotlin {
                 implementation compose.preview
                 implementation libs.androidx.activity.compose
                 implementation libs.androidx.core.ktx
+                implementation libs.androidx.webkit
             }
         }
         commonMain {
@@ -37,6 +54,7 @@ kotlin {
                 implementation compose.ui
                 implementation compose.components.resources
                 implementation compose.materialIconsExtended
+                implementation libs.icons.lucide
                 implementation project(':shared')
                 implementation libs.kotlinx.coroutines.core
                 implementation libs.kotlinx.datetime
@@ -47,6 +65,11 @@ kotlin {
         commonTest {
             dependencies {
                 implementation libs.kotlin.test
+            }
+        }
+        all {
+            languageSettings {
+                optIn('kotlinx.cinterop.ExperimentalForeignApi')
             }
         }
     }
@@ -95,3 +118,4 @@ dependencies {
     debugImplementation compose.uiTooling
     detektPlugins libs.detekt.formatting
 }
+

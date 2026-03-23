@@ -47,7 +47,7 @@ The root [README](../README.md) summarizes this tree in one paragraph for new co
 
 - **`web/app`** — React client (Vite), UI, i18n, HTTP calls to the API.
 - **`server`** — Express API, **SQLite** persistence (`better-sqlite3`), serves the static client build in production.
-- **`mobile/`** — **Kotlin Multiplatform** project (Gradle): `shared` (Ktor client, domain rules aligned with `contract/`) and `composeApp` (Material 3 UI for Android and iOS). The app is an **HTTP client** to the same REST API as the browser; configure the server base URL in-app (LAN / Docker / tunnel). See [mobile/README.md](../mobile/README.md).
+- **`mobile/`** — **Kotlin Multiplatform** project (Gradle): `shared` (Ktor client, domain rules aligned with `contract/`) and `composeApp` (Material 3 UI for Android and iOS). The app is an **HTTP client** to the same REST API as the browser; configure the server base URL in-app (LAN / Docker / tunnel). See [mobile/README.md](../mobile/README.md). Web parity backlog: [mobile-web-parity-backlog.md](mobile-web-parity-backlog.md). Rich notes Phase B: [mobile-rich-notes-phase-b.md](mobile-rich-notes-phase-b.md).
 
 In development the front runs on the Vite port (e.g. 5173) and talks to the API on **8787** (same origin or `VITE_API_ORIGIN`). In production the server serves `web/app/dist` and exposes the API and static files on one host.
 

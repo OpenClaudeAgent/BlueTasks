@@ -4,7 +4,7 @@ import {DayPicker} from 'react-day-picker';
 import type {Locale} from 'date-fns';
 import {RotateCw} from 'lucide-react';
 import {useTranslation} from 'react-i18next';
-import {addDaysToKey, formatDateKey, parseTaskDate, todayKey} from '../../lib/dateKeys';
+import {addDaysToKey, addMonthsToKey, formatDateKey, parseTaskDate, todayKey} from '../../lib/dateKeys';
 import type {RecurrenceKind} from '../../types';
 
 export type TaskCardHeaderDatePopoverProps = {
@@ -77,6 +77,9 @@ export function TaskCardHeaderDatePopover({
             </button>
             <button onClick={() => onSelectDate(addDaysToKey(todayKey(), 7))} type="button">
               {t('nextWeek')}
+            </button>
+            <button onClick={() => onSelectDate(addMonthsToKey(todayKey(), 1))} type="button">
+              {t('nextMonth')}
             </button>
             <button onClick={() => onSelectDate(null)} type="button">
               {t('clearDate')}

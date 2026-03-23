@@ -5,11 +5,16 @@
   "license": "MIT",
   "workspaces": [
     "web/app",
+    "web/mobile-lexical-shell",
     "server"
   ],
   "scripts": {
     "dev": "concurrently -k \"npm run dev --workspace server\" \"npm run dev --workspace web/app\"",
-    "build": "npm run build --workspace web/app && npm run build --workspace server",
+    "check:category-icon-parity": "node scripts/check-category-icon-parity.cjs",
+    "build": "npm run check:category-icon-parity && npm run build --workspace web/app && npm run build --workspace server",
+    "build:mobile-lexical": "npm run build --workspace @bluetasks/mobile-lexical-shell && node scripts/copy-mobile-lexical-assets.mjs && node scripts/check-mobile-lexical-embed-html.mjs",
+    "check:mobile-lexical-embed": "node scripts/check-mobile-lexical-embed-html.mjs",
+    "generate:mobile-i18n": "node scripts/generate-mobile-i18n-from-web.mjs",
     "start": "npm run start --workspace server",
     "lint:eslint-web": "npm run lint --workspace web/app",
     "lint:stylelint": "npm run lint:css --workspace web/app",
@@ -30,7 +35,7 @@
     "test:coverage:gate": "npm run test:coverage:gate --workspace @bluetasks/app && npm run test:coverage:gate --workspace @bluetasks/server",
     "test:scenario": "playwright test",
     "test:a11y": "playwright test e2e/a11y-axe.spec.ts",
-    "duplicates": "jscpd web/app/src server/src e2e contract scripts desktop/src-tauri/src",
+    "duplicates": "jscpd web/app/src server/src e2e contract scripts desktop/src-tauri/src mobile/shared/src mobile/composeApp/src",
     "semgrep:docker": "docker run --rm -v \"$PWD:/src\" -w /src semgrep/semgrep sh -c 'semgrep scan --config p/typescript --config p/react --error web/app && semgrep scan --config p/typescript --config p/security-audit --error server && semgrep scan --config p/typescript --error contract e2e scripts playwright.config.ts eslint.tooling.config.mjs eslint.e2e.config.mjs'",
     "ci": "npm run lint && npm run duplicates && npm run test:coverage:gate && npm run build && npm run test:scenario",
     "check": "npm run ci",
@@ -39,7 +44,9 @@
     "docker:release": "npm ci && npm run package:docker",
     "desktop:assemble-runtime": "node scripts/assemble-desktop-runtime.mjs",
     "desktop:fetch-node": "node scripts/fetch-embedded-node.mjs",
-    "desktop:prep": "npm run build && npm run desktop:assemble-runtime && npm run desktop:fetch-node"
+    "desktop:prep": "npm run build && npm run desktop:assemble-runtime && npm run desktop:fetch-node",
+    "mobile:quality": "cd mobile && ./gradlew qualityGate --no-daemon",
+    "mobile:ci": "cd mobile && ./gradlew qualityGate :composeApp:assembleDebug --no-daemon"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.1",

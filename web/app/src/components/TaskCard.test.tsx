@@ -6,7 +6,7 @@ import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {I18nextProvider} from 'react-i18next';
 import i18n from '../i18n';
-import {addDaysToKey, todayKey} from '../lib/dateKeys';
+import {addDaysToKey, addMonthsToKey, todayKey} from '../lib/dateKeys';
 import {formatTaskDatePill} from '../lib/dateFormat';
 import {createTask} from '../lib/tasks';
 import type {Category} from '../types';
@@ -325,6 +325,33 @@ describe('Feature: Task card (expanded)', () => {
       await user.click(screen.getByRole('button', {name: /^in one week$/i}));
       expect(onChange).toHaveBeenCalledWith(task.id, {
         taskDate: addDaysToKey(todayKey(), 7),
+        recurrence: null,
+      });
+    });
+
+    it('given expanded card, when user sets due date to In one month from pill, then onChange updates taskDate', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      const task = {...createTask('Dated'), taskDate: null};
+      render(
+        <I18nextProvider i18n={i18n}>
+          <TaskCardHarness
+            categories={sampleCategories}
+            expanded
+            isSaving={false}
+            onChange={onChange}
+            onDelete={vi.fn()}
+            onToggleExpandTask={vi.fn()}
+            onToggleStatus={vi.fn()}
+            task={task}
+          />
+        </I18nextProvider>,
+      );
+      const card = screen.getByRole('article');
+      await user.click(within(card).getByRole('button', {name: /—|no date/i}));
+      await user.click(screen.getByRole('button', {name: /^in one month$/i}));
+      expect(onChange).toHaveBeenCalledWith(task.id, {
+        taskDate: addMonthsToKey(todayKey(), 1),
         recurrence: null,
       });
     });

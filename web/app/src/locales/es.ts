@@ -85,6 +85,7 @@ export default {
   today: 'Hoy',
   tomorrow: 'Mañana',
   nextWeek: 'En una semana',
+  nextMonth: 'En un mes',
   clearDate: 'Quitar',
   noDate: 'Sin fecha',
   noDateShort: '—',

@@ -38,6 +38,12 @@ public enum class SettingsTab {
     Categories,
 }
 
+public data class PendingCategoryDelete(
+    val id: String,
+    val name: String,
+    val taskCount: Int,
+)
+
 public data class AppUiState(
     val baseUrlDraft: String = "",
     val savedBaseUrl: String = "",
@@ -56,6 +62,7 @@ public data class AppUiState(
     val importExportBanner: String? = null,
     val confirmImportPending: Boolean = false,
     val confirmReplaceServerDb: ByteArray? = null,
+    val pendingCategoryDelete: PendingCategoryDelete? = null,
 ) {
     val visibleTasks: List<ApiTaskRow>
         get() = filterTasks(tasks, section, categoryFilter)
@@ -285,8 +292,52 @@ public class BlueTasksAppViewModel(
         }
     }
 
-    public fun deleteCategory(id: String) {
+    public fun updateCategory(
+        id: String,
+        name: String,
+        icon: String,
+    ) {
         val s = session ?: return
+        val trimmed = name.trim()
+        if (trimmed.isEmpty()) return
+        viewModelScope.launch {
+            s.api.updateCategory(id, UpdateCategoryBody(name = trimmed, icon = icon)).fold(
+                onSuccess = { row ->
+                    _state.value =
+                        _state.value.copy(
+                            categories =
+                                _state.value.categories.map { if (it.id == id) row else it }
+                                    .sortedBy { it.sortIndex },
+                        )
+                },
+                onFailure = { e -> _state.value = _state.value.copy(error = e.message) },
+            )
+        }
+    }
+
+    public fun requestCategoryDelete(id: String) {
+        val cat = _state.value.categories.find { it.id == id } ?: return
+        val n = _state.value.tasks.count { it.categoryId == id }
+        _state.value =
+            _state.value.copy(
+                pendingCategoryDelete =
+                    PendingCategoryDelete(
+                        id = id,
+                        name = cat.name,
+                        taskCount = n,
+                    ),
+            )
+    }
+
+    public fun dismissCategoryDelete() {
+        _state.value = _state.value.copy(pendingCategoryDelete = null)
+    }
+
+    public fun confirmCategoryDelete() {
+        val pending = _state.value.pendingCategoryDelete ?: return
+        val id = pending.id
+        val s = session ?: return
+        _state.value = _state.value.copy(pendingCategoryDelete = null)
         viewModelScope.launch {
             s.api.deleteCategory(id).fold(
                 onSuccess = {

@@ -1,0 +1,465 @@
+/**
+ * Subset of app chrome for embedding LexicalTaskEditor in the mobile WebView shell.
+ * Keeps theme variables and .editor* rules in sync with index.css (duplicate with care).
+ */
+:root {
+  color-scheme: dark;
+  --canvas: #2a2634;
+  --canvas-elevated: #323042;
+  --border: rgba(255, 255, 255, 0.055);
+  --border-strong: rgba(255, 255, 255, 0.09);
+  --text: rgba(255, 255, 255, 0.94);
+  --text-secondary: rgba(255, 255, 255, 0.62);
+  --text-muted: rgba(255, 255, 255, 0.38);
+  --text-soft: rgba(255, 255, 255, 0.72);
+  --accent: #7eb8ff;
+  --editor-bg: #2f2c3a;
+  --editor-checkbox: rgba(255, 255, 255, 0.45);
+  /* Mobile shell / touch: slightly larger box + extra gutter (Lexical #2233); web app stays on index.css. */
+  --checkbox-size: 20px;
+  --checkbox-radius: 5px;
+  --checklist-text-gutter: 14px;
+  --checkbox-border-width: 1px;
+  --space-1: 4px;
+  --space-2: 6px;
+  --space-3: 8px;
+  --space-4: 10px;
+  --editor-toolbar-btn-size: 30px;
+  --editor-toolbar-btn-radius: 7px;
+  --radius-sm: 10px;
+  font-family:
+    'SF Pro Text',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Helvetica Neue',
+    sans-serif;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/**
+ * Fill the WebView viewport: without this, `.editor` is only as tall as its content
+ * and `body` (--canvas) shows under the rounded card — the “heel” on mobile.
+ */
+html,
+body {
+  margin: 0;
+  min-width: 0;
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  background: var(--canvas);
+  color: var(--text);
+  overflow: hidden;
+}
+
+#root {
+  margin: 0;
+  min-width: 0;
+  height: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  color: inherit;
+  background: none;
+  border: none;
+}
+
+input,
+button,
+[contenteditable='true'] {
+  outline: none;
+}
+
+.editor {
+  margin-top: 0;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  /* Shell mobile only: square corners — matches embedded WebView / sheet chrome. */
+  border-radius: 0;
+  border: 1px solid var(--border);
+  background: var(--editor-bg);
+  overflow: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.editor__toolbarButton {
+  width: var(--editor-toolbar-btn-size);
+  height: var(--editor-toolbar-btn-size);
+  border-radius: var(--editor-toolbar-btn-radius);
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.04);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.editor__toolbarButton:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.editor__toolbarSelect {
+  min-width: 7.5rem;
+  max-width: 11rem;
+  height: var(--editor-toolbar-btn-size);
+  margin-left: var(--space-1);
+  padding: 0 var(--space-2);
+  border-radius: var(--editor-toolbar-btn-radius);
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.editor__toolbarSelect:hover {
+  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.editor__toolbarSelect:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.editor__surface {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.editor__input {
+  display: block;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 120px;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-3) var(--space-4) 12px;
+  color: var(--text);
+  line-height: 1.5;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
+  tab-size: 4;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.editor__placeholder {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-4);
+  color: var(--text-soft);
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.editor__paragraph {
+  margin: 0 0 var(--space-3);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  tab-size: 4;
+}
+
+.editor__tab {
+  white-space: pre;
+}
+
+.editor__heading {
+  margin: var(--space-3) 0 var(--space-2);
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.editor__heading--h1 {
+  font-size: 20px;
+}
+
+.editor__quote {
+  margin: var(--space-2) 0;
+  padding-left: var(--space-3);
+  border-left: 2px solid rgba(126, 184, 255, 0.28);
+  color: var(--text-secondary);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.editor__list {
+  margin: var(--space-2) 0;
+  padding-left: 0;
+}
+
+.editor__list--unordered:not(.editor__list--check),
+.editor__list--ordered {
+  padding-left: 1.1rem;
+}
+
+.editor__list--check {
+  list-style: none;
+  padding: 0;
+  margin: var(--space-1) 0 var(--space-2);
+}
+
+.editor__list--check.editor__list--nestedSublist {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 0.2em 0 0;
+  padding-left: 1.1rem;
+  margin-left: 0;
+  clear: both;
+}
+
+.editor__listItem {
+  margin: var(--space-1) 0;
+}
+
+.editor__list--check .editor__listItem--checked,
+.editor__list--check .editor__listItem--unchecked {
+  list-style: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 1px 0;
+  /* ~44px min row height improves touch targets (iOS HIG); pairs with wider gutter above. */
+  padding: 6px 0 6px calc(var(--checkbox-size) + var(--checklist-text-gutter));
+  min-height: 44px;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.editor__list--check .editor__listItem--checked:has(> ul),
+.editor__list--check .editor__listItem--unchecked:has(> ul) {
+  display: block;
+  padding-left: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.editor__list--check .editor__listItem--checked:has(> ul)::before,
+.editor__list--check .editor__listItem--unchecked:has(> ul)::before,
+.editor__list--check .editor__listItem--checked:has(> ul)::after {
+  content: none;
+  display: none;
+}
+
+.editor__list--check .editor__listItem--checked:focus,
+.editor__list--check .editor__listItem--unchecked:focus,
+.editor__list--check .editor__listItem--checked:focus-visible,
+.editor__list--check .editor__listItem--unchecked:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.editor__list--check .editor__listItem--checked::before,
+.editor__list--check .editor__listItem--unchecked::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  border-radius: var(--checkbox-radius);
+  border: var(--checkbox-border-width) solid var(--editor-checkbox);
+  background: rgba(255, 255, 255, 0.03);
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.editor__list--check .editor__listItem--checked::before {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.editor__list--check .editor__listItem--checked::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 50%;
+  width: 4px;
+  height: 7px;
+  margin-top: -4px;
+  border: solid rgba(13, 17, 23, 0.88);
+  border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.editor__list--check .editor__listItem--checked {
+  color: var(--text-secondary);
+  text-decoration: line-through;
+}
+
+.editor__links {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.editor__text--bold {
+  font-weight: 700;
+}
+
+.editor__text--italic {
+  font-style: italic;
+}
+
+.editor__text--code {
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.92em;
+}
+
+.editor__codeBlock {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  margin: var(--space-3) 0;
+  padding: 28px 16px 14px;
+  border-radius: var(--radius-sm);
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--border);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 13px;
+  white-space: pre-wrap;
+  overflow-x: auto;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.editor__codeBlock::before {
+  content: attr(data-highlight-language);
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-3);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  pointer-events: none;
+  white-space: nowrap;
+  word-break: normal;
+  max-width: calc(100% - 32px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+.editor__codeBlock:not([data-highlight-language])::before,
+.editor__codeBlock[data-highlight-language='']::before {
+  content: 'plaintext';
+}
+
+.editor__codeBlock span {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.editor__horizontalRule {
+  margin: var(--space-3) 0;
+  border: none;
+  border-top: 1px solid var(--border-strong);
+  background: transparent;
+}
+
+.editor__horizontalRule.selected,
+.editor__horizontalRule--selected {
+  border-top-color: var(--accent);
+}
+
+.editor__imageWrap {
+  display: block;
+  margin: var(--space-3) 0;
+  max-width: 100%;
+}
+
+.editor__imageWrap img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+
+.editor__table {
+  width: 100%;
+  max-width: 100%;
+  margin: var(--space-3) 0;
+  border-collapse: collapse;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 13px;
+  table-layout: fixed;
+}
+
+.editor__tableCell,
+.editor__tableCellHeader {
+  border: 1px solid var(--border);
+  padding: var(--space-2) var(--space-3);
+  min-width: 0;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.editor__tableCellHeader {
+  background: rgba(0, 0, 0, 0.25);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.editor__tableRow {
+  background: transparent;
+}

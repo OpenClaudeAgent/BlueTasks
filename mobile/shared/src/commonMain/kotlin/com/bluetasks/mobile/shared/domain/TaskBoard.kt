@@ -103,6 +103,7 @@ public fun sortTasks(tasks: List<ApiTaskRow>): List<ApiTaskRow> =
             .thenBy { it.id },
     )
 
+@Suppress("ktlint:standard:max-line-length")
 public const val EMPTY_LEXICAL_JSON: String =
     """{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}"""
 

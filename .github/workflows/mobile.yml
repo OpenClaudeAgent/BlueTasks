@@ -13,13 +13,19 @@ jobs:
         working-directory: mobile
     steps:
       - uses: actions/checkout@v6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - name: Build mobile Lexical WebView bundle
+        working-directory: ${{ github.workspace }}
+        run: npm ci && npm run build:mobile-lexical
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "21"
       - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
-      - name: Unit tests (shared)
-        run: ./gradlew :shared:test --no-daemon
-      - name: Android debug APK
-        run: ./gradlew :composeApp:assembleDebug --no-daemon
+      - name: Quality gate + debug APK
+        run: ./gradlew qualityGate :composeApp:assembleDebug --no-daemon

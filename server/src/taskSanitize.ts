@@ -43,7 +43,13 @@ export function normalizePriority(value: unknown): TaskPriority {
 }
 
 export function normalizePinnedInput(value: unknown): boolean {
-  return value === true || value === 1 || value === '1';
+  if (value === true || value === 1 || value === '1') {
+    return true;
+  }
+  if (typeof value === 'string' && value.toLowerCase() === 'true') {
+    return true;
+  }
+  return false;
 }
 
 export function normalizeRecurrence(value: unknown): RecurrenceKind | null {
