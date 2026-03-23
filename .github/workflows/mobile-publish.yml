@@ -1,29 +1,31 @@
-# Standalone: unsigned Android AAB + iOS Release simulator .app zip, attached to an existing GitHub Release for tag v*.
-# Not wired into CI or the Release workflow — run manually from Actions when you want mobile assets.
-# See docs/mobile-release-ci-plan.md.
-name: Mobile artifacts (unsigned)
+# Unsigned Android APK + AAB and iOS IPA, attached to the GitHub Release for tag v*.
+# Triggered by Release workflow (same pattern as desktop-publish / docker-publish) or manually / tag push.
+name: Mobile release
 
 on:
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing tag (e.g. v0.3.4)'
+        description: 'Git tag (e.g. v0.4.0)'
         required: true
         type: string
 
 concurrency:
-  group: mobile-artifacts-unsigned-${{ github.event.inputs.tag }}
+  group: mobile-release-${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
   cancel-in-progress: true
 
 permissions:
   contents: write
 
 env:
-  RELEASE_TAG: ${{ github.event.inputs.tag }}
+  RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
 
 jobs:
-  android-bundle:
-    name: Android AAB — ${{ github.event.inputs.tag }}
+  android:
+    name: Android APK + AAB — ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
@@ -53,30 +55,38 @@ jobs:
       - uses: android-actions/setup-android@v3
       - uses: gradle/actions/setup-gradle@v4
 
-      - name: Bundle release (unsigned AAB)
+      - name: assembleRelease + bundleRelease (unsigned)
         working-directory: mobile
-        run: ./gradlew :composeApp:bundleRelease --no-daemon
+        run: ./gradlew :composeApp:assembleRelease :composeApp:bundleRelease --no-daemon
 
       - name: Collect Android outputs
         run: |
           VERSION="${RELEASE_TAG#v}"
-          mkdir -p "$GITHUB_WORKSPACE/mobile-release-out"
+          OUT="$GITHUB_WORKSPACE/mobile-release-out"
+          mkdir -p "$OUT"
           shopt -s nullglob
-          for f in mobile/composeApp/build/outputs/bundle/release/*.aab; do
-            base=$(basename "$f")
-            cp "$f" "$GITHUB_WORKSPACE/mobile-release-out/BlueTasks_${VERSION}_${base}"
-          done
-          test "$(find "$GITHUB_WORKSPACE/mobile-release-out" -name '*.aab' | wc -l)" -ge 1
-          (cd "$GITHUB_WORKSPACE/mobile-release-out" && sha256sum *.aab) > "$GITHUB_WORKSPACE/mobile-release-out/SHA256SUMS-android-aab.txt"
-          cat "$GITHUB_WORKSPACE/mobile-release-out/SHA256SUMS-android-aab.txt"
+          apks=(mobile/composeApp/build/outputs/apk/release/*.apk)
+          aabs=(mobile/composeApp/build/outputs/bundle/release/*.aab)
+          if [ ${#apks[@]} -lt 1 ]; then
+            echo "No release APK under composeApp/build/outputs/apk/release/"
+            exit 1
+          fi
+          if [ ${#aabs[@]} -lt 1 ]; then
+            echo "No release AAB under composeApp/build/outputs/bundle/release/"
+            exit 1
+          fi
+          cp "${apks[0]}" "$OUT/BlueTasks_${VERSION}_android_unsigned.apk"
+          cp "${aabs[0]}" "$OUT/BlueTasks_${VERSION}_android_unsigned.aab"
+          (cd "$OUT" && sha256sum BlueTasks_${VERSION}_android_unsigned.apk BlueTasks_${VERSION}_android_unsigned.aab) > "$OUT/SHA256SUMS-android.txt"
+          cat "$OUT/SHA256SUMS-android.txt"
 
       - uses: actions/upload-artifact@v7
         with:
-          name: bluetasks-android-release
+          name: bluetasks-mobile-android
           path: mobile-release-out/
 
-  ios-simulator:
-    name: iOS Release (simulator) — ${{ github.event.inputs.tag }}
+  ios-ipa:
+    name: iOS IPA (unsigned) — ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }}
     runs-on: macos-latest
     timeout-minutes: 60
     steps:
@@ -112,49 +122,47 @@ jobs:
           ./gradlew :composeApp:generateDummyFramework --no-daemon
           cd iosApp && pod install
 
-      - name: Xcode build (Release, iOS Simulator)
+      - name: Xcode build (Release, iphoneos, no code signing)
         working-directory: mobile/iosApp
         run: |
           xcodebuild -workspace iosApp.xcworkspace -scheme iosApp -configuration Release \
-            -sdk iphonesimulator \
-            -destination 'generic/platform=iOS Simulator' \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
             -derivedDataPath ./build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
             build
 
-      - name: Zip simulator app
+      - name: Package unsigned IPA
         run: |
           VERSION="${RELEASE_TAG#v}"
-          APP=$(find mobile/iosApp/build/DerivedData -type d -name 'iosApp.app' -path '*Release-iphonesimulator*' | head -1)
+          APP=$(find mobile/iosApp/build/DerivedData -type d -name 'iosApp.app' -path '*Release-iphoneos*' | head -1)
           if [ -z "$APP" ] || [ ! -d "$APP" ]; then
-            echo "iosApp.app (Release-iphonesimulator) not found"
+            echo "iosApp.app (Release-iphoneos) not found"
             find mobile/iosApp/build/DerivedData -name '*.app' -type d 2>/dev/null || true
             exit 1
           fi
-          mkdir -p "$GITHUB_WORKSPACE/ios-release-out"
-          ditto -c -k --keepParent "$APP" "$GITHUB_WORKSPACE/ios-release-out/BlueTasks_${VERSION}_ios_simulator.app.zip"
-          shasum -a 256 "$GITHUB_WORKSPACE/ios-release-out/BlueTasks_${VERSION}_ios_simulator.app.zip" \
-            > "$GITHUB_WORKSPACE/ios-release-out/SHA256SUMS-ios-simulator.txt"
-          cat "$GITHUB_WORKSPACE/ios-release-out/SHA256SUMS-ios-simulator.txt"
+          mkdir -p "$GITHUB_WORKSPACE/ios-ipa-out/Payload"
+          ditto "$APP" "$GITHUB_WORKSPACE/ios-ipa-out/Payload/iosApp.app"
+          cd "$GITHUB_WORKSPACE/ios-ipa-out"
+          zip -qr "BlueTasks_${VERSION}_ios_unsigned.ipa" Payload
+          rm -rf Payload
+          shasum -a 256 "BlueTasks_${VERSION}_ios_unsigned.ipa" > SHA256SUMS-ios-ipa.txt
+          cat SHA256SUMS-ios-ipa.txt
 
       - uses: actions/upload-artifact@v7
         with:
-          name: bluetasks-ios-simulator
-          path: ios-release-out/
+          name: bluetasks-mobile-ios
+          path: ios-ipa-out/
 
   publish:
-    name: Publish GitHub Release assets (${{ github.event.inputs.tag }})
-    needs: [android-bundle, ios-simulator]
+    name: Publish GitHub Release assets (${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || github.ref_name }})
+    needs: [android, ios-ipa]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8
         with:
-          pattern: bluetasks-android-release
-          path: release-assets
-          merge-multiple: true
-
-      - uses: actions/download-artifact@v8
-        with:
-          pattern: bluetasks-ios-simulator
+          pattern: bluetasks-mobile-*
           path: release-assets
           merge-multiple: true
 

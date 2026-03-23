@@ -43,6 +43,7 @@ Related workflows:
 - **[Docker image](../.github/workflows/docker-publish.yml)** — multi-arch **build** and **push** to GHCR on `v*` tag or manual dispatch (image tag input).
 - **[Release](../.github/workflows/release.yml)** — manual `workflow_dispatch` with a semver: syncs workspace `package.json` files, updates `CHANGELOG.md`, refreshes the lockfile, commits, pushes `v*` (then run **Docker image** as documented in [releasing.md](releasing.md)).
 - **[Mobile Android instrumented](../.github/workflows/mobile-android-instrumented.yml)** — optional `workflow_dispatch`: emulator + `connectedDebugAndroidTest` (not a PR gate).
+- **[Mobile release](../.github/workflows/mobile-publish.yml)** — unsigned APK + AAB + IPA on GitHub Release; dispatched from [Release](../.github/workflows/release.yml) or `push: tags v*` / manual.
 
 ## Front-end coverage strategy
 

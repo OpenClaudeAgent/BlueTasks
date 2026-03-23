@@ -100,7 +100,7 @@ That copies the bundle into `composeApp` Android assets and Compose resources (`
 
 PR CI (`.github/workflows/ci.yml`) runs Lexical embed, `qualityGate`, debug APK, and `iosTestGate` — not every push to arbitrary branches beyond `main`/`master`. Use **Mobile Android instrumented** (Actions, manual) for emulator `connectedDebugAndroidTest` when needed.
 
-**Release artifacts (optional):** run [**Mobile artifacts (unsigned)**](../.github/workflows/mobile-artifacts-unsigned.yml) from GitHub Actions (`workflow_dispatch`, pass an existing tag `v*`). It builds an **unsigned** AAB and an iOS Release **simulator** `.app` zip and uploads them to that tag’s GitHub Release. Not tied to PR CI or the monorepo Release workflow — see [docs/mobile-release-ci-plan.md](../docs/mobile-release-ci-plan.md).
+**Release:** the monorepo [**Release**](../.github/workflows/release.yml) workflow dispatches [**Mobile release**](../.github/workflows/mobile-publish.yml), which uploads **unsigned** **APK**, **AAB**, and **IPA** to the same **GitHub Release** as desktop (or run **Mobile release** manually with tag `v*`). See [docs/releasing.md](../docs/releasing.md) and [docs/mobile-release-ci-plan.md](../docs/mobile-release-ci-plan.md).
 
 ## Module layout
 

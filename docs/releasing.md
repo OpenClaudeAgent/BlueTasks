@@ -19,13 +19,13 @@ What it does:
 - Inserts the new section into `CHANGELOG.md` and updates compare links ([`changelog-release.mjs`](../scripts/changelog-release.mjs)).
 - Runs `npm install` to sync `package-lock.json`.
 - Commits `chore(release): vX.Y.Z`, creates tag `vX.Y.Z`, and **pushes** commit + tag.
-- Runs follow-up jobs that **dispatch** [**Docker image**](../.github/workflows/docker-publish.yml) and [**Desktop release**](../.github/workflows/desktop-publish.yml) with `tag=vX.Y.Z` (GHCR gets `:vX.Y.Z` and `:latest`; desktop attaches installers to the GitHub Release). The bot’s tag push does **not** trigger other workflows, so both pipelines are started explicitly via `gh workflow run`.
+- Runs follow-up jobs that **dispatch** [**Docker image**](../.github/workflows/docker-publish.yml), [**Desktop release**](../.github/workflows/desktop-publish.yml), and [**Mobile release**](../.github/workflows/mobile-publish.yml) with `tag=vX.Y.Z` (GHCR gets `:vX.Y.Z` and `:latest`; desktop and mobile attach assets to the **same** GitHub Release via `softprops/action-gh-release` with `allowUpdates: true`). The bot’s tag push does **not** trigger other workflows, so those pipelines are started explicitly via `gh workflow run`.
 - [**Desktop release**](../.github/workflows/desktop-publish.yml) builds in parallel on **`macos-latest`**, **`windows-latest`**, and **`ubuntu-latest`**, then attaches installers to the release (unsigned).
   - **macOS:** `BlueTasks_X.Y.Z_macos_aarch64.app.zip` and DMG if produced.
   - **Windows:** NSIS `.exe` (and `.msi` if the bundle produced one).
   - **Linux:** `.deb` (x64) from `bundle/deb/` (see [`tauri.linux.conf.json`](../desktop/src-tauri/tauri.linux.conf.json)).
-- **Mobile** unsigned AAB + iOS simulator zip: not part of this workflow. After a GitHub Release exists for `vX.Y.Z`, run [**Mobile artifacts (unsigned)**](../.github/workflows/mobile-artifacts-unsigned.yml) manually (Actions → workflow_dispatch, pass the tag). See [mobile-release-ci-plan.md](mobile-release-ci-plan.md).
-- If you push a tag **`v*`** yourself (escape hatch), `push: tags` still runs **Docker** and **Desktop** workflows without a manual dispatch.
+- [**Mobile release**](../.github/workflows/mobile-publish.yml) builds **unsigned** **APK** + **AAB** (Android) and an **unsigned** **IPA** (iOS, `iphoneos` build packaged as `Payload/*.app`), then uploads them to that tag’s GitHub Release (`BlueTasks_X.Y.Z_android_unsigned.apk`, `.aab`, `BlueTasks_X.Y.Z_ios_unsigned.ipa`, plus checksums). Same publication model as desktop: **GitHub Release assets** on `vX.Y.Z`. See [mobile-release-ci-plan.md](mobile-release-ci-plan.md).
+- If you push a tag **`v*`** yourself (escape hatch), `push: tags` still runs **Docker**, **Desktop**, and **Mobile** workflows without a manual dispatch (if those workflows define `on.push.tags`).
 
 That pipeline is the **source of truth** for a release—not a local bump by hand or by tooling unless you are in the escape hatch below.
 
@@ -33,10 +33,10 @@ That pipeline is the **source of truth** for a release—not a local bump by han
 
 The README uses Shields **`github/v/tag`** (semver sort), labeled **version**, not **`github/v/release`**.
 
-- **`github/v/release`** reflects the latest **published** GitHub Release. That object is created when [**Desktop release**](../.github/workflows/desktop-publish.yml) finishes (`softprops/action-gh-release`). [**Mobile artifacts (unsigned)**](../.github/workflows/mobile-artifacts-unsigned.yml) can **append** assets to the same release (`allowUpdates: true`) if you run it afterward. If only a **git tag** exists (e.g. escape-hatch push) and Desktop did not complete, the badge for “release” can stay on an **older** version while tags and `package.json` already moved forward.
+- **`github/v/release`** reflects the latest **published** GitHub Release. That object is created when [**Desktop release**](../.github/workflows/desktop-publish.yml) finishes (`softprops/action-gh-release`). [**Mobile release**](../.github/workflows/mobile-publish.yml) **appends** APK/AAB/IPA to the same release (`allowUpdates: true`), usually in parallel after the monorepo **Release** workflow dispatches it. If only a **git tag** exists (e.g. escape-hatch push) and Desktop did not complete, the badge for “release” can stay on an **older** version while tags and `package.json` already moved forward.
 - **`github/v/tag`** matches the **newest `v*` tag** and stays consistent with the monorepo semver. The badge still links to the [Releases](https://github.com/OpenClaudeAgent/BlueTasks/releases) list for downloads.
 
-After a normal **Actions → Release** run, Docker and Desktop are dispatched explicitly; when Desktop succeeds, you get an up-to-date tag **and** a GitHub Release with desktop assets. Run **Mobile artifacts (unsigned)** separately if you need AAB / iOS simulator zips on that release.
+After a normal **Actions → Release** run, Docker, Desktop, and Mobile are dispatched explicitly; when Desktop and Mobile complete, you get an up-to-date tag **and** a GitHub Release with desktop **and** mobile assets (APK, AAB, IPA — all unsigned).
 
 ## Manual release (local, escape hatch only)
 

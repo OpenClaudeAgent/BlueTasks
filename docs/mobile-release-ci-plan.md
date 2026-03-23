@@ -1,6 +1,6 @@
 # GitHub Actions plan — mobile app release (Android + iOS)
 
-**Implemented in-repo:** [`.github/workflows/mobile-artifacts-unsigned.yml`](../.github/workflows/mobile-artifacts-unsigned.yml) — **manual-only** (`workflow_dispatch`), **unsigned** AAB + iOS simulator zip; **not** dispatched from [`release.yml`](../.github/workflows/release.yml) or [`ci.yml`](../.github/workflows/ci.yml). Version alignment on release still comes from [`sync-package-version.mjs`](../scripts/sync-package-version.mjs) (Gradle + Xcode).
+**Implemented in-repo:** [`.github/workflows/mobile-publish.yml`](../.github/workflows/mobile-publish.yml) — **unsigned** APK + AAB + IPA, attached to the GitHub Release for `v*` (same pattern as [desktop-publish.yml](../.github/workflows/desktop-publish.yml)). Triggered by [`release.yml`](../.github/workflows/release.yml) (`publish-mobile`), `workflow_dispatch`, or `push: tags: v*`. Not part of PR [`ci.yml`](../.github/workflows/ci.yml). Version alignment on release: [`sync-package-version.mjs`](../scripts/sync-package-version.mjs) (Gradle + Xcode).
 
 **Current CI policy:** **unsigned only** (no Android keystore / no distribution iOS archive). The sections below describe a later path for Play / App Store signing.
 
@@ -10,12 +10,12 @@
 
 ## Current repo state
 
-| Area             | Status                                                                                                                              |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Mobile PR CI     | `ci.yml`: Lexical bundle, `qualityGate`, debug APK, `iosTestGate` (instrumented Android: manual workflow only)                      |
-| Monorepo version | `sync-package-version.mjs` updates **root / web / server / desktop** — **not** `mobile/composeApp/build.gradle` or iOS **CFBundle** |
-| Android release  | No `bundleRelease` / signed AAB in CI                                                                                               |
-| iOS release      | Xcode shell + CocoaPods + Gradle framework; no archive build in CI                                                                  |
+| Area             | Status                                                                                                                            |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Mobile PR CI     | `ci.yml`: Lexical bundle, `qualityGate`, debug APK, `iosTestGate` (instrumented Android: manual workflow only)                    |
+| Monorepo version | `sync-package-version.mjs` updates root / web / server / desktop **and** mobile Gradle + Xcode `MARKETING_VERSION` / build number |
+| Android release  | `mobile-publish.yml`: `assembleRelease` + `bundleRelease` → unsigned APK + AAB on GitHub Release                                  |
+| iOS release      | `mobile-publish.yml`: `iphoneos` `xcodebuild` (no signing) → unsigned `.ipa` (`Payload/iosApp.app`) on GitHub Release             |
 
 **Product prerequisites:** final Play / App Store bundle IDs, developer accounts, distribution tracks (internal, TestFlight, production).
 
@@ -82,19 +82,18 @@
 
 - After `.ipa` export: **fastlane** `pilot` / `deliver`, or `apple-actions/upload-testflight-build`, with App Store Connect API key (`ASC_API_KEY` JSON + Issuer ID + Key ID).
 
-### Phase 3 — Monorepo **Release** integration (optional)
+### Phase 3 — Monorepo **Release** integration
 
-- **Current choice:** mobile stays **out** of [release.yml](../.github/workflows/release.yml); run [mobile-artifacts-unsigned.yml](../.github/workflows/mobile-artifacts-unsigned.yml) manually once the tag (and usually the Desktop release) exists.
-- **Alternative:** add `publish-mobile` with `gh workflow run mobile-artifacts-unsigned.yml -f tag=v${{ inputs.version }}` next to Docker / Desktop.
+- **Done:** [release.yml](../.github/workflows/release.yml) includes `publish-mobile` → `gh workflow run mobile-publish.yml -f tag=vX.Y.Z` next to Docker / Desktop.
 
 ---
 
 ## Target workflow file (skeleton)
 
-Implemented as [`.github/workflows/mobile-artifacts-unsigned.yml`](../.github/workflows/mobile-artifacts-unsigned.yml). Sketch:
+Implemented as [`.github/workflows/mobile-publish.yml`](../.github/workflows/mobile-publish.yml). Sketch:
 
 ```yaml
-name: Mobile artifacts (unsigned)
+name: Mobile release
 
 on:
   workflow_dispatch:

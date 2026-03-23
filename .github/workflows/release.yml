@@ -1,4 +1,4 @@
-# Bump workspace versions, update CHANGELOG, commit, push tag v*, then dispatch Docker and Desktop workflows.
+# Bump workspace versions, update CHANGELOG, commit, push tag v*, then dispatch Docker, Desktop, and Mobile workflows.
 # (Tag push with GITHUB_TOKEN does not trigger other workflows; we call workflow_dispatch explicitly.)
 name: Release
 run-name: Release v${{ inputs.version }}
@@ -137,5 +137,21 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh workflow run desktop-publish.yml \
+            --repo "${{ github.repository }}" \
+            -f "tag=v${{ inputs.version }}"
+
+  publish-mobile:
+    name: Publish mobile (APK, AAB, IPA)
+    needs: ship
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Trigger Mobile release workflow
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run mobile-publish.yml \
             --repo "${{ github.repository }}" \
             -f "tag=v${{ inputs.version }}"
