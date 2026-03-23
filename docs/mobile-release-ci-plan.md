@@ -12,7 +12,7 @@
 
 | Area             | Status                                                                                                                              |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Mobile PR CI     | `ci.yml`: Lexical bundle, `qualityGate`, debug APK, `iosTestGate` (instrumented Android: manual workflow only)                     |
+| Mobile PR CI     | `ci.yml`: Lexical bundle, `qualityGate`, debug APK, `iosTestGate` (instrumented Android: manual workflow only)                      |
 | Monorepo version | `sync-package-version.mjs` updates **root / web / server / desktop** — **not** `mobile/composeApp/build.gradle` or iOS **CFBundle** |
 | Android release  | No `bundleRelease` / signed AAB in CI                                                                                               |
 | iOS release      | Xcode shell + CocoaPods + Gradle framework; no archive build in CI                                                                  |
