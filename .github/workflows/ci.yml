@@ -232,38 +232,6 @@ jobs:
         working-directory: mobile
         run: ./gradlew qualityGate :composeApp:assembleDebug --no-daemon
 
-  mobile-android-connected:
-    name: Mobile Android (instrumented tests, emulator)
-    # GitHub-hosted emulator often returns "Can't find service: package" during APK install; do not block main.
-    continue-on-error: true
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '21'
-      - uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
-      - name: connectedDebugAndroidTest
-        uses: ReactiveCircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          arch: x86_64
-          target: google_apis
-          # Best-effort: wait until PackageManager can resolve the platform package before install.
-          script: |
-            adb wait-for-device shell 'while [ -z "$(getprop sys.boot_completed | tr -d "\r")" ]; do sleep 2; done'
-            for i in $(seq 1 60); do
-              if adb shell pm path android >/dev/null 2>&1; then
-                sleep 15
-                break
-              fi
-              sleep 3
-            done
-            cd mobile && ./gradlew :composeApp:connectedDebugAndroidTest --no-daemon
-
   mobile-ios:
     name: Mobile iOS (KMP iosSimulatorArm64 tests)
     runs-on: macos-latest

@@ -1,0 +1,39 @@
+# Optional: Android instrumented tests on emulator. Not part of PR CI (GitHub-hosted emulators are too flaky for a hard gate).
+# Run from Actions → Mobile Android instrumented → Run workflow.
+name: Mobile Android instrumented
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: mobile-android-instrumented-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  connected:
+    name: connectedDebugAndroidTest (emulator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          script: |
+            adb wait-for-device shell 'while [ -z "$(getprop sys.boot_completed | tr -d "\r")" ]; do sleep 2; done'
+            for i in $(seq 1 60); do
+              if adb shell pm path android >/dev/null 2>&1; then
+                sleep 15
+                break
+              fi
+              sleep 3
+            done
+            cd mobile && ./gradlew :composeApp:connectedDebugAndroidTest --no-daemon

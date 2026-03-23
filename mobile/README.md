@@ -38,7 +38,7 @@ export JAVA_HOME="$(/usr/libexec/java_home -v 21 2>/dev/null || echo /opt/homebr
 
 Depuis la racine du repo : `npm run mobile:kover` (rapports HTML + XML), `npm run mobile:kover-verify`.
 
-On **push / pull_request** to `main` or `master`, CI (`.github/workflows/ci.yml`) runs **mobile-android** (`npm run build:mobile-lexical` + `qualityGate` + `assembleDebug` on Ubuntu), **mobile-android-connected** (emulator + `connectedDebugAndroidTest`), and **mobile-ios** (`iosTestGate` on macOS).
+On **push / pull_request** to `main` or `master`, CI (`.github/workflows/ci.yml`) runs **mobile-android** (`npm run build:mobile-lexical` + `qualityGate` + `assembleDebug` on Ubuntu) and **mobile-ios** (`iosTestGate` on macOS). **Instrumented** Android tests on an emulator are **not** in PR CI (too flaky on GitHub-hosted runners); run them locally or via [Mobile Android instrumented](../.github/workflows/mobile-android-instrumented.yml) (`workflow_dispatch`).
 
 Individual checks still work: `./gradlew ktlintCheck`, `./gradlew detekt`.
 
@@ -98,7 +98,7 @@ That copies the bundle into `composeApp` Android assets and Compose resources (`
 
 ## GitHub Actions
 
-PR CI (`.github/workflows/ci.yml`) runs Lexical embed, `qualityGate`, debug APK, instrumented tests (emulator), and `iosTestGate` — not every push to arbitrary branches beyond `main`/`master`.
+PR CI (`.github/workflows/ci.yml`) runs Lexical embed, `qualityGate`, debug APK, and `iosTestGate` — not every push to arbitrary branches beyond `main`/`master`. Use **Mobile Android instrumented** (Actions, manual) for emulator `connectedDebugAndroidTest` when needed.
 
 **Release artifacts (optional):** run [**Mobile artifacts (unsigned)**](../.github/workflows/mobile-artifacts-unsigned.yml) from GitHub Actions (`workflow_dispatch`, pass an existing tag `v*`). It builds an **unsigned** AAB and an iOS Release **simulator** `.app` zip and uploads them to that tag’s GitHub Release. Not tied to PR CI or the monorepo Release workflow — see [docs/mobile-release-ci-plan.md](../docs/mobile-release-ci-plan.md).
 
