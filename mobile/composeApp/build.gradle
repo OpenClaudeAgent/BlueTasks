@@ -8,10 +8,11 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.kover)
 }
 
 group = 'com.bluetasks.mobile'
-version = '0.1.0'
+version = '0.3.4'
 
 kotlin {
     jvmToolchain(21)
@@ -67,6 +68,13 @@ kotlin {
                 implementation libs.kotlin.test
             }
         }
+        androidInstrumentedTest {
+            dependencies {
+                implementation libs.compose.ui.test.junit4
+                implementation libs.androidx.test.ext.junit
+                implementation libs.androidx.test.runner
+            }
+        }
         all {
             languageSettings {
                 optIn('kotlinx.cinterop.ExperimentalForeignApi')
@@ -83,8 +91,9 @@ android {
         applicationId = 'com.bluetasks.mobile'
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = '0.1.0'
+        versionCode = 3004
+        versionName = '0.3.4'
+        testInstrumentationRunner = 'androidx.test.runner.AndroidJUnitRunner'
     }
     packaging {
         resources {
@@ -116,6 +125,7 @@ detekt {
 
 dependencies {
     debugImplementation compose.uiTooling
+    debugImplementation libs.androidx.compose.ui.test.manifest
     detektPlugins libs.detekt.formatting
 }
 

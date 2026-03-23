@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
- * Set the same semver on root, web/app, server, desktop package.json, Tauri config, and Cargo.toml.
+ * Set the same semver on root, web/app, server, desktop package.json, Tauri config, Cargo.toml,
+ * mobile composeApp (Gradle), and iOS Xcode project (MARKETING_VERSION / build number).
  * Usage: node scripts/sync-package-version.mjs 0.2.0
  */
 import {readFileSync, writeFileSync} from 'node:fs';
@@ -60,6 +61,48 @@ if (!updatedCargo) {
 }
 writeFileSync(cargoPath, cargoLines.join('\n'), 'utf8');
 
+/** Android versionCode: monotonic from numeric X.Y.Z (ignores prerelease for the code part). */
+function semverToAndroidVersionCode(v) {
+  const base = v.split('-')[0].split('+')[0];
+  const parts = base.split('.').map((x) => parseInt(x, 10));
+  if (parts.length !== 3 || parts.some((n) => !Number.isFinite(n) || n < 0 || n > 999)) {
+    console.error(
+      'sync-package-version: need semver X.Y.Z with each segment 0..999 for Android versionCode',
+    );
+    process.exit(1);
+  }
+  const [maj, min, pat] = parts;
+  return maj * 1_000_000 + min * 1_000 + pat;
+}
+
+const androidVersionCode = semverToAndroidVersionCode(version);
+
+const composeGradlePath = join(root, 'mobile/composeApp/build.gradle');
+let composeGradle = readFileSync(composeGradlePath, 'utf8');
+composeGradle = composeGradle.replace(/^version = '[^']*'$/m, `version = '${version}'`);
+composeGradle = composeGradle.replace(
+  /^(\s*)versionCode = \d+$/m,
+  `$1versionCode = ${androidVersionCode}`,
+);
+composeGradle = composeGradle.replace(
+  /^(\s*)versionName = '[^']*'$/m,
+  `$1versionName = '${version.replace(/'/g, "\\'")}'`,
+);
+writeFileSync(composeGradlePath, composeGradle, 'utf8');
+
+const iosPbxprojPath = join(root, 'mobile/iosApp/iosApp.xcodeproj/project.pbxproj');
+let pbx = readFileSync(iosPbxprojPath, 'utf8');
+const escapedMarketing = version.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+pbx = pbx.replace(
+  /^(\s*)MARKETING_VERSION = [^;]+;$/gm,
+  `$1MARKETING_VERSION = "${escapedMarketing}";`,
+);
+pbx = pbx.replace(
+  /^(\s*)CURRENT_PROJECT_VERSION = \d+;$/gm,
+  `$1CURRENT_PROJECT_VERSION = ${androidVersionCode};`,
+);
+writeFileSync(iosPbxprojPath, pbx, 'utf8');
+
 console.log(
-  `Synced version to ${version} in ${jsonPaths.length} package.json, tauri.conf.json, and Cargo.toml.`,
+  `Synced version to ${version} in ${jsonPaths.length} package.json, tauri.conf.json, Cargo.toml, mobile/composeApp/build.gradle, and iosApp Xcode project (versionCode/build ${androidVersionCode}).`,
 );

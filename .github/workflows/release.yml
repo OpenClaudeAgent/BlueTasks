@@ -1,4 +1,4 @@
-# Bump workspace versions, update CHANGELOG, commit, push tag v*, then dispatch Docker + Desktop workflows.
+# Bump workspace versions, update CHANGELOG, commit, push tag v*, then dispatch Docker and Desktop workflows.
 # (Tag push with GITHUB_TOKEN does not trigger other workflows; we call workflow_dispatch explicitly.)
 name: Release
 run-name: Release v${{ inputs.version }}
@@ -101,7 +101,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json web/app/package.json server/package.json desktop/package.json desktop/src-tauri/tauri.conf.json desktop/src-tauri/Cargo.toml desktop/src-tauri/Cargo.lock CHANGELOG.md
+          git add package.json package-lock.json web/app/package.json server/package.json desktop/package.json desktop/src-tauri/tauri.conf.json desktop/src-tauri/Cargo.toml desktop/src-tauri/Cargo.lock CHANGELOG.md mobile/composeApp/build.gradle mobile/iosApp/iosApp.xcodeproj/project.pbxproj
           git status
           git commit -m "chore(release): v${V}"
           git tag "v${V}"

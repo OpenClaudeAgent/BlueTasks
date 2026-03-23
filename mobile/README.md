@@ -17,14 +17,34 @@ From this directory:
 # macOS (Homebrew): JDK 21 is often here even when `java_home -v 21` does not list it:
 export JAVA_HOME="$(/usr/libexec/java_home -v 21 2>/dev/null || echo /opt/homebrew/opt/openjdk@21/libexec/openjdk.jdk/Contents/Home)"
 
-./gradlew :shared:test
-./gradlew :composeApp:assembleDebug
 ./gradlew qualityGate
+./gradlew :composeApp:assembleDebug
+./gradlew androidUnitTestGate   # :shared + :composeApp JVM unit tests (commonTest) only
+./gradlew iosTestGate           # macOS + Xcode: Kotlin/Native tests on iOS Simulator arm64
+./gradlew androidConnectedTestGate   # device or emulator: :composeApp instrumented tests
 ```
 
-`qualityGate` runs **ktlint**, **detekt**, **`:shared:test`**, and **`:composeApp:lintDebug`**. From the repo root you can use `npm run mobile:quality` or `npm run mobile:ci` (gate + `assembleDebug`).
+`qualityGate` runs **ktlint**, **detekt**, **`androidUnitTestGate`** (`:shared:testDebugUnitTest` + `:composeApp:testDebugUnitTest`), **`koverGate`** (`koverVerify` — couverture JVM fusionnée `:shared` + `:composeApp`, seuil ligne ≥ **9 %** dans `mobile/build.gradle`), and **`:composeApp:lintDebug`**. From the repo root you can use `npm run mobile:quality` or `npm run mobile:ci` (gate + `assembleDebug`). Use `npm run mobile:ios-test` / `npm run mobile:android-unit-test` / `npm run mobile:android-connected` for the focused Gradle gates.
+
+### Couverture (Kover)
+
+[Kover](https://github.com/Kotlin/kotlinx-kover) mesure la couverture des tests **JVM** (dont `testDebugUnitTest` Android). Les tests **iOS natifs** et **instrumentés** ne sont pas inclus.
+
+```bash
+./gradlew koverLog           # résumé console
+./gradlew koverHtmlReport    # HTML : build/reports/kover/html/index.html (racine), + par module sous */build/reports/kover/
+./gradlew koverVerify        # même borne que le CI (qualityGate)
+```
+
+Depuis la racine du repo : `npm run mobile:kover` (rapports HTML + XML), `npm run mobile:kover-verify`.
+
+On **push / pull_request** to `main` or `master`, CI (`.github/workflows/ci.yml`) runs **mobile-android** (`npm run build:mobile-lexical` + `qualityGate` + `assembleDebug` on Ubuntu), **mobile-android-connected** (emulator + `connectedDebugAndroidTest`), and **mobile-ios** (`iosTestGate` on macOS).
 
 Individual checks still work: `./gradlew ktlintCheck`, `./gradlew detekt`.
+
+## Localization
+
+Edit string resources directly in `composeApp/src/commonMain/composeResources/`: default language in `values/strings.xml`, other locales in `values-<lang>/strings.xml` (same keys in every file). On **Android** and **iOS**, the UI language follows the **system** preferences; there is no separate in-app language setting.
 
 Open `composeApp` in Android Studio for an emulator or device.
 
@@ -78,7 +98,9 @@ That copies the bundle into `composeApp` Android assets and Compose resources (`
 
 ## GitHub Actions
 
-No mobile workflow runs on every push (keeps CI cost down). The manual workflow runs `npm ci` + `npm run build:mobile-lexical` at the repo root, then `./gradlew qualityGate :composeApp:assembleDebug` (Java 21).
+PR CI (`.github/workflows/ci.yml`) runs Lexical embed, `qualityGate`, debug APK, instrumented tests (emulator), and `iosTestGate` — not every push to arbitrary branches beyond `main`/`master`.
+
+**Release artifacts (optional):** run [**Mobile artifacts (unsigned)**](../.github/workflows/mobile-artifacts-unsigned.yml) from GitHub Actions (`workflow_dispatch`, pass an existing tag `v*`). It builds an **unsigned** AAB and an iOS Release **simulator** `.app` zip and uploads them to that tag’s GitHub Release. Not tied to PR CI or the monorepo Release workflow — see [docs/mobile-release-ci-plan.md](../docs/mobile-release-ci-plan.md).
 
 ## Module layout
 
