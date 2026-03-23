@@ -1,0 +1,23 @@
+# CocoaPods links the Kotlin/Compose framework built by :composeApp.
+# Run from mobile/iosApp: `pod install`, then open iosApp.xcworkspace in Xcode.
+
+deployment_target = '16.0'
+
+target 'iosApp' do
+  use_frameworks! :linkage => :static
+  platform :ios, deployment_target
+  pod 'composeApp', :path => '../composeApp'
+end
+
+post_install do |installer|
+  installer.generated_projects.each do |project|
+    project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = deployment_target
+      end
+    end
+    project.build_configurations.each do |config|
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = deployment_target
+    end
+  end
+end

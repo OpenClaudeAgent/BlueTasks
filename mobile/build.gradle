@@ -1,0 +1,77 @@
+plugins {
+    alias(libs.plugins.androidApplication) apply false
+    alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.kotlinCocoapods) apply false
+    alias(libs.plugins.kotlinMultiplatform) apply false
+    alias(libs.plugins.kotlinSerialization) apply false
+    alias(libs.plugins.composeMultiplatform) apply false
+    alias(libs.plugins.composeCompiler) apply false
+    alias(libs.plugins.ktlint) apply false
+    alias(libs.plugins.detekt) apply false
+    alias(libs.plugins.kover)
+}
+
+dependencies {
+    kover(project(':shared'))
+    kover(project(':composeApp'))
+}
+
+kover {
+    reports {
+        total {
+            filters {
+                excludes {
+                    packages(
+                        'com.bluetasks.mobile.generated',
+                        'com.bluetasks.mobile.generated.**',
+                    )
+                }
+            }
+            verify {
+                // Merged line % is dominated by untested composeApp UI; :shared alone is ~39%.
+                // Raise this floor as you add JVM-tested code (Kover does not see iOS / instrumented tests).
+                rule('merged-jvm-line-coverage') {
+                    minBound(9)
+                }
+            }
+        }
+    }
+}
+
+tasks.register('androidUnitTestGate') {
+    group = 'verification'
+    description = 'JVM unit tests for :shared and :composeApp (commonTest on Android debug).'
+    dependsOn ':shared:testDebugUnitTest', ':composeApp:testDebugUnitTest'
+}
+
+tasks.register('iosTestGate') {
+    group = 'verification'
+    description = 'Kotlin/Native tests on iOS Simulator arm64 (requires macOS + Xcode).'
+    dependsOn ':shared:iosSimulatorArm64Test', ':composeApp:iosSimulatorArm64Test'
+}
+
+tasks.register('androidConnectedTestGate') {
+    group = 'verification'
+    description = 'Instrumented tests on a device/emulator (:composeApp:connectedDebugAndroidTest).'
+    dependsOn ':composeApp:connectedDebugAndroidTest'
+}
+
+tasks.register('koverGate') {
+    group = 'verification'
+    description = 'Kover merged report + coverage bounds (JVM / Android unit tests only).'
+    dependsOn('koverVerify')
+}
+
+tasks.register('qualityGate') {
+    group = 'verification'
+    description = 'KtLint + Detekt + Android JVM unit tests + Kover + Android lintDebug (local/CI gate).'
+    dependsOn(
+        ':shared:ktlintCheck',
+        ':composeApp:ktlintCheck',
+        ':shared:detekt',
+        ':composeApp:detekt',
+        'androidUnitTestGate',
+        'koverGate',
+        ':composeApp:lintDebug',
+    )
+}

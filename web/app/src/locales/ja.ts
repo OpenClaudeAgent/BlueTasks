@@ -85,6 +85,7 @@ export default {
   today: '今日',
   tomorrow: '明日',
   nextWeek: '1週間後',
+  nextMonth: '1か月後',
   clearDate: 'クリア',
   noDate: '日付なし',
   noDateShort: '—',

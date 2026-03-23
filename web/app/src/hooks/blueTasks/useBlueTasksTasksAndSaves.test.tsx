@@ -331,4 +331,99 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
     expect(result.current.tasks.find((t) => t.id === 'del-fail-1')).toBeDefined();
     expect(tasksApi.remove).toHaveBeenCalledWith('del-fail-1');
   });
+
+  it('Scenario: Draft change for unknown task id When handler runs Then state and API stay untouched', async () => {
+    const row = mergeTaskFromApi({...createTask('Known'), id: 'only-1'} as never);
+    vi.mocked(tasksApi.list).mockResolvedValue([row as never]);
+    vi.mocked(categoriesApi.list).mockResolvedValue([]);
+
+    const {result} = renderHook(
+      () => {
+        const {t} = useTranslation();
+        return useBlueTasksTasksAndSaves(bridge, t);
+      },
+      {wrapper},
+    );
+    await waitFor(() => expect(result.current.tasks.some((t) => t.id === 'only-1')).toBe(true));
+
+    vi.useFakeTimers();
+    await act(async () => {
+      result.current.handleTaskDraftChange('missing-id', {title: 'ghost'});
+    });
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SAVE_DELAY_MS + 200);
+    });
+    vi.useRealTimers();
+
+    expect(tasksApi.update).not.toHaveBeenCalled();
+    expect(result.current.tasks.find((t) => t.id === 'only-1')?.title).toBe('Known');
+  });
+
+  it('Scenario: Status change on a task When debounced save is scheduled Then flush runs without waiting full delay', async () => {
+    const row = mergeTaskFromApi({...createTask('Flip'), id: 'status-1', status: 'pending'} as never);
+    vi.mocked(tasksApi.list).mockResolvedValue([row as never]);
+    vi.mocked(categoriesApi.list).mockResolvedValue([]);
+    vi.mocked(tasksApi.update).mockImplementation(async (_id, payload) =>
+      mergeTaskFromApi({...(row as never), ...payload} as never),
+    );
+
+    const {result} = renderHook(
+      () => {
+        const {t} = useTranslation();
+        return useBlueTasksTasksAndSaves(bridge, t);
+      },
+      {wrapper},
+    );
+    await waitFor(() => expect(result.current.tasks.some((t) => t.id === 'status-1')).toBe(true));
+
+    vi.useFakeTimers();
+    await act(async () => {
+      result.current.handleTaskDraftChange('status-1', {status: 'completed'});
+    });
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    vi.useRealTimers();
+
+    await waitFor(() => {
+      expect(tasksApi.update).toHaveBeenCalledWith(
+        'status-1',
+        expect.objectContaining({status: 'completed'}),
+      );
+    });
+  });
+
+  it('Scenario: Delete task with pending debounced save When remove succeeds Then timer is cleared and update is not applied later', async () => {
+    const row = mergeTaskFromApi({...createTask('Gone'), id: 'pending-del'} as never);
+    vi.mocked(tasksApi.list).mockResolvedValue([row as never]);
+    vi.mocked(categoriesApi.list).mockResolvedValue([]);
+    vi.mocked(tasksApi.remove).mockResolvedValue(undefined);
+
+    const {result} = renderHook(
+      () => {
+        const {t} = useTranslation();
+        return useBlueTasksTasksAndSaves(bridge, t);
+      },
+      {wrapper},
+    );
+    await waitFor(() => expect(result.current.tasks.some((t) => t.id === 'pending-del')).toBe(true));
+
+    vi.useFakeTimers();
+    await act(async () => {
+      result.current.handleTaskDraftChange('pending-del', {title: 'Never saved'});
+    });
+
+    await act(async () => {
+      await result.current.handleDelete('pending-del');
+    });
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(SAVE_DELAY_MS + 200);
+    });
+    vi.useRealTimers();
+
+    expect(tasksApi.update).not.toHaveBeenCalled();
+    expect(tasksApi.remove).toHaveBeenCalledWith('pending-del');
+    expect(result.current.tasks.find((t) => t.id === 'pending-del')).toBeUndefined();
+  });
 });

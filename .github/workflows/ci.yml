@@ -209,6 +209,65 @@ jobs:
       - run: npm ci
       - run: npm run build
 
+  mobile-android:
+    name: Mobile Android (Lexical + qualityGate + JVM tests + debug APK)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Build and verify embedded Lexical shell
+        run: npm run build:mobile-lexical
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - name: qualityGate + assembleDebug
+        working-directory: mobile
+        run: ./gradlew qualityGate :composeApp:assembleDebug --no-daemon
+
+  mobile-android-connected:
+    name: Mobile Android (instrumented tests, emulator)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - name: connectedDebugAndroidTest
+        uses: ReactiveCircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          script: cd mobile && ./gradlew :composeApp:connectedDebugAndroidTest --no-daemon
+
+  mobile-ios:
+    name: Mobile iOS (KMP iosSimulatorArm64 tests)
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v4
+      - name: iosTestGate
+        working-directory: mobile
+        run: ./gradlew iosTestGate --no-daemon
+
   e2e:
     name: E2E tests (Playwright ${{ matrix.shard }}/2)
     runs-on: ubuntu-latest

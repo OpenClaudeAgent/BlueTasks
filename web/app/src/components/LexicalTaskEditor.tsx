@@ -73,6 +73,7 @@ import {
 } from '../lib/editorState';
 import {registerCheckListAtomicCatchUp} from '../lib/lexicalCheckListAtomicCatchUp';
 import {registerCheckListRichEmptyParagraphExit} from '../lib/lexicalCheckListRichEmptyParagraphExit';
+import {registerCheckListTouchFix} from '../lib/lexicalCheckListTouchFix';
 import {registerParagraphLeadingTabCoalesce} from '../lib/lexicalParagraphLeadingTabCoalesce';
 import {CHECK_LIST_FLAT_TABS} from '../lib/lexicalMarkdownCheckListFlatTabs';
 import {registerTaskEditorTabCommands} from '../lib/lexicalTaskEditorTabCommands';
@@ -196,6 +197,7 @@ export function LexicalTaskEditor({value, placeholder, onChange, labels}: Props)
           <HistoryPlugin />
           <ListPlugin />
           <CheckListPlugin />
+          <CheckListTouchFixPlugin />
           <MarkdownShortcutPlugin transformers={MARKDOWN_TRANSFORMERS} />
           <CheckListAtomicCatchUpPlugin />
           <CheckListRichEmptyParagraphExitPlugin />
@@ -235,6 +237,14 @@ function CodeHighlightShikiPlugin() {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => registerTaskEditorCodeHighlighting(editor), [editor]);
+
+  return null;
+}
+
+function CheckListTouchFixPlugin() {
+  const [editor] = useLexicalComposerContext();
+
+  useEffect(() => registerCheckListTouchFix(editor), [editor]);
 
   return null;
 }

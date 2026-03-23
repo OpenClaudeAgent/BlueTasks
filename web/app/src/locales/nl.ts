@@ -86,6 +86,7 @@ export default {
   today: 'Vandaag',
   tomorrow: 'Morgen',
   nextWeek: 'Over een week',
+  nextMonth: 'Over een maand',
   clearDate: 'Wissen',
   noDate: 'Geen datum',
   noDateShort: '—',
