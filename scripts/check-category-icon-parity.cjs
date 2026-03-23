@@ -3,8 +3,8 @@
  * Ensures mobile category icon ids stay aligned with server/data/category-icon-ids.json
  * and that CategoryIconVector.kt maps every canonical id (run from repo root: npm run check:category-icon-parity).
  */
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
 const root = path.join(__dirname, '..');
 const jsonPath = path.join(root, 'server/data/category-icon-ids.json');
@@ -39,7 +39,9 @@ function sameOrder(a, b) {
 }
 
 if (!sameOrder(jsonIds, ktIds)) {
-  console.error('Mismatch: server/data/category-icon-ids.json vs CategoryIconIds.kt (order and contents must match).');
+  console.error(
+    'Mismatch: server/data/category-icon-ids.json vs CategoryIconIds.kt (order and contents must match).',
+  );
   console.error('JSON:', jsonIds.join(', '));
   console.error('KT:  ', ktIds.join(', '));
   process.exit(1);

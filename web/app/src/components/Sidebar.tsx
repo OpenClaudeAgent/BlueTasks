@@ -74,90 +74,90 @@ export function Sidebar({
 
       <div className="sidebar__scrollRegion">
         <nav className="sidebar__nav" aria-label={t('primaryNavigation')}>
-        {sectionOrder.map((section) => {
-          const Icon = sectionIcons[section];
-          return (
-            <button
-              key={section}
-              aria-label={
-                sidebarCompact ? `${t(`sections.${section}`)}, ${counts[section]}` : undefined
-              }
-              className={`sidebar__item ${selectedSection === section ? 'is-active' : ''}`}
-              onClick={() => onSelect(section)}
-              type="button"
-            >
-              <span className="sidebar__itemIcon">
-                <Icon size={22} />
-              </span>
-              <span className="sidebar__itemLabel">{t(`sections.${section}`)}</span>
-              <span className="sidebar__itemCount">{counts[section]}</span>
-            </button>
-          );
-        })}
-      </nav>
-
-      <div className="sidebar__categories">
-        <div className="sidebar__categoriesLabel" id="sidebar-categories-heading">
-          {t('categoriesNavLabel')}
-        </div>
-        <div
-          aria-label={sidebarCompact ? t('categoriesNavLabel') : undefined}
-          aria-labelledby={sidebarCompact ? undefined : 'sidebar-categories-heading'}
-          className="sidebar__categoriesNav"
-          role="group"
-        >
-          <button
-            aria-label={
-              sidebarCompact ? `${t('categoriesAll')}, ${categoryRowCounts.all}` : undefined
-            }
-            className={`sidebar__item ${categoryFilter === CATEGORY_FILTER_ALL ? 'is-active' : ''}`}
-            onClick={() => onCategoryFilterChange(CATEGORY_FILTER_ALL)}
-            type="button"
-          >
-            <span className="sidebar__itemIcon">
-              <Layers size={22} />
-            </span>
-            <span className="sidebar__itemLabel">{t('categoriesAll')}</span>
-            <span className="sidebar__itemCount">{categoryRowCounts.all}</span>
-          </button>
-          <button
-            aria-label={
-              sidebarCompact
-                ? `${t('categoriesUncategorized')}, ${categoryRowCounts.uncategorized}`
-                : undefined
-            }
-            className={`sidebar__item ${categoryFilter === CATEGORY_FILTER_UNCATEGORIZED ? 'is-active' : ''}`}
-            onClick={() => onCategoryFilterChange(CATEGORY_FILTER_UNCATEGORIZED)}
-            type="button"
-          >
-            <span className="sidebar__itemIcon">
-              <Folder size={22} />
-            </span>
-            <span className="sidebar__itemLabel">{t('categoriesUncategorized')}</span>
-            <span className="sidebar__itemCount">{categoryRowCounts.uncategorized}</span>
-          </button>
-          {categories.map((c) => {
-            const CatIcon = getCategoryIconComponent(c.icon);
+          {sectionOrder.map((section) => {
+            const Icon = sectionIcons[section];
             return (
               <button
-                key={c.id}
+                key={section}
                 aria-label={
-                  sidebarCompact ? `${c.name}, ${categoryRowCounts.byId[c.id] ?? 0}` : undefined
+                  sidebarCompact ? `${t(`sections.${section}`)}, ${counts[section]}` : undefined
                 }
-                className={`sidebar__item ${categoryFilter === c.id ? 'is-active' : ''}`}
-                onClick={() => onCategoryFilterChange(c.id)}
+                className={`sidebar__item ${selectedSection === section ? 'is-active' : ''}`}
+                onClick={() => onSelect(section)}
                 type="button"
               >
                 <span className="sidebar__itemIcon">
-                  <CatIcon size={22} />
+                  <Icon size={22} />
                 </span>
-                <span className="sidebar__itemLabel">{c.name}</span>
-                <span className="sidebar__itemCount">{categoryRowCounts.byId[c.id] ?? 0}</span>
+                <span className="sidebar__itemLabel">{t(`sections.${section}`)}</span>
+                <span className="sidebar__itemCount">{counts[section]}</span>
               </button>
             );
           })}
+        </nav>
+
+        <div className="sidebar__categories">
+          <div className="sidebar__categoriesLabel" id="sidebar-categories-heading">
+            {t('categoriesNavLabel')}
+          </div>
+          <div
+            aria-label={sidebarCompact ? t('categoriesNavLabel') : undefined}
+            aria-labelledby={sidebarCompact ? undefined : 'sidebar-categories-heading'}
+            className="sidebar__categoriesNav"
+            role="group"
+          >
+            <button
+              aria-label={
+                sidebarCompact ? `${t('categoriesAll')}, ${categoryRowCounts.all}` : undefined
+              }
+              className={`sidebar__item ${categoryFilter === CATEGORY_FILTER_ALL ? 'is-active' : ''}`}
+              onClick={() => onCategoryFilterChange(CATEGORY_FILTER_ALL)}
+              type="button"
+            >
+              <span className="sidebar__itemIcon">
+                <Layers size={22} />
+              </span>
+              <span className="sidebar__itemLabel">{t('categoriesAll')}</span>
+              <span className="sidebar__itemCount">{categoryRowCounts.all}</span>
+            </button>
+            <button
+              aria-label={
+                sidebarCompact
+                  ? `${t('categoriesUncategorized')}, ${categoryRowCounts.uncategorized}`
+                  : undefined
+              }
+              className={`sidebar__item ${categoryFilter === CATEGORY_FILTER_UNCATEGORIZED ? 'is-active' : ''}`}
+              onClick={() => onCategoryFilterChange(CATEGORY_FILTER_UNCATEGORIZED)}
+              type="button"
+            >
+              <span className="sidebar__itemIcon">
+                <Folder size={22} />
+              </span>
+              <span className="sidebar__itemLabel">{t('categoriesUncategorized')}</span>
+              <span className="sidebar__itemCount">{categoryRowCounts.uncategorized}</span>
+            </button>
+            {categories.map((c) => {
+              const CatIcon = getCategoryIconComponent(c.icon);
+              return (
+                <button
+                  key={c.id}
+                  aria-label={
+                    sidebarCompact ? `${c.name}, ${categoryRowCounts.byId[c.id] ?? 0}` : undefined
+                  }
+                  className={`sidebar__item ${categoryFilter === c.id ? 'is-active' : ''}`}
+                  onClick={() => onCategoryFilterChange(c.id)}
+                  type="button"
+                >
+                  <span className="sidebar__itemIcon">
+                    <CatIcon size={22} />
+                  </span>
+                  <span className="sidebar__itemLabel">{c.name}</span>
+                  <span className="sidebar__itemCount">{categoryRowCounts.byId[c.id] ?? 0}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
       </div>
 
       <div className="sidebar__footer">

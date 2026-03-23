@@ -360,7 +360,11 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
   });
 
   it('Scenario: Status change on a task When debounced save is scheduled Then flush runs without waiting full delay', async () => {
-    const row = mergeTaskFromApi({...createTask('Flip'), id: 'status-1', status: 'pending'} as never);
+    const row = mergeTaskFromApi({
+      ...createTask('Flip'),
+      id: 'status-1',
+      status: 'pending',
+    } as never);
     vi.mocked(tasksApi.list).mockResolvedValue([row as never]);
     vi.mocked(categoriesApi.list).mockResolvedValue([]);
     vi.mocked(tasksApi.update).mockImplementation(async (_id, payload) =>
@@ -406,7 +410,9 @@ describe('Feature: useBlueTasksTasksAndSaves', () => {
       },
       {wrapper},
     );
-    await waitFor(() => expect(result.current.tasks.some((t) => t.id === 'pending-del')).toBe(true));
+    await waitFor(() =>
+      expect(result.current.tasks.some((t) => t.id === 'pending-del')).toBe(true),
+    );
 
     vi.useFakeTimers();
     await act(async () => {

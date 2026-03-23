@@ -104,10 +104,10 @@ PR CI (`.github/workflows/ci.yml`) runs Lexical embed, `qualityGate`, debug APK,
 
 ## Module layout
 
-| Module       | Role                                                |
-| ------------ | --------------------------------------------------- |
-| `:shared`    | Domain filters/sort, Ktor client, API DTOs, session |
-| `:composeApp`| Material 3 UI, ViewModel, Android/iOS entry        |
+| Module        | Role                                                |
+| ------------- | --------------------------------------------------- |
+| `:shared`     | Domain filters/sort, Ktor client, API DTOs, session |
+| `:composeApp` | Material 3 UI, ViewModel, Android/iOS entry         |
 
 `composeApp` UI is split under `com.bluetasks.mobile.ui` — `screens/` (`ConnectScreen`, `MainBoardScreen`, `TaskEditorSheet`, `SettingsSheet`) and `components/` (e.g. `TaskRowCard`, category chips, icon mapping). `App.kt` wires the ViewModel, `FileBridge`, and dialogs.
 

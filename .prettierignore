@@ -1,5 +1,6 @@
 **/node_modules
 **/dist
+**/build
 **/coverage
 **/coverage-gate
 jscpd-report
@@ -16,3 +17,8 @@ package-lock.json
 **/*.eot
 LICENSE
 CHANGELOG.md
+# Vite bundle copied into the mobile embed (minified / generated)
+mobile/**/bluetasks_lexical/**/*.js
+mobile/**/bluetasks_lexical/**/*.css
+mobile/**/bluetasks_lexical/**/*.html
+mobile/iosApp/Pods/

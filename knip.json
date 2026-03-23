@@ -5,8 +5,11 @@
     "desktop/src/main.js",
     "scripts/bundle-server-docker.mjs",
     "scripts/docker-appPaths-stub.cjs",
-    "scripts/docker-prune-native-deps.mjs"
+    "scripts/docker-prune-native-deps.mjs",
+    "mobile/**/bluetasks_lexical/**/*.js",
+    "mobile/**/build/**"
   ],
+  "ignoreWorkspaces": ["web/mobile-lexical-shell"],
   "ignoreDependencies": ["esbuild"],
   "ignoreBinaries": ["shellcheck", "tauri"],
   "rules": {

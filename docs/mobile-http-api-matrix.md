@@ -6,18 +6,18 @@ This document maps the **Express server** routes to **web** and **Kotlin Multipl
 
 The server mounts only these JSON/multipart APIs (see `server/src/createApp.ts`):
 
-| Method | Path | Purpose |
-|--------|------|---------|
-| GET | `/api/tasks` | List all tasks |
-| POST | `/api/tasks` | Create task |
-| PUT | `/api/tasks/:id` | Update task |
-| DELETE | `/api/tasks/:id` | Delete task |
-| GET | `/api/categories` | List categories |
-| POST | `/api/categories` | Create category |
-| PUT | `/api/categories/:id` | Update category |
-| DELETE | `/api/categories/:id` | Delete category |
-| GET | `/api/export/database` | Download SQLite snapshot |
-| POST | `/api/import/database` | Replace DB (multipart field `database`) |
+| Method | Path                   | Purpose                                 |
+| ------ | ---------------------- | --------------------------------------- |
+| GET    | `/api/tasks`           | List all tasks                          |
+| POST   | `/api/tasks`           | Create task                             |
+| PUT    | `/api/tasks/:id`       | Update task                             |
+| DELETE | `/api/tasks/:id`       | Delete task                             |
+| GET    | `/api/categories`      | List categories                         |
+| POST   | `/api/categories`      | Create category                         |
+| PUT    | `/api/categories/:id`  | Update category                         |
+| DELETE | `/api/categories/:id`  | Delete category                         |
+| GET    | `/api/export/database` | Download SQLite snapshot                |
+| POST   | `/api/import/database` | Replace DB (multipart field `database`) |
 
 **Web client:** `web/app/src/api.ts` (`tasksApi`, `categoriesApi`, `downloadDatabaseExport`, `uploadDatabaseImport`).
 
@@ -27,9 +27,9 @@ There are **no additional public REST routes** on the server today; if the produ
 
 ## Functional gaps vs web (not separate APIs)
 
-| Area | API fields | Mobile today |
-|------|------------|--------------|
-| **Checklist** | `checklistTotal`, `checklistCompleted` | Passed through `toWritePayload` / `TaskWritePayload`; no mobile UI to edit checklist items (web uses Lexical). |
+| Area           | API fields                             | Mobile today                                                                                                                                                                                   |
+| -------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Checklist**  | `checklistTotal`, `checklistCompleted` | Passed through `toWritePayload` / `TaskWritePayload`; no mobile UI to edit checklist items (web uses Lexical).                                                                                 |
 | **Rich notes** | `contentJson` (Lexical), `contentText` | Phase A: mobile edits **plain text** only; `contentJson` is preserved on save when the editor does not replace it. See below and [mobile-rich-notes-phase-b.md](mobile-rich-notes-phase-b.md). |
 
 ## Lexical (`contentJson`) vs plain text (`contentText`)

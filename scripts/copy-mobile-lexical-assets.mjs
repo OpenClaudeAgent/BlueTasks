@@ -5,7 +5,12 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import {checkEmbedHtmlInvariants, lexicalAndroidAssetsDir, lexicalComposeEmbedDir, lexicalDistDir} from './mobile-lexical-embed-paths.mjs';
+import {
+  checkEmbedHtmlInvariants,
+  lexicalAndroidAssetsDir,
+  lexicalComposeEmbedDir,
+  lexicalDistDir,
+} from './mobile-lexical-embed-paths.mjs';
 
 const dist = lexicalDistDir;
 

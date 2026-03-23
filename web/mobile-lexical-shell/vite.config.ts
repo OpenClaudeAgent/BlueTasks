@@ -26,7 +26,10 @@ function lexicalShellEmbeddedWebViewPlugin(): Plugin {
       html = html.replaceAll(' crossorigin', '');
       html = html.replaceAll('<script type="module"', '<script defer');
       if (html.includes('<script src="./assets/index.js"') && !html.includes('<script defer')) {
-        html = html.replace('<script src="./assets/index.js"', '<script defer src="./assets/index.js"');
+        html = html.replace(
+          '<script src="./assets/index.js"',
+          '<script defer src="./assets/index.js"',
+        );
       }
       fs.writeFileSync(htmlPath, html);
     },

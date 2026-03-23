@@ -30,5 +30,9 @@ export default {
       files: ['**/src/index.css'],
       rules: legacyThemeRules,
     },
+    {
+      files: ['**/src/lexicalMobileShell.css'],
+      rules: legacyThemeRules,
+    },
   ],
 };

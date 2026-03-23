@@ -10,12 +10,12 @@
 
 ## Current repo state
 
-| Area | Status |
-|------|--------|
-| Mobile PR CI | `ci.yml`: Lexical bundle, `qualityGate`, debug APK, instrumented tests, `iosTestGate` |
+| Area             | Status                                                                                                                              |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Mobile PR CI     | `ci.yml`: Lexical bundle, `qualityGate`, debug APK, instrumented tests, `iosTestGate`                                               |
 | Monorepo version | `sync-package-version.mjs` updates **root / web / server / desktop** — **not** `mobile/composeApp/build.gradle` or iOS **CFBundle** |
-| Android release | No `bundleRelease` / signed AAB in CI |
-| iOS release | Xcode shell + CocoaPods + Gradle framework; no archive build in CI |
+| Android release  | No `bundleRelease` / signed AAB in CI                                                                                               |
+| iOS release      | Xcode shell + CocoaPods + Gradle framework; no archive build in CI                                                                  |
 
 **Product prerequisites:** final Play / App Store bundle IDs, developer accounts, distribution tracks (internal, TestFlight, production).
 
@@ -33,48 +33,53 @@
 
 2. **GitHub secrets** (suggested names)
 
-   **Android (Play App Signing or upload key)**  
-   - `ANDROID_KEYSTORE_BASE64` — base64-encoded keystore  
-   - `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`  
+   **Android (Play App Signing or upload key)**
+   - `ANDROID_KEYSTORE_BASE64` — base64-encoded keystore
+   - `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`
    - Optional: **Play** **service account** JSON (`GOOGLE_PLAY_SERVICE_ACCOUNT_JSON`) for `r0adkll/upload-google-play`.
 
-   **iOS**  
-   - **Option A:** distribution certificate + provisioning profile as secrets (`IOS_DISTRIBUTION_CERT_BASE64`, `IOS_DISTRIBUTION_CERT_PASSWORD`, `IOS_PROVISION_PROFILE_BASE64`) + `APPLE_TEAM_ID`, `APPLE_ID`, `APP_SPECIFIC_PASSWORD` (notary / altool if needed).  
-   - **Option B:** **Fastlane match** with encrypted repo + `MATCH_PASSWORD`.  
+   **iOS**
+   - **Option A:** distribution certificate + provisioning profile as secrets (`IOS_DISTRIBUTION_CERT_BASE64`, `IOS_DISTRIBUTION_CERT_PASSWORD`, `IOS_PROVISION_PROFILE_BASE64`) + `APPLE_TEAM_ID`, `APPLE_ID`, `APP_SPECIFIC_PASSWORD` (notary / altool if needed).
+   - **Option B:** **Fastlane match** with encrypted repo + `MATCH_PASSWORD`.
    - **Option C:** **Xcode Cloud** or local signed build + manual upload (CI only produces unsigned artifacts).
 
-3. **Gradle signing (Android)**  
+3. **Gradle signing (Android)**
    - `mobile/composeApp`: `signingConfigs.release` gated on secret presence (do not commit the keystore).
 
 ### Phase 1 — CI “release artifacts” (no store)
 
 **Trigger:** `workflow_dispatch` with input `tag: vX.Y.Z` **or** `repository_dispatch` / `gh workflow run` from **Release** (same as Docker and Desktop).
 
-**Android job (`ubuntu-latest`)**  
-- Checkout at tag  
-- `npm ci` + `npm run build:mobile-lexical`  
-- JDK 21 + Android SDK (`android-actions/setup-android`)  
-- `./gradlew :composeApp:bundleRelease` (or `assembleRelease`) with signing when secrets exist  
-- **Upload artifact:** `*.aab` and/or `*.apk` + checksum  
+**Android job (`ubuntu-latest`)**
 
-**iOS job (`macos-latest`)**  
-- Checkout at tag  
-- Same Lexical + JDK 21  
-- `./gradlew :composeApp:generateDummyFramework` (or equivalent per [mobile/README](../mobile/README.md)), then `pod install` under `mobile/iosApp`  
-- `xcodebuild -workspace iosApp.xcworkspace -scheme iosApp -configuration Release -archivePath build/iosApp.xcarchive archive`  
-- If signing is configured: `xcodebuild -exportArchive` with `ExportOptions.plist` (App Store / ad hoc)  
-- **Upload artifact:** `.ipa` or zipped `.xcarchive`  
+- Checkout at tag
+- `npm ci` + `npm run build:mobile-lexical`
+- JDK 21 + Android SDK (`android-actions/setup-android`)
+- `./gradlew :composeApp:bundleRelease` (or `assembleRelease`) with signing when secrets exist
+- **Upload artifact:** `*.aab` and/or `*.apk` + checksum
 
-**GitHub Release**  
+**iOS job (`macos-latest`)**
+
+- Checkout at tag
+- Same Lexical + JDK 21
+- `./gradlew :composeApp:generateDummyFramework` (or equivalent per [mobile/README](../mobile/README.md)), then `pod install` under `mobile/iosApp`
+- `xcodebuild -workspace iosApp.xcworkspace -scheme iosApp -configuration Release -archivePath build/iosApp.xcarchive archive`
+- If signing is configured: `xcodebuild -exportArchive` with `ExportOptions.plist` (App Store / ad hoc)
+- **Upload artifact:** `.ipa` or zipped `.xcarchive`
+
+**GitHub Release**
+
 - Reuse the `softprops/action-gh-release` pattern from [desktop-publish.yml](../.github/workflows/desktop-publish.yml) to attach mobile artifacts to the **same** `v*` release (needs `contents: write` and coordination with desktop or a dedicated “assemble release assets” job).
 
 ### Phase 2 — Store deployment (optional)
 
-**Android — Google Play**  
-- After a successful signed bundle job: **upload** to **internal** / **closed** track, then manual promotion to production.  
+**Android — Google Play**
+
+- After a successful signed bundle job: **upload** to **internal** / **closed** track, then manual promotion to production.
 - Common actions: `r0adkll/upload-google-play` or **fastlane** `supply`.
 
-**iOS — TestFlight / App Store**  
+**iOS — TestFlight / App Store**
+
 - After `.ipa` export: **fastlane** `pilot` / `deliver`, or `apple-actions/upload-testflight-build`, with App Store Connect API key (`ASC_API_KEY` JSON + Issuer ID + Key ID).
 
 ### Phase 3 — Monorepo **Release** integration (optional)
@@ -133,28 +138,28 @@ Tune artifact names, signing, and **permissions** if uploading to the GitHub rel
 
 ## Risks and constraints
 
-| Risk | Mitigation |
-|------|------------|
-| iOS + CocoaPods build time | Cache Gradle + Pods; `macos-14` / `macos-latest` runners |
-| Lexical bundle skipped | Always run `npm run build:mobile-lexical` before Gradle / Xcode |
-| iOS signing (certs) | Prefer **match** or documented, rotatable secrets |
-| Tag without aligned mobile version | Phase 0 required before promising store semver consistency |
-| **Kover / tests** | Do not gate release on them; keep `qualityGate` on `main` (already in CI) |
+| Risk                               | Mitigation                                                                |
+| ---------------------------------- | ------------------------------------------------------------------------- |
+| iOS + CocoaPods build time         | Cache Gradle + Pods; `macos-14` / `macos-latest` runners                  |
+| Lexical bundle skipped             | Always run `npm run build:mobile-lexical` before Gradle / Xcode           |
+| iOS signing (certs)                | Prefer **match** or documented, rotatable secrets                         |
+| Tag without aligned mobile version | Phase 0 required before promising store semver consistency                |
+| **Kover / tests**                  | Do not gate release on them; keep `qualityGate` on `main` (already in CI) |
 
 ---
 
 ## Checklist before first store release
 
-- [ ] Mobile version synced with tag `v*` (script + Release workflow).  
-- [ ] Android `versionCode` bumped on each Play upload (Play requirement).  
-- [ ] Privacy policy / store listings if required.  
-- [ ] Screenshots and metadata in App Store Connect + Play Console.  
+- [ ] Mobile version synced with tag `v*` (script + Release workflow).
+- [ ] Android `versionCode` bumped on each Play upload (Play requirement).
+- [ ] Privacy policy / store listings if required.
+- [ ] Screenshots and metadata in App Store Connect + Play Console.
 - [ ] Manual smoke test on CI artifact before production.
 
 ---
 
 ## Internal references
 
-- [mobile/README.md](../mobile/README.md) — Gradle, iOS, Lexical.  
-- [releasing.md](releasing.md) — Release flow, Desktop, Docker.  
+- [mobile/README.md](../mobile/README.md) — Gradle, iOS, Lexical.
+- [releasing.md](releasing.md) — Release flow, Desktop, Docker.
 - [ci.yml](../.github/workflows/ci.yml) — existing mobile jobs.
