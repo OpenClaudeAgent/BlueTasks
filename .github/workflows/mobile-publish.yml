@@ -47,13 +47,13 @@ jobs:
             echo "Skipping build:mobile-lexical on this ref (use committed bluetasks_lexical assets)."
           fi
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
 
-      - uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: android-actions/setup-android@v4
+      - uses: gradle/actions/setup-gradle@v6
 
       - name: assembleRelease + bundleRelease (unsigned)
         working-directory: mobile
@@ -113,13 +113,13 @@ jobs:
             echo "Skipping build:mobile-lexical on this ref (use committed bluetasks_lexical assets)."
           fi
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
 
-      - uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: android-actions/setup-android@v4
+      - uses: gradle/actions/setup-gradle@v6
 
       - name: CocoaPods + KMP framework
         working-directory: mobile
