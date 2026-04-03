@@ -176,4 +176,29 @@ describe('Feature: useBlueTasksBoard composition', () => {
       'today',
     );
   });
+
+  it('Scenario: Expanded task — pointerdown outside the card clears selection', async () => {
+    mockUi.selectedTaskId = 't1';
+    const card = document.createElement('article');
+    card.className = 'taskCard';
+    card.dataset.taskId = 't1';
+    const outside = document.createElement('div');
+    document.body.append(card, outside);
+
+    const {unmount} = renderBoard();
+    try {
+      await waitFor(() => {
+        expect(mockUi.setSelectedTaskId).toHaveBeenCalled();
+      });
+      vi.clearAllMocks();
+      outside.dispatchEvent(new PointerEvent('pointerdown', {bubbles: true}));
+      await waitFor(() => {
+        expect(mockUi.setSelectedTaskId).toHaveBeenCalledWith(null);
+      });
+    } finally {
+      unmount();
+      card.remove();
+      outside.remove();
+    }
+  });
 });

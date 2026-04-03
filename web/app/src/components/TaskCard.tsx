@@ -48,6 +48,7 @@ function TaskCardComponent({
   return (
     <article
       className={`taskCard ${expanded ? 'is-expanded' : ''} ${task.status === 'completed' ? 'is-completed' : ''}`}
+      data-task-id={task.id}
     >
       <TaskCardHeaderRow
         CategoryGlyph={chrome.CategoryGlyph}

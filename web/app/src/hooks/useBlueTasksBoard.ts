@@ -5,6 +5,7 @@ import {CATEGORY_FILTER_ALL, CATEGORY_FILTER_UNCATEGORIZED} from '../types';
 import {useBlueTasksTasksAndSaves} from './blueTasks/useBlueTasksTasksAndSaves';
 import {useBlueTasksUiState} from './blueTasks/useBlueTasksUiState';
 import {useBoardTimerNowMs} from './useBoardTimerNowMs';
+import {useDismissExpandedTaskOnOutsidePointerDown} from './useDismissExpandedTaskOnOutsidePointerDown';
 
 /**
  * Composes UI state + tasks/categories persistence. See `useBlueTasksUiState` and `useBlueTasksTasksAndSaves`.
@@ -91,6 +92,12 @@ export function useBlueTasksBoard() {
     },
     [setSelectedTaskId],
   );
+
+  const dismissExpandedTask = useCallback(() => {
+    setSelectedTaskId(null);
+  }, [setSelectedTaskId]);
+
+  useDismissExpandedTaskOnOutsidePointerDown(selectedTaskId, dismissExpandedTask);
 
   const clearTitleFocusTaskId = useCallback(() => {
     setTitleFocusTaskId(null);
