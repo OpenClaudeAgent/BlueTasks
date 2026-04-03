@@ -16,12 +16,12 @@ jobs:
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v6
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '21'
-      - uses: android-actions/setup-android@v3
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: android-actions/setup-android@v4
+      - uses: gradle/actions/setup-gradle@v6
       - uses: ReactiveCircus/android-emulator-runner@v2
         with:
           api-level: 34
