@@ -51,7 +51,9 @@ test.describe('Task card: click outside to collapse', () => {
 
     await page.getByRole('button', {name: titleB, exact: true}).click();
 
-    await expect(taskCardByTitle(page, titleB).getByRole('textbox', {name: 'Task title'})).toBeVisible();
+    await expect(
+      taskCardByTitle(page, titleB).getByRole('textbox', {name: 'Task title'}),
+    ).toBeVisible();
     await expect(cardA.getByRole('button', {name: titleA, exact: true})).toBeVisible();
     await expect(cardA.getByRole('textbox', {name: 'Task title'})).toHaveCount(0);
   });

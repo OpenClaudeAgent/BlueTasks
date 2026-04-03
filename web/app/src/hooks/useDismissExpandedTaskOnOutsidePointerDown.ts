@@ -10,7 +10,10 @@ export function useDismissExpandedTaskOnOutsidePointerDown(
   onDismiss: () => void,
 ) {
   const onDismissRef = useRef(onDismiss);
-  onDismissRef.current = onDismiss;
+
+  useEffect(() => {
+    onDismissRef.current = onDismiss;
+  });
 
   useEffect(() => {
     if (!selectedTaskId) {
