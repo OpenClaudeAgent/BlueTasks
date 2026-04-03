@@ -8,6 +8,9 @@
     "web/mobile-lexical-shell",
     "server"
   ],
+  "overrides": {
+    "path-to-regexp": "^8.4.2"
+  },
   "scripts": {
     "dev": "concurrently -k \"npm run dev --workspace server\" \"npm run dev --workspace web/app\"",
     "check:category-icon-parity": "node scripts/check-category-icon-parity.cjs",
