@@ -62,7 +62,7 @@ test.describe('Category filters', () => {
       .getByRole('button', {name: /Project X/})
       .click();
     await expect(page.locator('.taskBoard__count')).toHaveText('1');
-    await expect(page.getByRole('button', {name: 'Assigned'})).toBeVisible();
+    await expect(taskCardByTitle(page, 'Assigned')).toBeVisible();
 
     await request.delete(`/api/categories/${category.id}`);
   });

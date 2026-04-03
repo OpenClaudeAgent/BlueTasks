@@ -25,7 +25,9 @@ test.describe('Notes', () => {
     const editor = card.locator('.editor__input');
     await editor.click();
     await editor.pressSequentially(noteSnippet);
-    await page.locator('.mainHeader__title').click();
+    // Blur via locator (not a main-panel click): clicking the page header collapses the
+    // expanded card and unmounts the editor, which breaks this assertion.
+    await editor.blur();
     await expect(editor).toContainText(noteSnippet);
     await expect
       .poll(
