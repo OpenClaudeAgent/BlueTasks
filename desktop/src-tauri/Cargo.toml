@@ -1,6 +1,6 @@
 [package]
 name = "desktop"
-version = "0.3.6"
+version = "0.3.7"
 description = "BlueTasks desktop (Tauri + embedded Node)"
 authors = ["BlueTasks"]
 edition = "2021"
