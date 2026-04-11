@@ -39,6 +39,13 @@ kotlin {
         commonTest {
             dependencies {
                 implementation libs.kotlin.test
+                implementation libs.ktor.client.mock
+            }
+        }
+        androidUnitTest {
+            dependencies {
+                // Ktor + SLF4J on JVM unit tests must not bind slf4j-android (needs mocked android.util.Log).
+                implementation libs.slf4j.nop
             }
         }
         androidMain {

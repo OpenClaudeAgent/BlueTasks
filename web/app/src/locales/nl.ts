@@ -22,6 +22,7 @@ export default {
   settingsNoCategoriesYet: 'Nog geen categorieën — voeg er hierboven een toe.',
   settingsCategoryTaskCount: '{{count}} taken',
   settingsDeleteCategoryConfirm: 'Categorie „{{name}}” verwijderen?',
+  settingsDeleteCategoryDialogTitle: 'Categorie verwijderen?',
   settingsDeleteCategoryWithTasks:
     'Categorie „{{name}}” verwijderen? {{count}} ta(a)k(en) worden niet toegewezen.',
   settingsRenameCategory: 'Categorie hernoemen',

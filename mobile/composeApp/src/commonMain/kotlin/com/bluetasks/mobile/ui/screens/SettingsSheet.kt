@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -60,6 +61,9 @@ import com.bluetasks.mobile.generated.settings_category_icon
 import com.bluetasks.mobile.generated.settings_category_tasks_count
 import com.bluetasks.mobile.generated.settings_data_intro
 import com.bluetasks.mobile.generated.settings_delete
+import com.bluetasks.mobile.generated.settings_delete_category_message
+import com.bluetasks.mobile.generated.settings_delete_category_title
+import com.bluetasks.mobile.generated.settings_delete_category_with_tasks
 import com.bluetasks.mobile.generated.settings_new_category
 import com.bluetasks.mobile.generated.settings_rename
 import com.bluetasks.mobile.generated.settings_save
@@ -104,12 +108,13 @@ public fun SettingsSheet(
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         contentColor = MaterialTheme.colorScheme.onSurface,
     ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .verticalScroll(sheetScrollState)
-                .padding(16.dp),
-        ) {
+        Box(Modifier.fillMaxWidth()) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(sheetScrollState)
+                    .padding(16.dp),
+            ) {
             SettingsTabChips(
                 selected = state.settingsTab,
                 onSelect = vm::setSettingsTab,
@@ -199,6 +204,34 @@ public fun SettingsSheet(
                 }
             }
             Spacer(Modifier.height(24.dp))
+            }
+            state.pendingCategoryDelete?.let { pending ->
+                val msg =
+                    if (pending.taskCount > 0) {
+                        stringResource(
+                            Res.string.settings_delete_category_with_tasks,
+                            pending.name,
+                            pending.taskCount,
+                        )
+                    } else {
+                        stringResource(Res.string.settings_delete_category_message, pending.name)
+                    }
+                AlertDialog(
+                    onDismissRequest = { vm.dismissCategoryDelete() },
+                    title = { Text(stringResource(Res.string.settings_delete_category_title)) },
+                    text = { Text(msg) },
+                    confirmButton = {
+                        Button(onClick = { vm.confirmCategoryDelete() }) {
+                            Text(stringResource(Res.string.settings_delete))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { vm.dismissCategoryDelete() }) {
+                            Text(stringResource(Res.string.cancel))
+                        }
+                    },
+                )
+            }
         }
     }
 }

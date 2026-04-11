@@ -19,10 +19,6 @@ import com.bluetasks.mobile.generated.cancel
 import com.bluetasks.mobile.generated.import_replace_confirm
 import com.bluetasks.mobile.generated.import_replace_message
 import com.bluetasks.mobile.generated.import_replace_title
-import com.bluetasks.mobile.generated.settings_delete
-import com.bluetasks.mobile.generated.settings_delete_category_message
-import com.bluetasks.mobile.generated.settings_delete_category_title
-import com.bluetasks.mobile.generated.settings_delete_category_with_tasks
 import com.bluetasks.mobile.ui.screens.ConnectScreen
 import com.bluetasks.mobile.ui.screens.MainBoardScreen
 import com.bluetasks.mobile.ui.screens.SettingsSheet
@@ -106,33 +102,6 @@ public fun App(fileBridge: FileBridge) {
                 )
             }
 
-            state.pendingCategoryDelete?.let { pending ->
-                val msg =
-                    if (pending.taskCount > 0) {
-                        stringResource(
-                            Res.string.settings_delete_category_with_tasks,
-                            pending.name,
-                            pending.taskCount,
-                        )
-                    } else {
-                        stringResource(Res.string.settings_delete_category_message, pending.name)
-                    }
-                AlertDialog(
-                    onDismissRequest = { vm.dismissCategoryDelete() },
-                    title = { Text(stringResource(Res.string.settings_delete_category_title)) },
-                    text = { Text(msg) },
-                    confirmButton = {
-                        Button(onClick = { vm.confirmCategoryDelete() }) {
-                            Text(stringResource(Res.string.settings_delete))
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { vm.dismissCategoryDelete() }) {
-                            Text(stringResource(Res.string.cancel))
-                        }
-                    },
-                )
-            }
         }
     }
 }

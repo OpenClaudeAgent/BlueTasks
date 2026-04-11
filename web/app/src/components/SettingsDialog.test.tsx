@@ -1,6 +1,6 @@
 /** @vitest-environment jsdom */
 import {describe, expect, it, vi, beforeEach, afterEach} from 'vitest';
-import {render, screen} from '@testing-library/react';
+import {render, screen, within} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {I18nextProvider} from 'react-i18next';
 import i18n from '../i18n';
@@ -194,9 +194,9 @@ describe('SettingsDialog', () => {
     });
   });
 
-  it('Scenario: Categories — user deletes empty category after confirm', async () => {
+  it('Scenario: Categories — user deletes empty category via in-app confirm (no window.confirm)', async () => {
     const user = userEvent.setup();
-    vi.spyOn(window, 'confirm').mockReturnValue(true);
+    const confirmSpy = vi.spyOn(window, 'confirm');
     const onCategoriesUpdated = vi.fn().mockResolvedValue(undefined);
     render(
       <I18nextProvider i18n={i18n}>
@@ -209,9 +209,34 @@ describe('SettingsDialog', () => {
         />
       </I18nextProvider>,
     );
-    await screen.findByRole('dialog');
-    await user.click(screen.getByRole('button', {name: 'Delete'}));
+    const settingsDialog = await screen.findByRole('dialog');
+    await user.click(within(settingsDialog).getByRole('button', {name: /^delete$/i}));
+    expect(confirmSpy).not.toHaveBeenCalled();
+    const alertDialog = await screen.findByRole('alertdialog');
+    await user.click(within(alertDialog).getByRole('button', {name: /^delete$/i}));
     expect(categoriesRemoveMock).toHaveBeenCalledWith(sampleCategory.id);
+    await expect.poll(() => onCategoriesUpdated.mock.calls.length).toBeGreaterThan(0);
+    confirmSpy.mockRestore();
+  });
+
+  it('Scenario: Categories — user cancels delete in alert dialog', async () => {
+    const user = userEvent.setup();
+    render(
+      <I18nextProvider i18n={i18n}>
+        <SettingsDialog
+          categories={[sampleCategory]}
+          onCategoriesUpdated={async () => {}}
+          onOpenChange={() => {}}
+          open
+          taskCountByCategoryId={{[sampleCategory.id]: 0}}
+        />
+      </I18nextProvider>,
+    );
+    const settingsDialog = await screen.findByRole('dialog');
+    await user.click(within(settingsDialog).getByRole('button', {name: /^delete$/i}));
+    const alertDialog = await screen.findByRole('alertdialog');
+    await user.click(within(alertDialog).getByRole('button', {name: /cancel/i}));
+    expect(categoriesRemoveMock).not.toHaveBeenCalled();
   });
 
   it('Scenario: Categories — user adds category with Enter in name field', async () => {

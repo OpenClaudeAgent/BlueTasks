@@ -89,10 +89,20 @@ public class BlueTasksAppViewModel(
 
     init {
         val url = settings.apiBaseUrl
+        val savedSection = settings.boardSection
+        val section =
+            if (savedSection in sectionIds) {
+                savedSection
+            } else {
+                settings.boardSection = SECTION_TODAY
+                SECTION_TODAY
+            }
         _state.value =
             AppUiState(
                 baseUrlDraft = url,
                 savedBaseUrl = url,
+                section = section,
+                categoryFilter = settings.boardCategoryFilter,
             )
         if (url.isNotBlank()) {
             viewModelScope.launch { connectInternal(url) }
@@ -135,6 +145,7 @@ public class BlueTasksAppViewModel(
                                 savedBaseUrl = url,
                                 error = null,
                             )
+                        applyCategoryFilterIfStale(cats)
                     },
                     onFailure = { e ->
                         _state.value = _state.value.copy(loading = false, error = e.message ?: "Categories failed")
@@ -147,6 +158,22 @@ public class BlueTasksAppViewModel(
                 _state.value = _state.value.copy(loading = false, error = e.message ?: "Cannot reach server")
             },
         )
+    }
+
+    private fun categoryFilterValidForCategories(
+        filter: String,
+        categories: List<ApiCategoryRow>,
+    ): Boolean =
+        when (filter) {
+            FILTER_CATEGORY_ALL, FILTER_CATEGORY_UNCATEGORIZED -> true
+            else -> categories.any { it.id == filter }
+        }
+
+    private fun applyCategoryFilterIfStale(categories: List<ApiCategoryRow>) {
+        val current = _state.value.categoryFilter
+        if (categoryFilterValidForCategories(current, categories)) return
+        settings.boardCategoryFilter = FILTER_CATEGORY_ALL
+        _state.value = _state.value.copy(categoryFilter = FILTER_CATEGORY_ALL)
     }
 
     public fun refresh() {
@@ -163,6 +190,7 @@ public class BlueTasksAppViewModel(
                                     tasks = list,
                                     categories = cats.sortedBy { it.sortIndex },
                                 )
+                            applyCategoryFilterIfStale(cats)
                         },
                         onFailure = { e ->
                             _state.value = _state.value.copy(loading = false, error = e.message)
@@ -177,10 +205,13 @@ public class BlueTasksAppViewModel(
     }
 
     public fun setSection(section: String) {
+        if (section !in sectionIds) return
+        settings.boardSection = section
         _state.value = _state.value.copy(section = section)
     }
 
     public fun setCategoryFilter(filter: String) {
+        settings.boardCategoryFilter = filter
         _state.value = _state.value.copy(categoryFilter = filter)
     }
 
@@ -341,9 +372,15 @@ public class BlueTasksAppViewModel(
         viewModelScope.launch {
             s.api.deleteCategory(id).fold(
                 onSuccess = {
+                    val wasFilter = _state.value.categoryFilter == id
+                    val nextFilter = if (wasFilter) FILTER_CATEGORY_ALL else _state.value.categoryFilter
+                    if (wasFilter) {
+                        settings.boardCategoryFilter = FILTER_CATEGORY_ALL
+                    }
                     _state.value =
                         _state.value.copy(
                             categories = _state.value.categories.filter { it.id != id },
+                            categoryFilter = nextFilter,
                             tasks =
                                 _state.value.tasks.map { t ->
                                     if (t.categoryId == id) t.copy(categoryId = null) else t
