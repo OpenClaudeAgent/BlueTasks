@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -60,6 +61,9 @@ import com.bluetasks.mobile.generated.settings_category_icon
 import com.bluetasks.mobile.generated.settings_category_tasks_count
 import com.bluetasks.mobile.generated.settings_data_intro
 import com.bluetasks.mobile.generated.settings_delete
+import com.bluetasks.mobile.generated.settings_delete_category_message
+import com.bluetasks.mobile.generated.settings_delete_category_title
+import com.bluetasks.mobile.generated.settings_delete_category_with_tasks
 import com.bluetasks.mobile.generated.settings_new_category
 import com.bluetasks.mobile.generated.settings_rename
 import com.bluetasks.mobile.generated.settings_save
@@ -104,101 +108,130 @@ public fun SettingsSheet(
         containerColor = MaterialTheme.colorScheme.surfaceVariant,
         contentColor = MaterialTheme.colorScheme.onSurface,
     ) {
-        Column(
-            Modifier
-                .fillMaxWidth()
-                .verticalScroll(sheetScrollState)
-                .padding(16.dp),
-        ) {
-            SettingsTabChips(
-                selected = state.settingsTab,
-                onSelect = vm::setSettingsTab,
-                generalLabel = stringResource(Res.string.general_tab),
-                categoriesLabel = stringResource(Res.string.categories_tab),
-            )
-            Spacer(Modifier.height(16.dp))
-            when (state.settingsTab) {
-                SettingsTab.General -> {
-                    Text(
-                        stringResource(Res.string.settings_data_intro),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    OutlinedTextField(
-                        value = state.baseUrlDraft,
-                        onValueChange = vm::updateBaseUrlDraft,
-                        label = { Text(stringResource(Res.string.server_url_hint)) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Button(onClick = { vm.connect() }, modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(Res.string.connect))
+        Box(Modifier.fillMaxWidth()) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(sheetScrollState)
+                    .padding(16.dp),
+            ) {
+                SettingsTabChips(
+                    selected = state.settingsTab,
+                    onSelect = vm::setSettingsTab,
+                    generalLabel = stringResource(Res.string.general_tab),
+                    categoriesLabel = stringResource(Res.string.categories_tab),
+                )
+                Spacer(Modifier.height(16.dp))
+                when (state.settingsTab) {
+                    SettingsTab.General -> {
+                        Text(
+                            stringResource(Res.string.settings_data_intro),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                        Spacer(Modifier.height(12.dp))
+                        OutlinedTextField(
+                            value = state.baseUrlDraft,
+                            onValueChange = vm::updateBaseUrlDraft,
+                            label = { Text(stringResource(Res.string.server_url_hint)) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Button(onClick = { vm.connect() }, modifier = Modifier.fillMaxWidth()) {
+                            Text(stringResource(Res.string.connect))
+                        }
                     }
-                }
-                SettingsTab.Categories -> {
-                    Text(
-                        stringResource(Res.string.settings_category_icon),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 6.dp),
-                    )
-                    SettingsCategoryIconStrip(
-                        selectedIconId = state.newCategoryIcon,
-                        onSelectIcon = vm::updateNewCategoryIcon,
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    OutlinedTextField(
-                        value = state.newCategoryName,
-                        onValueChange = vm::updateNewCategoryName,
-                        label = { Text(stringResource(Res.string.settings_new_category)) },
-                        modifier = Modifier.fillMaxWidth(),
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    SettingsFullWidthIconButton(
-                        onClick = { vm.addCategory() },
-                        icon = { Icon(Lucide.Plus, contentDescription = null, modifier = Modifier.size(SettingsChipIcon)) },
-                        label = { Text(stringResource(Res.string.settings_add_category)) },
-                    )
-                    Spacer(Modifier.height(16.dp))
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        state.categories.forEach { c ->
-                            val taskCount = state.tasks.count { it.categoryId == c.id }
-                            if (editingId == c.id) {
-                                SettingsCategoryEditCard(
-                                    editName = editName,
-                                    onEditNameChange = { editName = it },
-                                    editIcon = editIcon,
-                                    onSelectEditIcon = { editIcon = it },
-                                    onCancel = { editingId = null },
-                                    onSave = {
-                                        vm.updateCategory(c.id, editName, editIcon)
-                                        editingId = null
-                                    },
-                                )
-                            } else {
-                                SettingsCategoryListRow(
-                                    categoryIconId = c.icon,
-                                    name = c.name,
-                                    taskCountText = stringResource(Res.string.settings_category_tasks_count, taskCount),
-                                    onEdit = {
-                                        editingId = c.id
-                                        editName = c.name
-                                        editIcon = c.icon
-                                    },
-                                    onDelete = { vm.requestCategoryDelete(c.id) },
-                                    renameContentDescription = stringResource(Res.string.settings_rename),
-                                    deleteContentDescription = stringResource(Res.string.settings_delete),
-                                )
+                    SettingsTab.Categories -> {
+                        Text(
+                            stringResource(Res.string.settings_category_icon),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(bottom = 6.dp),
+                        )
+                        SettingsCategoryIconStrip(
+                            selectedIconId = state.newCategoryIcon,
+                            onSelectIcon = vm::updateNewCategoryIcon,
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = state.newCategoryName,
+                            onValueChange = vm::updateNewCategoryName,
+                            label = { Text(stringResource(Res.string.settings_new_category)) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        SettingsFullWidthIconButton(
+                            onClick = { vm.addCategory() },
+                            icon = { Icon(Lucide.Plus, contentDescription = null, modifier = Modifier.size(SettingsChipIcon)) },
+                            label = { Text(stringResource(Res.string.settings_add_category)) },
+                        )
+                        Spacer(Modifier.height(16.dp))
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            state.categories.forEach { c ->
+                                val taskCount = state.tasks.count { it.categoryId == c.id }
+                                if (editingId == c.id) {
+                                    SettingsCategoryEditCard(
+                                        editName = editName,
+                                        onEditNameChange = { editName = it },
+                                        editIcon = editIcon,
+                                        onSelectEditIcon = { editIcon = it },
+                                        onCancel = { editingId = null },
+                                        onSave = {
+                                            vm.updateCategory(c.id, editName, editIcon)
+                                            editingId = null
+                                        },
+                                    )
+                                } else {
+                                    SettingsCategoryListRow(
+                                        categoryIconId = c.icon,
+                                        name = c.name,
+                                        taskCountText = stringResource(Res.string.settings_category_tasks_count, taskCount),
+                                        onEdit = {
+                                            editingId = c.id
+                                            editName = c.name
+                                            editIcon = c.icon
+                                        },
+                                        onDelete = { vm.requestCategoryDelete(c.id) },
+                                        renameContentDescription = stringResource(Res.string.settings_rename),
+                                        deleteContentDescription = stringResource(Res.string.settings_delete),
+                                    )
+                                }
                             }
                         }
                     }
                 }
+                Spacer(Modifier.height(24.dp))
             }
-            Spacer(Modifier.height(24.dp))
+            state.pendingCategoryDelete?.let { pending ->
+                val msg =
+                    if (pending.taskCount > 0) {
+                        stringResource(
+                            Res.string.settings_delete_category_with_tasks,
+                            pending.name,
+                            pending.taskCount,
+                        )
+                    } else {
+                        stringResource(Res.string.settings_delete_category_message, pending.name)
+                    }
+                AlertDialog(
+                    onDismissRequest = { vm.dismissCategoryDelete() },
+                    title = { Text(stringResource(Res.string.settings_delete_category_title)) },
+                    text = { Text(msg) },
+                    confirmButton = {
+                        Button(onClick = { vm.confirmCategoryDelete() }) {
+                            Text(stringResource(Res.string.settings_delete))
+                        }
+                    },
+                    dismissButton = {
+                        TextButton(onClick = { vm.dismissCategoryDelete() }) {
+                            Text(stringResource(Res.string.cancel))
+                        }
+                    },
+                )
+            }
         }
     }
 }

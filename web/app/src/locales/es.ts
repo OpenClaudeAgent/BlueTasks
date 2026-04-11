@@ -21,6 +21,7 @@ export default {
   settingsNoCategoriesYet: 'Aún no hay categorías — añade una arriba.',
   settingsCategoryTaskCount: '{{count}} tareas',
   settingsDeleteCategoryConfirm: '¿Eliminar la categoría «{{name}}»?',
+  settingsDeleteCategoryDialogTitle: '¿Eliminar categoría?',
   settingsDeleteCategoryWithTasks:
     '¿Eliminar la categoría «{{name}}»? {{count}} tarea(s) quedarán sin categoría.',
   settingsRenameCategory: 'Renombrar categoría',

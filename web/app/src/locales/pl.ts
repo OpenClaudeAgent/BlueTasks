@@ -21,6 +21,7 @@ export default {
   settingsNoCategoriesYet: 'Brak kategorii — dodaj jedną powyżej.',
   settingsCategoryTaskCount: '{{count}} zadań',
   settingsDeleteCategoryConfirm: 'Usunąć kategorię „{{name}}”?',
+  settingsDeleteCategoryDialogTitle: 'Usunąć kategorię?',
   settingsDeleteCategoryWithTasks:
     'Usunąć kategorię „{{name}}”? {{count}} zadań stanie się nieprzypisanych.',
   settingsRenameCategory: 'Zmień nazwę kategorii',

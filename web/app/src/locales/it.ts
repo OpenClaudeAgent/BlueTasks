@@ -21,6 +21,7 @@ export default {
   settingsNoCategoriesYet: 'Nessuna categoria — aggiungine una sopra.',
   settingsCategoryTaskCount: '{{count}} attività',
   settingsDeleteCategoryConfirm: 'Eliminare la categoria «{{name}}»?',
+  settingsDeleteCategoryDialogTitle: 'Eliminare la categoria?',
   settingsDeleteCategoryWithTasks:
     'Eliminare la categoria «{{name}}»? {{count}} attività resteranno senza categoria.',
   settingsRenameCategory: 'Rinomina categoria',

@@ -21,6 +21,7 @@ export default {
   settingsNoCategoriesYet: 'カテゴリはまだありません。上から追加してください。',
   settingsCategoryTaskCount: '{{count}} 件のタスク',
   settingsDeleteCategoryConfirm: 'カテゴリ「{{name}}」を削除しますか？',
+  settingsDeleteCategoryDialogTitle: 'カテゴリを削除しますか？',
   settingsDeleteCategoryWithTasks:
     'カテゴリ「{{name}}」を削除しますか？ {{count}} 件のタスクは未分類になります。',
   settingsRenameCategory: 'カテゴリ名を変更',

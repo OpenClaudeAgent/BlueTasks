@@ -58,12 +58,14 @@ test.describe('Settings: categories CRUD', () => {
     await dialog.getByPlaceholder('New category name').fill('EmptyZone');
     await dialog.getByRole('button', {name: 'Add'}).click();
 
-    page.once('dialog', (d) => void d.accept());
     await dialog
       .locator('.settingsDialog__row')
       .filter({hasText: 'EmptyZone'})
       .getByRole('button', {name: 'Delete'})
       .click();
+
+    const deleteConfirm = page.getByRole('alertdialog');
+    await deleteConfirm.getByRole('button', {name: 'Delete'}).click();
 
     await expect(dialog.getByText('EmptyZone')).toHaveCount(0);
     await page.keyboard.press('Escape');
@@ -89,15 +91,15 @@ test.describe('Settings: categories CRUD', () => {
     const dialog = page.getByRole('dialog', {name: 'Settings'});
     await dialog.getByRole('button', {name: 'Categories'}).click();
 
-    page.once('dialog', (d) => {
-      expect(d.message()).toContain('WithTasks');
-      void d.accept();
-    });
     await dialog
       .locator('.settingsDialog__row')
       .filter({hasText: 'WithTasks'})
       .getByRole('button', {name: 'Delete'})
       .click();
+
+    const deleteConfirm = page.getByRole('alertdialog');
+    await expect(deleteConfirm.getByText(/WithTasks/)).toBeVisible();
+    await deleteConfirm.getByRole('button', {name: 'Delete'}).click();
 
     await expect(dialog.getByText('WithTasks')).toHaveCount(0);
     await page.keyboard.press('Escape');
