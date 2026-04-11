@@ -101,7 +101,6 @@ public fun App(fileBridge: FileBridge) {
                     },
                 )
             }
-
         }
     }
 }
