@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.3.8] - 2026-04-11
+
+- Fix category delete (mobile bottom sheet + web/Tauri AlertDialog); persist board section and category filter; delete API tests.
+
 ## [0.3.7] - 2026-04-03
 
 - Re-export API row asserts in scenario/server; split calendar keys (dateKeys); extract TaskCardFooter pickers.
@@ -104,7 +108,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Initial published image tag `v0.1.0` (multi-arch GHCR workflow).
 
-[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.7...HEAD
+[Unreleased]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.8...HEAD
+[0.3.8]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.7...v0.3.8
 [0.3.7]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.6-ci-test...v0.3.7
 [0.3.6]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.6-ci-test...v0.3.6
 [0.3.5]: https://github.com/OpenClaudeAgent/BlueTasks/compare/v0.3.4...v0.3.5
