@@ -56,23 +56,23 @@
     "mobile:ci": "cd mobile && ./gradlew qualityGate :composeApp:assembleDebug --no-daemon"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.11.1",
+    "@axe-core/playwright": "^4.11.3",
     "@eslint/js": "^10.0.1",
-    "@playwright/test": "^1.59.1",
+    "@playwright/test": "^1.60.0",
     "axe-core": "^4.11.2",
-    "concurrently": "^9.2.1",
+    "concurrently": "^10.0.3",
     "esbuild": "^0.28.0",
-    "eslint": "^10.1.0",
+    "eslint": "^10.4.1",
     "eslint-config-prettier": "^10.1.1",
-    "eslint-plugin-playwright": "^2.10.1",
-    "eslint-plugin-sonarjs": "^4.0.2",
+    "eslint-plugin-playwright": "^2.10.4",
+    "eslint-plugin-sonarjs": "^4.0.3",
     "eslint-plugin-unicorn": "^64.0.0",
-    "globals": "^17.4.0",
-    "jscpd": "^4.0.8",
-    "knip": "^6.3.0",
-    "markdownlint-cli2": "^0.22.0",
-    "prettier": "^3.6.2",
-    "typescript-eslint": "^8.58.0",
-    "zod": "^4.3.6"
+    "globals": "^17.6.0",
+    "jscpd": "^4.2.4",
+    "knip": "^6.16.1",
+    "markdownlint-cli2": "^0.22.1",
+    "prettier": "^3.8.3",
+    "typescript-eslint": "^8.60.1",
+    "zod": "^4.4.3"
   }
 }
